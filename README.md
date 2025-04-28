@@ -9,7 +9,7 @@ A focused lineup of projects that span AI, automation, and technical problem-sol
 - 🏙️ **Neighborhood Matchmaker** – A GPT-4 powered tool that helps users find ideal neighborhoods based on lifestyle and preferences.
 - 🌍 **Language Translation Tool** – An intelligent document translator that automates context-aware translations across multiple formats.
 - 📈 **Risky** – A portfolio optimization platform that uses LLMs and financial data to help users make smarter investment decisions.
-- 📈 **Ranker** – An AI-driven report generator that can compare companies within an industry, automating financial analysis, leadership profiling and market research
+- 📈 **Infera** – An AI-driven report generator that can compare companies within an industry, automating financial analysis, leadership profiling and market research
 - 💡 **Prompting 101** – A distilled guide to mastering prompt engineering for large language models, small language models and reasoning models.
 
 Each project reflects my interest in building practical tools that make complex systems more intuitive, more accessible, and more human-friendly.
