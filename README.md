@@ -20,7 +20,7 @@ Each project reflects my interest in building practical tools that make complex 
 - Hosted on **GitHub Pages**
 - Project links and visuals sourced directly from my GitHub repos
 
-> This is more than a list of projects — it's a snapshot of how I think and what I care about building.
+> This is a snapshot of how I think and what I care about building.
 
 ## Setup (For Devs)
 
