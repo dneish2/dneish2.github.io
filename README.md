@@ -1,6 +1,6 @@
 # The Neishfolio
 
-Welcome to my portfolio hub, hosted via GitHub Pages at [dneish2.github.io](https://dneish2.github.io). This is where I collect, showcase, and occasionally riff on the projects that best represent what I do as a software engineer and systems thinker.
+Welcome to my portfolio hub, hosted via GitHub Pages at [dneish2.github.io](https://dneish2.github.io). This is where I collect, showcase, and occasionally reflect on the projects that best represent what I do as a software engineer and systems thinker.
 
 ## What You’ll Find Here
 
