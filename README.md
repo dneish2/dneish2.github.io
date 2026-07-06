@@ -32,8 +32,10 @@ assets/js/hero.js                       decision-graph canvas + scramble tagline
 
 ## Local preview
 
-```bash
-git clone https://github.com/dneish2/dneish2.github.io
-cd dneish2.github.io
-python -m http.server 8080   # root-relative URLs need a server, not file://
-```
+Double-click `index.html` — the site uses relative paths, so it renders fully from `file://`, no server needed. (A server works too: `python -m http.server 8080`.)
+
+## Drop-in slots
+
+- `assets/img/portrait.jpg` — profile photo; the About placeholder swaps itself out the moment the file exists (4:5 crop looks best).
+- `work/land-tax-sale/` — self-contained prototype folder; then flip the "publishing soon" chip on the homepage card to a link.
+- Figma case study + design deck URLs — replace the two "publishing soon" chips in the Real Estate cluster.

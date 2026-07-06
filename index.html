@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://dneish2.github.io/" />
   <meta name="theme-color" content="#0E0D0B" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23E3A83B' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23E3A83B'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/main.css" />
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -21,11 +21,11 @@
 <!-- SITE-HEADER v1 -->
 <header class="site-header">
   <div class="inner">
-    <a class="wordmark" href="/">DN<span class="tick">_</span></a>
+    <a class="wordmark" href="index.html">DN<span class="tick">_</span></a>
     <nav class="site-nav" aria-label="Site">
-      <a href="/#work">Work</a>
-      <a href="/writing/">Writing</a>
-      <a href="/#about">About</a>
+      <a href="#work">Work</a>
+      <a href="writing/index.html">Writing</a>
+      <a href="#about">About</a>
       <a class="nav-cta" href="mailto:david.neishm@gmail.com">Email</a>
     </nav>
   </div>
@@ -43,7 +43,7 @@
       <p class="tagline" data-scramble="I build systems that make better decisions under pressure.">I build systems that make better decisions under pressure.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#work">See the work &darr;</a>
-        <a class="btn btn-ghost" href="/writing/">Read the writing &rarr;</a>
+        <a class="btn btn-ghost" href="writing/index.html">Read the writing &rarr;</a>
       </div>
     </div>
   </section>
@@ -51,7 +51,14 @@
   <!-- ============================== ORIGIN ============================== -->
   <section class="origin" id="about">
     <div class="container">
-      <div class="beats">
+      <div class="origin-grid">
+        <figure class="portrait" data-reveal>
+          <div class="frame">
+            <img src="assets/img/portrait.jpg" alt="David Neish" onerror="this.parentElement.classList.add('placeholder'); this.remove();" />
+          </div>
+          <figcaption>David Neish</figcaption>
+        </figure>
+        <div class="beats">
         <div class="beat" data-reveal style="--i:0">
           <span class="mark">15 &rarr;</span>
           <p><strong>Built my first PC to win, not to browse.</strong> Grinding League and Minecraft tournaments taught me game theory and optimization under pressure.</p>
@@ -63,6 +70,7 @@
         <div class="beat" data-reveal style="--i:2">
           <span class="mark">&rarr; Now</span>
           <p><strong>AI decision systems, end to end.</strong> Finance, language, research &mdash; built in the open, measured honestly, written up here.</p>
+        </div>
         </div>
       </div>
     </div>
@@ -105,7 +113,7 @@
 
             <p class="stack-line" data-reveal>Python (stdlib backend) &middot; React + Vite &middot; Ollama&rarr;Claude router &middot; Supabase</p>
             <div class="cta-row" data-reveal>
-              <a class="btn btn-primary" href="/writing/finplatform-architecture.html">Architecture notes &rarr;</a>
+              <a class="btn btn-primary" href="writing/finplatform-architecture.html">Architecture notes &rarr;</a>
               <a class="btn btn-ghost" href="https://www.youtube.com/watch?v=3lWuJoMPnBc" rel="noopener">Lineage: Infera demo</a>
               <a class="btn btn-ghost" href="https://youtu.be/ZJJTWE1hNQE" rel="noopener">Lineage: Risky demo</a>
             </div>
@@ -239,11 +247,11 @@
       <div class="section-head" data-reveal>
         <span class="kicker" style="margin:0">Notes &amp; deep dives</span>
         <span class="rule"></span>
-        <a class="kicker mono" style="margin:0" href="/writing/">All writing &rarr;</a>
+        <a class="kicker mono" style="margin:0" href="writing/index.html">All writing &rarr;</a>
       </div>
 
       <div class="writing-list">
-        <a class="writing-row" href="/writing/article-1.html" data-reveal style="--i:0">
+        <a class="writing-row" href="writing/article-1.html" data-reveal style="--i:0">
           <span class="chip chip-soon">In draft</span>
           <span>
             <h3>Essay No. 1</h3>
@@ -251,7 +259,7 @@
           </span>
           <span class="arrow">&rarr;</span>
         </a>
-        <a class="writing-row" href="/writing/finplatform-architecture.html" data-reveal style="--i:1">
+        <a class="writing-row" href="writing/finplatform-architecture.html" data-reveal style="--i:1">
           <span class="chip chip-soon">In draft</span>
           <span>
             <h3>finplatform: a reference architecture</h3>
@@ -259,7 +267,7 @@
           </span>
           <span class="arrow">&rarr;</span>
         </a>
-        <a class="writing-row" href="/writing/real-estate-playbook.html" data-reveal style="--i:2">
+        <a class="writing-row" href="writing/real-estate-playbook.html" data-reveal style="--i:2">
           <span class="chip chip-soon">In draft</span>
           <span>
             <h3>The real estate playbook</h3>
@@ -268,6 +276,62 @@
           <span class="arrow">&rarr;</span>
         </a>
       </div>
+    </div>
+  </section>
+
+  <!-- ============================== VIGNETTE ============================== -->
+  <section class="vignette-section">
+    <div class="container">
+      <figure class="vignette" data-reveal>
+        <svg class="beach" viewBox="0 0 340 150" role="img" aria-label="Line drawing of David reclining on a beach chair with a laptop and a coconut drink, palm tree swaying, sun over the water">
+          <!-- sun -->
+          <circle class="vg-sun" cx="272" cy="34" r="13" fill="#E3A83B" />
+          <!-- horizon -->
+          <line x1="0" y1="92" x2="340" y2="92" stroke="rgba(237,232,222,0.18)" stroke-width="1" />
+          <!-- waves (wavelength 40px; drift loops one wavelength) -->
+          <path class="vg-wave vg-wave-a" d="M-40 102 q 10 -6 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="rgba(237,232,222,0.22)" stroke-width="1" />
+          <path class="vg-wave vg-wave-b" d="M-40 112 q 10 -4 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="rgba(237,232,222,0.12)" stroke-width="1" />
+          <!-- sand -->
+          <path d="M0 150 L0 132 Q 170 122 340 132 L340 150 Z" fill="rgba(237,232,222,0.05)" />
+          <!-- gulls -->
+          <path d="M96 42 q 4 -4 8 0 q 4 -4 8 0 M126 32 q 3 -3 6 0 q 3 -3 6 0" fill="none" stroke="rgba(237,232,222,0.30)" stroke-width="1" stroke-linecap="round" />
+          <!-- palm -->
+          <g class="vg-palm" fill="none" stroke="rgba(237,232,222,0.55)" stroke-width="1.5" stroke-linecap="round">
+            <path d="M30 132 C 32 110 36 88 46 70" />
+            <path d="M46 70 Q 30 58 14 62" />
+            <path d="M46 70 Q 40 52 24 48" />
+            <path d="M46 70 Q 56 50 70 46" />
+            <path d="M46 70 Q 60 60 76 66" />
+            <path d="M46 70 Q 36 74 24 82" />
+            <circle cx="43" cy="73" r="2.5" fill="rgba(237,232,222,0.35)" stroke="none" />
+            <circle cx="50" cy="74" r="2.5" fill="rgba(237,232,222,0.35)" stroke="none" />
+          </g>
+          <!-- chair + figure + laptop -->
+          <g fill="none" stroke="rgba(237,232,222,0.55)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- lounge chair -->
+            <path d="M150 96 L168 114 L206 116" />
+            <path d="M172 116 L172 130 M200 117 L200 130 M158 104 L154 130" />
+            <!-- person -->
+            <circle cx="145" cy="89" r="6" />
+            <path d="M151 94 L170 109" />
+            <path d="M170 109 L187 102 L197 112" />
+            <!-- arm to keyboard -->
+            <path d="M158 100 L172 105" />
+            <!-- laptop -->
+            <path d="M173 106 L186 103" />
+            <path d="M186 103 L183 92 L177 94" />
+          </g>
+          <!-- laptop screen glow -->
+          <polygon class="vg-screen" points="183.5,93 186,103 178.5,104.5 177.5,94.5" fill="#E3A83B" />
+          <!-- side table + coconut -->
+          <g fill="none" stroke="rgba(237,232,222,0.55)" stroke-width="1.5" stroke-linecap="round">
+            <path d="M222 130 L222 118 M214 118 L230 118" />
+            <circle cx="222" cy="111" r="6" />
+            <path d="M224 106 L230 96" stroke="#E3A83B" />
+          </g>
+        </svg>
+        <figcaption>Meanwhile &mdash; shipping from anywhere with a horizon.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -286,7 +350,7 @@
 </footer>
 <!-- /SITE-FOOTER -->
 
-<script src="/assets/js/main.js" defer></script>
-<script src="/assets/js/hero.js" defer></script>
+<script src="assets/js/main.js" defer></script>
+<script src="assets/js/hero.js" defer></script>
 </body>
 </html>
