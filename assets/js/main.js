@@ -32,4 +32,27 @@
   // Footer year.
   var year = document.querySelector('[data-year]');
   if (year) year.textContent = String(new Date().getFullYear());
+
+  // Footer sign-off types itself when it scrolls into view.
+  var signoff = document.querySelector('.site-footer .signoff');
+  var motionOK = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+  if (signoff && motionOK && 'IntersectionObserver' in window) {
+    var full = signoff.textContent;
+    new IntersectionObserver(function (entries, obs) {
+      if (!entries[0].isIntersecting) return;
+      obs.disconnect();
+      signoff.classList.add('typing');
+      signoff.textContent = '';
+      var i = 0;
+      (function step() {
+        i += 1;
+        signoff.textContent = full.slice(0, i);
+        if (i < full.length) {
+          setTimeout(step, 26);
+        } else {
+          setTimeout(function () { signoff.classList.remove('typing'); }, 1400);
+        }
+      })();
+    }, { threshold: 0.5 }).observe(signoff);
+  }
 })();

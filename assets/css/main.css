@@ -447,14 +447,14 @@ img { max-width: 100%; height: auto; display: block; }
 }
 .origin-grid {
   display: grid;
-  grid-template-columns: 190px 1fr;
+  grid-template-columns: 280px 1fr;
   gap: var(--s-5);
   align-items: center;
 }
 .origin .beats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s-4);
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s-4) var(--s-5);
 }
 
 /* portrait — drop assets/img/portrait.jpg and the placeholder disappears */
@@ -684,7 +684,30 @@ img { max-width: 100%; height: auto; display: block; }
   }
   .vg-sun { animation: vg-glow 6s ease-in-out infinite; }
   .vg-screen { animation: vg-flicker 3.5s ease-in-out infinite; }
+  .vg-shimmer { animation: vg-shimmerpulse 5s ease-in-out infinite; }
+  .vg-gulls {
+    transform-box: fill-box;
+    animation: vg-bob 7s ease-in-out infinite alternate;
+  }
 }
+
+/* sunset mode — click the sun */
+.vg-sky { opacity: 0; transition: opacity 2.5s ease; pointer-events: none; }
+.vg-sun { cursor: pointer; transition: transform 2.8s ease, fill 2.8s ease; }
+.vg-shimmer { opacity: 0.3; transition: stroke 2.8s ease; }
+.beach.sunset .vg-sky { opacity: 0.35; }
+.beach.sunset .vg-sun { transform: translateY(44px); fill: #A34A58; animation: none; }
+.beach.sunset .vg-shimmer { stroke: #A34A58; }
+
+/* hover — the laptop wakes up and a thought appears */
+.vg-bubble {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.beach:hover .vg-bubble { opacity: 1; transform: none; }
+.beach:hover .vg-screen { animation: none; opacity: 1; }
 @keyframes vg-drift { to { transform: translateX(-40px); } }
 @keyframes vg-sway {
   from { transform: rotate(-1.5deg); }
@@ -699,6 +722,42 @@ img { max-width: 100%; height: auto; display: block; }
   40%      { opacity: 0.95; }
   60%      { opacity: 0.65; }
 }
+@keyframes vg-shimmerpulse {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.45; }
+}
+@keyframes vg-bob {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-4px); }
+}
+
+/* router diagram — the request dot rides the amber path */
+.req-dot { opacity: 0; }
+@supports (offset-path: path("M0 0 L1 1")) {
+  @media (prefers-reduced-motion: no-preference) {
+    .req-dot {
+      offset-path: path("M56 158 L140 158 L216 164 L254 190 L302 190");
+      offset-rotate: 0deg;
+      animation: req-travel 4.5s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+    }
+  }
+}
+@keyframes req-travel {
+  0%        { offset-distance: 0%; opacity: 0; }
+  8%        { opacity: 1; }
+  72%       { offset-distance: 100%; opacity: 1; }
+  84%, 100% { offset-distance: 100%; opacity: 0; }
+}
+
+/* footer sign-off typewriter caret */
+.site-footer .signoff { min-height: 1.3em; }
+.site-footer .signoff.typing::after {
+  content: "_";
+  color: var(--accent);
+  margin-left: 2px;
+  animation: caret-blink 0.9s steps(2, start) infinite;
+}
+@keyframes caret-blink { 50% { opacity: 0; } }
 
 /* --------------------------------------------------------------------------
    6. PAGE — writing index + articles
@@ -798,14 +857,15 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 @media (max-width: 860px) and (min-width: 641px) {
-  .origin-grid { grid-template-columns: 160px 1fr; gap: var(--s-4); }
+  .origin-grid { grid-template-columns: 220px 1fr; gap: var(--s-4); }
   .origin .beats { grid-template-columns: 1fr; gap: var(--s-3); }
 }
 
 @media (max-width: 640px) {
   .hero { min-height: 60vh; padding-top: var(--s-6); }
   .origin-grid { grid-template-columns: 1fr; gap: var(--s-4); }
-  .portrait { max-width: 210px; margin: 0 auto; width: 100%; }
+  .portrait { max-width: 260px; margin: 0 auto; width: 100%; }
+  .origin .beats { grid-template-columns: 1fr; }
   .origin .beats { grid-template-columns: 1fr; gap: var(--s-3); }
   .writing-row { grid-template-columns: 1fr; gap: 0.5rem; }
   .writing-row .arrow { display: none; }

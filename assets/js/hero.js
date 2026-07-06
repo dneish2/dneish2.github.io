@@ -240,6 +240,22 @@
 
   init();
 
+  // --- beach vignette: click the sun for sunset ----------------------------------
+  var beach = document.querySelector('.beach');
+  if (beach) {
+    var sun = beach.querySelector('.vg-sun');
+    if (sun) {
+      var toggle = function () { beach.classList.toggle('sunset'); };
+      sun.addEventListener('click', toggle);
+      sun.setAttribute('tabindex', '0');
+      sun.setAttribute('role', 'button');
+      sun.setAttribute('aria-label', 'Toggle sunset');
+      sun.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    }
+  }
+
   // --- scramble tagline ---------------------------------------------------------
   // Resolves the hero one-liner character by character, once, on load.
   var el = document.querySelector('[data-scramble]');

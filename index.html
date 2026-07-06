@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>David Neish — Decision Systems</title>
-  <meta name="description" content="David Neish builds AI decision systems for finance, language, and research. Portfolio and writing: finplatform, Passage, Prompting-101, and real estate work." />
+  <meta name="description" content="David Neish builds AI decision systems for finance, language, and research. Portfolio and writing: finplatform, Passage, real estate tools, and a prompting field guide." />
   <link rel="canonical" href="https://dneish2.github.io/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="David Neish — Decision Systems" />
@@ -59,18 +59,22 @@
           <figcaption>David Neish</figcaption>
         </figure>
         <div class="beats">
-        <div class="beat" data-reveal style="--i:0">
-          <span class="mark">15 &rarr;</span>
-          <p><strong>Built my first PC to win, not to browse.</strong> Grinding League and Minecraft tournaments taught me game theory and optimization under pressure.</p>
-        </div>
-        <div class="beat" data-reveal style="--i:1">
-          <span class="mark">&rarr; Mastercard</span>
-          <p><strong>The same instincts, at enterprise scale.</strong> Components I&rsquo;ve built power edge microservices on Mastercard&rsquo;s payment network &mdash; billions of transactions, no room for guesses.</p>
-        </div>
-        <div class="beat" data-reveal style="--i:2">
-          <span class="mark">&rarr; Now</span>
-          <p><strong>AI decision systems, end to end.</strong> Finance, language, research &mdash; built in the open, measured honestly, written up here.</p>
-        </div>
+          <div class="beat" data-reveal style="--i:0">
+            <span class="mark">15 &rarr;</span>
+            <p><strong>Built my first PC to win, not to browse.</strong> Tournament League and Minecraft. Game theory, fast decisions, no tilt. The obsession started there.</p>
+          </div>
+          <div class="beat" data-reveal style="--i:1">
+            <span class="mark">&rarr; College</span>
+            <p><strong>CS at SUNY Fredonia.</strong> Built a voice assistant with Paychex, kept 5,000 dorm residents online, and ran the campus eSports lounge. Real problems, real people, real deadlines.</p>
+          </div>
+          <div class="beat" data-reveal style="--i:2">
+            <span class="mark">&rarr; Mastercard</span>
+            <p><strong>Five years powering payments at scale.</strong> My components run in the edge microservices behind 1.2M+ daily transactions. Led Silent Mode for 8583 authorization. Automated CI/CD that gives back 250+ engineering hours a quarter.</p>
+          </div>
+          <div class="beat" data-reveal style="--i:3">
+            <span class="mark">&rarr; Now</span>
+            <p><strong>AI decision systems, end to end.</strong> Building in the open, measuring honestly, and studying Human-Computer Interaction at Indiana University. The goal: AI that feels obvious to use.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -90,28 +94,28 @@
         <div class="flagship-grid">
           <div>
             <span class="kicker" data-reveal><span class="idx">01</span> &mdash; AI research terminal &middot; Flagship</span>
-            <h2 data-reveal>finplatform &mdash; research that tells you the truth</h2>
-            <p class="one-liner" data-reveal>An AI financial research terminal: one place to screen stocks, price options, research private companies, and pressure-test your own ideas.</p>
+            <h2 data-reveal>finplatform. Research that tells you the truth.</h2>
+            <p class="one-liner" data-reveal>My AI research terminal. Screen stocks, read options clearly, dig into private companies, and pressure-test an idea before you put money behind it.</p>
 
             <div class="proof-row" data-reveal>
-              <div class="stat"><span class="n">5&rarr;1</span><span class="l">apps consolidated into one terminal</span></div>
-              <div class="stat"><span class="n">16</span><span class="l">backtest configurations, reported honestly</span></div>
-              <div class="stat"><span class="n">local &rarr; Claude</span><span class="l">tiered model router, pick honored end-to-end</span></div>
-              <div class="stat"><span class="n">4</span><span class="l">behavior invariants under continuous eval</span></div>
+              <div class="stat"><span class="n">5&rarr;1</span><span class="l">five apps merged into one terminal</span></div>
+              <div class="stat"><span class="n">local &rarr; Claude</span><span class="l">one router, your model pick honored end to end</span></div>
+              <div class="stat"><span class="n">4</span><span class="l">invariants every answer is evaluated against</span></div>
+              <div class="stat"><span class="n">1&rarr;10</span><span class="l">credits per request, priced per model, shown up front</span></div>
             </div>
 
             <div data-reveal>
-              <p>Every request rides a tiered router &mdash; from a local model on my own GPU up to Claude &mdash; and the model you pick is honored by every feature, with credits metered per model. Nothing is hidden behind a vague &ldquo;AI&rdquo; label: the interface tells you which model answered and what it cost.</p>
-              <p>The surfaces: a metric-driven screener where adding one metric definition buys filter, sort, and column for free; an options clarity panel on live chains &mdash; expected move, move needed, odds; a private-company research pipeline with a market map; auth with server-side JWT verification.</p>
-              <p>Under it all is an honesty layer: a custom test harness and an LLM behavior eval that holds every answer to four invariants &mdash; no fabrication, injection resistance, honest caveats, and abstention when the data isn&rsquo;t there.</p>
+              <p>The hard part isn&rsquo;t calling a model. It&rsquo;s calling the right one, at the right cost, and proving the answer is good. Every request rides a tiered router: quantized local models on my RTX 5090 through Ollama for the fast, cheap work, Claude when the question deserves frontier reasoning. You pick the model. Every feature honors the pick, and the interface tells you which model answered and what it cost.</p>
+              <p>The stack is boring where it should be and sharp where it counts. A Python backend on the standard library, a React + Vite front end, Supabase auth with server-side JWT verification. The screener is metric-driven, so one new metric definition buys a filter, a sort, and a column for free. The options panel turns a live chain into plain-English odds. The private-company pipeline scrapes, extracts, and draws a market map.</p>
+              <p>Then the part I care about most: evaluation. LLMs lie confidently, so every answer is held to four invariants. No fabrication. No obeying injected instructions. Honest caveats. Abstain when the data isn&rsquo;t there. Real usage becomes traces, failures become new eval cases, and CI runs the suite before anything ships. Inference optimization, model routing, evals, CI/CD: the same skills that run production payments, pointed at a product I own.</p>
             </div>
 
             <aside class="verdict" data-reveal>
               <span class="verdict-kicker">Honest verdict</span>
-              <p>A 16-configuration swing-trade backtest found <em>no significant edge</em>. finplatform reports that plainly &mdash; the product&rsquo;s job is truth, not comfort.</p>
+              <p>I built a swing-trade signal engine for it and tested it hard. The verdict was <em>no real edge</em>. finplatform says that to your face. I&rsquo;d rather ship the truth than a demo that flatters you.</p>
             </aside>
 
-            <p class="stack-line" data-reveal>Python (stdlib backend) &middot; React + Vite &middot; Ollama&rarr;Claude router &middot; Supabase</p>
+            <p class="stack-line" data-reveal>Python &middot; React + Vite &middot; Ollama on RTX 5090 &middot; Claude API &middot; Supabase &middot; GitHub Actions</p>
             <div class="cta-row" data-reveal>
               <a class="btn btn-primary" href="writing/finplatform-architecture.html">Architecture notes &rarr;</a>
               <a class="btn btn-ghost" href="https://www.youtube.com/watch?v=3lWuJoMPnBc" rel="noopener">Lineage: Infera demo</a>
@@ -153,8 +157,10 @@
               <line x1="216" y1="152" x2="254" y2="120" stroke="rgba(237,232,222,0.14)"/>
               <line x1="216" y1="164" x2="254" y2="190" stroke="#E3A83B" stroke-width="1.5"/>
               <line x1="216" y1="170" x2="254" y2="260" stroke="rgba(237,232,222,0.14)"/>
-              <!-- chosen node pulse -->
+              <!-- chosen node -->
               <circle cx="254" cy="190" r="3" fill="#E3A83B"/>
+              <!-- traveling request dot (CSS offset-path) -->
+              <circle class="req-dot" cx="0" cy="0" r="3.5" fill="#F2C46A"/>
               <!-- footer note -->
               <text x="180" y="312" text-anchor="middle" fill="#9C9485" font-family="Consolas,monospace" font-size="9">credits metered per model &middot; behavior evals on every answer</text>
             </svg>
@@ -166,30 +172,63 @@
       <!-- 02 · Passage -->
       <article class="showcase" id="passage" style="--proj-accent: var(--c-passage)">
         <span class="kicker" data-reveal><span class="idx">02</span> &mdash; Translation workspace</span>
-        <h2 data-reveal>Passage &mdash; translation that shows its work</h2>
-        <p class="one-liner" data-reveal>A translation workspace for text, documents, images, and voice &mdash; with a human in the review loop, segment by segment.</p>
+        <h2 data-reveal>Passage. Translation that shows its work.</h2>
+        <p class="one-liner" data-reveal>Translate text, documents, photos, and voice. A human stays in the loop the whole way through.</p>
 
         <div class="proof-row" data-reveal>
-          <div class="stat"><span class="n">96.86%</span><span class="l">cost reduction vs agency translation</span></div>
-          <div class="stat"><span class="n">57</span><span class="l">tests gating every deploy</span></div>
-          <div class="stat"><span class="n">4</span><span class="l">input modes: text, document, image, voice</span></div>
-          <div class="stat"><span class="n">0</span><span class="l">silent failures &mdash; it raises, never fakes</span></div>
+          <div class="stat"><span class="n">96.86%</span><span class="l">cheaper than the agency quote it replaced</span></div>
+          <div class="stat"><span class="n">57</span><span class="l">tests that must pass before any deploy</span></div>
+          <div class="stat"><span class="n">4</span><span class="l">ways in: type it, drop it, photograph it, say it</span></div>
+          <div class="stat"><span class="n">0</span><span class="l">silent failures. It raises, it never fakes.</span></div>
         </div>
 
         <div data-reveal>
-          <p>Passage doesn&rsquo;t hand you a wall of translated text and hope. It shows every segment side by side with its source so you can review, refine, and trust the result. Photograph a sign and it composites the translation back onto the image. Speak, and it speaks back.</p>
-          <p>The part I&rsquo;m proudest of is a contract, not a feature: when a translation fails, Passage raises an honest error instead of echoing your source text back disguised as output. The public API is signed, rate-limited, and hardened against prompt injection &mdash; embedded instructions get translated literally, not obeyed.</p>
+          <p>Most translation tools hand you a wall of text and hope. Passage shows every segment next to its source so you can check the work, fix one line, and keep moving. Photograph a street sign and it paints the translation back onto the image. Speak to it and it speaks back.</p>
+          <p>My favorite part is a rule, not a feature. When a translation fails, Passage tells you. It will never echo your source text back and call it done. The public API is token-signed and rate-limited, prompt injection gets translated instead of obeyed, and every push runs the full test suite in GitHub Actions before Cloud Run sees it.</p>
         </div>
 
-        <p class="stack-line" data-reveal>Python 3.12 &middot; NiceGUI &middot; OpenAI + Whisper &middot; Cloud Run, CI-gated</p>
+        <p class="stack-line" data-reveal>Python 3.12 &middot; NiceGUI &middot; OpenAI + Whisper &middot; GitHub Actions &rarr; Cloud Run</p>
         <div class="cta-row" data-reveal>
           <a class="btn btn-primary" href="https://github.com/dneish2/LanguageTranslation" rel="noopener">View on GitHub</a>
         </div>
       </article>
 
-      <!-- 03 · Prompting-101 (field guide) -->
+      <!-- 03 · Real estate / design -->
+      <article class="showcase" id="realestate" style="--proj-accent: var(--c-realestate)">
+        <span class="kicker" data-reveal><span class="idx">03</span> &mdash; Real estate &middot; Design</span>
+        <h2 data-reveal>Land, deals, and interfaces</h2>
+        <p class="one-liner" data-reveal>I invest in St. Louis real estate and build the tools I wish existed when I started.</p>
+
+        <div class="card" data-reveal style="margin-top: var(--s-3)">
+          <h3>Land Tax Sale &mdash; St. Louis</h3>
+          <p class="muted">Every year the City of St. Louis auctions tax-delinquent properties through the Sheriff&rsquo;s <a href="https://www.stlouis-mo.gov/government/departments/sheriff/land-tax/" rel="noopener">land tax sale</a>. The process is public. The tooling is a PDF. I&rsquo;m building the interface I wanted as a bidder: parcels, liens, timelines, and a straight answer to the only question that matters. Is this worth bidding on, and at what price do you walk?</p>
+          <div class="cta-row">
+            <span class="chip chip-soon">Prototype &middot; publishing soon</span>
+          </div>
+        </div>
+
+        <div class="cluster-grid">
+          <div class="mini-card" data-reveal style="--i:0">
+            <h4>End-to-end product design</h4>
+            <p>A complete real-estate product design in Figma. Research, flows, high-fidelity frames.</p>
+            <span class="chip chip-soon">Case study &middot; publishing soon</span>
+          </div>
+          <div class="mini-card" data-reveal style="--i:1">
+            <h4>Design deck</h4>
+            <p>The thinking behind the work, from problem to prototype.</p>
+            <span class="chip chip-soon">Deck &middot; publishing soon</span>
+          </div>
+          <div class="mini-card" data-reveal style="--i:2">
+            <h4>Neighborhood Matchmaker</h4>
+            <p>Tell it how you live. It recommends neighborhoods, with GPT-4 and image generation.</p>
+            <span><a href="https://youtu.be/C_eU21nwR-8" rel="noopener">Demo</a> &middot; <a href="https://github.com/dneish2/HoodMatcher" rel="noopener">GitHub</a></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 04 · Prompting-101 (field guide) -->
       <article class="showcase field-guide" id="prompting" style="--proj-accent: var(--c-prompting)">
-        <span class="kicker" data-reveal><span class="idx">03</span> &mdash; Field guide</span>
+        <span class="kicker" data-reveal><span class="idx">04</span> &mdash; Field guide</span>
         <blockquote data-reveal>
           &ldquo;Prompting is not asking a machine to think. It is <em>learning to think clearly yourself</em>.&rdquo;
           <cite>The Neish Principle &middot; Prompting-101</cite>
@@ -199,42 +238,9 @@
           <span><b>8</b> domains templated</span>
           <span><b>3</b> guides: foundations &rarr; copiloting &rarr; mastery</span>
         </div>
-        <p data-reveal>A working field guide, not a listicle: strategic prompting techniques grounded in the research, a copiloting model for daily workflows, and domain templates you can deploy as-is. Start at foundations, leave with a system.</p>
+        <p data-reveal>A field guide, not a listicle. Ten techniques with the receipts, a copiloting model I use every day, and templates for eight domains you can deploy as-is. The point is bigger than prompting. Learn to think clearly, then delegate.</p>
         <div class="cta-row" data-reveal>
           <a class="btn btn-primary" href="https://github.com/dneish2/Prompting-101" rel="noopener">Read the guide &rarr;</a>
-        </div>
-      </article>
-
-      <!-- 04 · Real estate / design -->
-      <article class="showcase" id="realestate" style="--proj-accent: var(--c-realestate)">
-        <span class="kicker" data-reveal><span class="idx">04</span> &mdash; Real estate &middot; Design</span>
-        <h2 data-reveal>Land, deals, and interfaces</h2>
-        <p class="one-liner" data-reveal>Real-estate work in the open: a land tax sale interface for St. Louis, an end-to-end product design, and the tools around them.</p>
-
-        <div class="card" data-reveal style="margin-top: var(--s-3)">
-          <h3>Land Tax Sale &mdash; St. Louis</h3>
-          <p class="muted">A working interface for navigating the City of St. Louis land tax sale &mdash; the Sheriff&rsquo;s auctions of tax-delinquent properties &mdash; built on <a href="https://www.stlouis-mo.gov/government/departments/sheriff/land-tax/" rel="noopener">the City&rsquo;s published process</a>. Parcels, timelines, and the decision of whether a property is worth bidding on.</p>
-          <div class="cta-row">
-            <span class="chip chip-soon">Prototype &mdash; publishing soon</span>
-          </div>
-        </div>
-
-        <div class="cluster-grid">
-          <div class="mini-card" data-reveal style="--i:0">
-            <h4>End-to-end product design</h4>
-            <p>A complete real-estate product design in Figma &mdash; research, flows, and high-fidelity frames.</p>
-            <span class="chip chip-soon">Case study &mdash; publishing soon</span>
-          </div>
-          <div class="mini-card" data-reveal style="--i:1">
-            <h4>Design deck</h4>
-            <p>The thinking behind the work &mdash; a design walkthrough from problem to prototype.</p>
-            <span class="chip chip-soon">Deck &mdash; publishing soon</span>
-          </div>
-          <div class="mini-card" data-reveal style="--i:2">
-            <h4>Neighborhood Matchmaker</h4>
-            <p>AI neighborhood recommendations from amenities, proximity, and lifestyle &mdash; GPT-4 plus image generation.</p>
-            <span><a href="https://youtu.be/C_eU21nwR-8" rel="noopener">Demo</a> &middot; <a href="https://github.com/dneish2/HoodMatcher" rel="noopener">GitHub</a></span>
-          </div>
         </div>
       </article>
 
@@ -255,7 +261,7 @@
           <span class="chip chip-soon">In draft</span>
           <span>
             <h3>Essay No. 1</h3>
-            <p class="dek">The first piece is being written. The outline lands here before the full essay does.</p>
+            <p class="dek">The first piece is in the works. The outline lands here before the essay does.</p>
           </span>
           <span class="arrow">&rarr;</span>
         </a>
@@ -263,7 +269,7 @@
           <span class="chip chip-soon">In draft</span>
           <span>
             <h3>finplatform: a reference architecture</h3>
-            <p class="dek">How one terminal routes local models to frontier models, meters credits per model, and keeps itself honest with behavior evals.</p>
+            <p class="dek">How the terminal routes local models to frontier models, meters credits per model, and evals itself before every ship.</p>
           </span>
           <span class="arrow">&rarr;</span>
         </a>
@@ -271,7 +277,7 @@
           <span class="chip chip-soon">In draft</span>
           <span>
             <h3>The real estate playbook</h3>
-            <p class="dek">A structured plan for the St. Louis land tax sale market &mdash; the process, the data, and the interfaces it deserves.</p>
+            <p class="dek">The St. Louis land tax sale, mapped. The process, the data, and the plan I&rsquo;m actually running.</p>
           </span>
           <span class="arrow">&rarr;</span>
         </a>
@@ -283,18 +289,30 @@
   <section class="vignette-section">
     <div class="container">
       <figure class="vignette" data-reveal>
-        <svg class="beach" viewBox="0 0 340 150" role="img" aria-label="Line drawing of David reclining on a beach chair with a laptop and a coconut drink, palm tree swaying, sun over the water">
+        <svg class="beach" viewBox="0 0 340 150" role="img" aria-label="Line drawing of David reclining on a beach chair with a laptop and a coconut drink, palm tree swaying, sun over the water. Click the sun for sunset.">
+          <defs>
+            <linearGradient id="vg-sunset-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#A34A58" stop-opacity="0.05" />
+              <stop offset="1" stop-color="#E3A83B" stop-opacity="0.5" />
+            </linearGradient>
+          </defs>
+          <!-- sunset sky wash (revealed on sun click) -->
+          <rect class="vg-sky" x="0" y="0" width="340" height="91" fill="url(#vg-sunset-grad)" />
           <!-- sun -->
-          <circle class="vg-sun" cx="272" cy="34" r="13" fill="#E3A83B" />
+          <circle class="vg-sun" cx="272" cy="34" r="13" fill="#E3A83B">
+            <title>Click for sunset</title>
+          </circle>
           <!-- horizon -->
           <line x1="0" y1="92" x2="340" y2="92" stroke="rgba(237,232,222,0.18)" stroke-width="1" />
+          <!-- sun reflection on the water -->
+          <path class="vg-shimmer" d="M262 98 h20 M266 105 h12 M269 111 h7" stroke="#E3A83B" stroke-width="1" stroke-linecap="round" fill="none" />
           <!-- waves (wavelength 40px; drift loops one wavelength) -->
           <path class="vg-wave vg-wave-a" d="M-40 102 q 10 -6 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="rgba(237,232,222,0.22)" stroke-width="1" />
           <path class="vg-wave vg-wave-b" d="M-40 112 q 10 -4 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="rgba(237,232,222,0.12)" stroke-width="1" />
           <!-- sand -->
           <path d="M0 150 L0 132 Q 170 122 340 132 L340 150 Z" fill="rgba(237,232,222,0.05)" />
           <!-- gulls -->
-          <path d="M96 42 q 4 -4 8 0 q 4 -4 8 0 M126 32 q 3 -3 6 0 q 3 -3 6 0" fill="none" stroke="rgba(237,232,222,0.30)" stroke-width="1" stroke-linecap="round" />
+          <path class="vg-gulls" d="M96 42 q 4 -4 8 0 q 4 -4 8 0 M126 32 q 3 -3 6 0 q 3 -3 6 0" fill="none" stroke="rgba(237,232,222,0.30)" stroke-width="1" stroke-linecap="round" />
           <!-- palm -->
           <g class="vg-palm" fill="none" stroke="rgba(237,232,222,0.55)" stroke-width="1.5" stroke-linecap="round">
             <path d="M30 132 C 32 110 36 88 46 70" />
@@ -323,6 +341,12 @@
           </g>
           <!-- laptop screen glow -->
           <polygon class="vg-screen" points="183.5,93 186,103 178.5,104.5 177.5,94.5" fill="#E3A83B" />
+          <!-- thought bubble (appears on hover) -->
+          <g class="vg-bubble">
+            <rect x="152" y="62" width="86" height="17" rx="8.5" fill="#171512" stroke="rgba(237,232,222,0.35)" stroke-width="1" />
+            <path d="M178 79 L174 87 L186 79" fill="#171512" stroke="rgba(237,232,222,0.35)" stroke-width="1" stroke-linejoin="round" />
+            <text x="195" y="73.5" text-anchor="middle" fill="#EDE8DE" font-family="Consolas,monospace" font-size="8">one more deploy.</text>
+          </g>
           <!-- side table + coconut -->
           <g fill="none" stroke="rgba(237,232,222,0.55)" stroke-width="1.5" stroke-linecap="round">
             <path d="M222 130 L222 118 M214 118 L230 118" />
@@ -330,7 +354,7 @@
             <path d="M224 106 L230 96" stroke="#E3A83B" />
           </g>
         </svg>
-        <figcaption>Meanwhile &mdash; shipping from anywhere with a horizon.</figcaption>
+        <figcaption>Off the clock: St. Louis, two cats, and long walks with my wife.</figcaption>
       </figure>
     </div>
   </section>
@@ -344,8 +368,9 @@
     <div class="links">
       <a href="mailto:david.neishm@gmail.com">david.neishm@gmail.com</a>
       <a href="https://github.com/dneish2" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/david-neish-298b1a16b" rel="noopener">LinkedIn</a>
     </div>
-    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; Plain HTML, no framework &middot; The work speaks.</p>
+    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; St. Louis &middot; Plain HTML, no framework.</p>
   </div>
 </footer>
 <!-- /SITE-FOOTER -->
