@@ -126,43 +126,43 @@
           <figure class="diagram-panel" data-reveal>
             <svg viewBox="0 0 360 320" role="img" aria-label="finplatform request routing: a request with a model pick flows through the router to one of four model tiers; credits are metered per model">
               <!-- request -->
-              <rect x="10" y="130" width="92" height="56" rx="4" fill="none" stroke="rgba(237,232,222,0.25)"/>
-              <text x="56" y="152" text-anchor="middle" fill="#EDE8DE" font-family="Consolas,monospace" font-size="11">REQUEST</text>
-              <text x="56" y="170" text-anchor="middle" fill="#9C9485" font-family="Consolas,monospace" font-size="9">pick: sonnet</text>
+              <rect x="10" y="130" width="92" height="56" rx="4" fill="none" stroke="rgba(237,232,222,0.35)"/>
+              <text x="56" y="152" text-anchor="middle" fill="#EDE8DE" font-family="Consolas,monospace" font-size="12">REQUEST</text>
+              <text x="56" y="170" text-anchor="middle" fill="#ACA599" font-family="Consolas,monospace" font-size="10.5">pick: sonnet</text>
               <!-- router -->
               <rect x="140" y="130" width="76" height="56" rx="4" fill="none" stroke="#E3A83B"/>
-              <text x="178" y="162" text-anchor="middle" fill="#E3A83B" font-family="Consolas,monospace" font-size="11">ROUTER</text>
+              <text x="178" y="162" text-anchor="middle" fill="#E3A83B" font-family="Consolas,monospace" font-size="12">ROUTER</text>
               <!-- request -> router -->
               <line x1="102" y1="158" x2="140" y2="158" stroke="#E3A83B" stroke-width="1.5"/>
               <!-- tiers -->
               <g font-family="Consolas,monospace">
-                <rect x="254" y="28" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.18)"/>
-                <text x="302" y="46" text-anchor="middle" fill="#9C9485" font-size="10">T0 LOCAL</text>
-                <text x="302" y="61" text-anchor="middle" fill="#9C9485" font-size="9">ollama &middot; 0 cr</text>
+                <rect x="254" y="28" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.34)"/>
+                <text x="302" y="46" text-anchor="middle" fill="#ACA599" font-size="11">T0 LOCAL</text>
+                <text x="302" y="61" text-anchor="middle" fill="#ACA599" font-size="10.5">ollama &middot; 0 cr</text>
 
-                <rect x="254" y="98" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.18)"/>
-                <text x="302" y="116" text-anchor="middle" fill="#9C9485" font-size="10">T1 FAST</text>
-                <text x="302" y="131" text-anchor="middle" fill="#9C9485" font-size="9">haiku &middot; 2 cr</text>
+                <rect x="254" y="98" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.34)"/>
+                <text x="302" y="116" text-anchor="middle" fill="#ACA599" font-size="11">T1 FAST</text>
+                <text x="302" y="131" text-anchor="middle" fill="#ACA599" font-size="10.5">haiku &middot; 2 cr</text>
 
                 <rect x="254" y="168" width="96" height="44" rx="4" fill="none" stroke="#E3A83B"/>
-                <text x="302" y="186" text-anchor="middle" fill="#E3A83B" font-size="10">T2 CORE</text>
-                <text x="302" y="201" text-anchor="middle" fill="#E3A83B" font-size="9">sonnet &middot; 5 cr</text>
+                <text x="302" y="186" text-anchor="middle" fill="#E3A83B" font-size="11">T2 CORE</text>
+                <text x="302" y="201" text-anchor="middle" fill="#E3A83B" font-size="10.5">sonnet &middot; 5 cr</text>
 
-                <rect x="254" y="238" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.18)"/>
-                <text x="302" y="256" text-anchor="middle" fill="#9C9485" font-size="10">T3 DEEP</text>
-                <text x="302" y="271" text-anchor="middle" fill="#9C9485" font-size="9">research &middot; 10 cr</text>
+                <rect x="254" y="238" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.34)"/>
+                <text x="302" y="256" text-anchor="middle" fill="#ACA599" font-size="11">T3 DEEP</text>
+                <text x="302" y="271" text-anchor="middle" fill="#ACA599" font-size="10.5">research &middot; 10 cr</text>
               </g>
               <!-- router -> tiers -->
-              <line x1="216" y1="146" x2="254" y2="50"  stroke="rgba(237,232,222,0.14)"/>
-              <line x1="216" y1="152" x2="254" y2="120" stroke="rgba(237,232,222,0.14)"/>
+              <line x1="216" y1="146" x2="254" y2="50"  stroke="rgba(237,232,222,0.30)"/>
+              <line x1="216" y1="152" x2="254" y2="120" stroke="rgba(237,232,222,0.30)"/>
               <line x1="216" y1="164" x2="254" y2="190" stroke="#E3A83B" stroke-width="1.5"/>
-              <line x1="216" y1="170" x2="254" y2="260" stroke="rgba(237,232,222,0.14)"/>
+              <line x1="216" y1="170" x2="254" y2="260" stroke="rgba(237,232,222,0.30)"/>
               <!-- chosen node -->
               <circle cx="254" cy="190" r="3" fill="#E3A83B"/>
               <!-- traveling request dot (CSS offset-path) -->
               <circle class="req-dot" cx="0" cy="0" r="3.5" fill="#F2C46A"/>
               <!-- footer note -->
-              <text x="180" y="312" text-anchor="middle" fill="#9C9485" font-family="Consolas,monospace" font-size="9">credits metered per model &middot; behavior evals on every answer</text>
+              <text x="180" y="312" text-anchor="middle" fill="#ACA599" font-family="Consolas,monospace" font-size="10.5">credits metered per model &middot; behavior evals on every answer</text>
             </svg>
             <figcaption>The request path. Your model pick is honored end-to-end.</figcaption>
           </figure>
@@ -201,7 +201,7 @@
 
         <div class="card" data-reveal style="margin-top: var(--s-3)">
           <h3>Land Tax Sale &mdash; St. Louis</h3>
-          <p class="muted">Every year the City of St. Louis auctions tax-delinquent properties through the Sheriff&rsquo;s <a href="https://www.stlouis-mo.gov/government/departments/sheriff/land-tax/" rel="noopener">land tax sale</a>. The process is public. The tooling is a PDF. I&rsquo;m building the interface I wanted as a bidder: parcels, liens, timelines, and a straight answer to the only question that matters. Is this worth bidding on, and at what price do you walk?</p>
+          <p>Every year the City of St. Louis auctions tax-delinquent properties through the Sheriff&rsquo;s <a href="https://www.stlouis-mo.gov/government/departments/sheriff/land-tax/" rel="noopener">land tax sale</a>. The process is public. The tooling is a PDF. I&rsquo;m building the interface I wanted as a bidder: parcels, liens, timelines, and a straight answer to the only question that matters. Is this worth bidding on, and at what price do you walk?</p>
           <div class="cta-row">
             <span class="chip chip-soon">Prototype &middot; publishing soon</span>
           </div>
@@ -303,7 +303,7 @@
             <title>Click for sunset</title>
           </circle>
           <!-- horizon -->
-          <line x1="0" y1="92" x2="340" y2="92" stroke="rgba(237,232,222,0.18)" stroke-width="1" />
+          <line x1="0" y1="92" x2="340" y2="92" stroke="rgba(237,232,222,0.34)" stroke-width="1" />
           <!-- sun reflection on the water -->
           <path class="vg-shimmer" d="M262 98 h20 M266 105 h12 M269 111 h7" stroke="#E3A83B" stroke-width="1" stroke-linecap="round" fill="none" />
           <!-- waves (wavelength 40px; drift loops one wavelength) -->

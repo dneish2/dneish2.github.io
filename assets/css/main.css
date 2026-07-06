@@ -14,9 +14,10 @@
   --bg-raised: #171512;
   --bg-inset:  #0A0908;
   --ink:       #EDE8DE;
-  --ink-muted: #9C9485;
-  --line:      rgba(237, 232, 222, 0.14);
-  --line-soft: rgba(237, 232, 222, 0.07);
+  --ink-muted: #ACA599;
+  --line:      rgba(237, 232, 222, 0.30);
+  --line-soft: rgba(237, 232, 222, 0.16);
+  --line-strong: rgba(237, 232, 222, 0.40);
   --accent:    #E3A83B;
   --accent-hi: #F2C46A;
   --ok:        #7FB069;
@@ -71,6 +72,19 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: clip;
+}
+
+/* a whisper of grain — print tactility behind the flat dark, never over text */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-repeat: repeat;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 h1, h2, h3, h4 {
@@ -274,7 +288,7 @@ img { max-width: 100%; height: auto; display: block; }
   white-space: nowrap;
 }
 .chip-live { color: var(--ok); border-color: rgba(127, 176, 105, 0.4); }
-.chip-soon { border-style: dashed; }
+.chip-soon { border-style: dashed; border-color: var(--line-strong); }
 
 /* proof row — numbers in mono, no adjectives allowed */
 .proof-row {
@@ -539,7 +553,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 .diagram-panel {
   background: var(--bg-inset);
-  border: 1px solid var(--line-soft);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   padding: var(--s-3);
   position: sticky;
