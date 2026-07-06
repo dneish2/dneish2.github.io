@@ -1,32 +1,39 @@
-# The Neishfolio
+# dneish2.github.io
 
-Welcome to my portfolio hub, hosted via GitHub Pages at [dneish2.github.io](https://dneish2.github.io). This is where I collect, showcase, and occasionally reflect on the projects that best represent what I do as a software engineer and systems thinker.
+Personal site of David Neish — part portfolio, part writing. Live at [dneish2.github.io](https://dneish2.github.io).
 
-## What You’ll Find Here
+The thesis: decision systems. I started as a game player optimizing decisions under pressure; now I build AI systems that do the same at enterprise scale. The site lets the work speak — numbers over adjectives — and invites you to play.
 
-A focused lineup of projects that span AI, automation, and technical problem-solving:
+## Structure
 
-- 🏙️ **Neighborhood Matchmaker** – A GPT-4 powered tool that helps users find ideal neighborhoods based on lifestyle and preferences.
-- 🌍 **Language Translation Tool** – An intelligent document translator that automates context-aware translations across multiple formats.
-- 📈 **Risky** – A portfolio optimization platform that uses LLMs and financial data to help users make smarter investment decisions.
-- 📈 **Infera** – An AI-driven report generator that can compare companies within an industry, automating financial analysis, leadership profiling and market research
-- 💡 **Prompting 101** – A distilled guide to mastering prompt engineering for large language models, small language models and reasoning models.
+```
+index.html                              hero + origin + selected work + writing teasers
+writing/index.html                      article index
+writing/*.html                          essays (outline ships first, prose follows)
+work/land-tax-sale/                     self-contained prototype (drop-in)
+assets/css/main.css                     the whole design system, one file
+assets/js/main.js                       scroll reveal + header state (~2KB)
+assets/js/hero.js                       decision-graph canvas + scramble tagline (~7KB)
+```
 
-Each project reflects my interest in building practical tools that make complex systems more intuitive, more accessible, and more human-friendly.
+## Selected work
 
-## Tech Stack
+- **finplatform** — AI financial research terminal; tiered model router (local GPU → Claude), per-model credits, behavior evals. Flagship.
+- **Passage** — translation workspace (text / document / image / voice) with segment-level review and an honest-error contract.
+- **Prompting-101** — a field guide to prompting: techniques, copiloting model, domain templates. [Repo](https://github.com/dneish2/Prompting-101)
+- **Real estate / design** — a land tax sale interface for St. Louis, an end-to-end product design, and Neighborhood Matchmaker.
 
-- HTML/CSS (custom built for simplicity and responsiveness)
-- Hosted on **GitHub Pages**
-- Project links and visuals sourced directly from my GitHub repos
+## Principles
 
-> This is a snapshot of how I think and what I care about building.
+- Plain HTML/CSS/JS. No framework, no build step, no CDN dependencies.
+- Dark, "terminal × editorial": serif headlines, mono numerals, one amber accent.
+- Motion respects `prefers-reduced-motion`; everything renders with JS disabled.
+- No lorem ipsum, no fluff. If a page isn't ready, it says so honestly.
 
-## Setup (For Devs)
-
-To view locally:
+## Local preview
 
 ```bash
 git clone https://github.com/dneish2/dneish2.github.io
 cd dneish2.github.io
-open index.html
+python -m http.server 8080   # root-relative URLs need a server, not file://
+```

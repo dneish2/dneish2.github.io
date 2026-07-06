@@ -2,165 +2,291 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>David Neish | Neishfolio </title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f5f7;
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
-    header {
-      background: #1f2937;
-      color: white;
-      padding: 2rem;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2.5rem;
-    }
-    header p {
-      margin-top: 0.5rem;
-      font-size: 1.2rem;
-      color: #d1d5db;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-    .project {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-      overflow: hidden;
-    }
-    .project img {
-      width: 100%;
-      height: auto;
-    }
-    .project-content {
-      padding: 1.5rem;
-    }
-    .project-content h2 {
-      margin-top: 0;
-    }
-    .project-content p {
-      line-height: 1.6;
-    }
-    .project-content a {
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    footer {
-      text-align: center;
-      padding: 2rem;
-      color: #6b7280;
-    }
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 2rem;
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>David Neish — Decision Systems</title>
+  <meta name="description" content="David Neish builds AI decision systems for finance, language, and research. Portfolio and writing: finplatform, Passage, Prompting-101, and real estate work." />
+  <link rel="canonical" href="https://dneish2.github.io/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="David Neish — Decision Systems" />
+  <meta property="og:description" content="AI decision systems for finance, language, and research. The work speaks; come play." />
+  <meta property="og:url" content="https://dneish2.github.io/" />
+  <meta name="theme-color" content="#0E0D0B" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23E3A83B' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23E3A83B'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
+<a class="skip-link" href="#work">Skip to the work</a>
 
-<header>
-  <h1>David Neish</h1>
-  <p>Explainable AI | Agentic Systems | Financial Services</p>
-    <p>
-    I build AI tools for financial research, decision support, and document workflows,
-    with a focus on making complex systems easier to understand, deploy, and improve.
-  </p>
+<!-- SITE-HEADER v1 -->
+<header class="site-header">
+  <div class="inner">
+    <a class="wordmark" href="/">DN<span class="tick">_</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/#work">Work</a>
+      <a href="/writing/">Writing</a>
+      <a href="/#about">About</a>
+      <a class="nav-cta" href="mailto:david.neishm@gmail.com">Email</a>
+    </nav>
+  </div>
 </header>
+<!-- /SITE-HEADER -->
 
-<div class="container">
+<main>
 
-  <div class="project">
-    <img src="https://raw.githubusercontent.com/dneish2/LanguageTranslation/main/Multilingual.png" alt="Translation Tool Cover" />
-    <div class="project-content">
-      <h2>Language Translation Tool 🌍</h2>
-      <p>
-        Replicate DOCX, PDF, and PPTX files across all languages. Great for global marketing, product materials, and internal policies. 
-        Saves teams hundreds of hours and reduces translation costs by up to 96.86% compared to agency-based translations.
-      </p>
-      <p><strong>Tech:</strong> Python, OpenAI API, NiceGUI</p>
-      <a href="https://github.com/dneish2/LanguageTranslation" target="_blank">View on GitHub</a>
+  <!-- ============================== HERO ============================== -->
+  <section class="hero">
+    <canvas id="hero-canvas" class="hero-canvas" aria-hidden="true"></canvas>
+    <div class="container">
+      <span class="kicker">Decision systems &middot; AI &middot; Finance</span>
+      <h1>David Neish</h1>
+      <p class="tagline" data-scramble="I build systems that make better decisions under pressure.">I build systems that make better decisions under pressure.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#work">See the work &darr;</a>
+        <a class="btn btn-ghost" href="/writing/">Read the writing &rarr;</a>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="project">
-  <img src="https://raw.githubusercontent.com/dneish2/Infera/main/radarChart.png" alt="Infera Financial Health Chart" />
-  <div class="project-content">
-    <h2>Infera  📄</h2>
-    <p>
-     Infera builds full company profiles using real-time financials, leadership summaries, and red-flag alerts like lawsuits.
-      Perfect for M&A, sales strategy, or market scouting. Just name a few companies and get a ranked report.
-    </p>
-      <a href="https://www.youtube.com/watch?v=3lWuJoMPnBc" target="_blank" rel="noopener noreferrer">
-    ▶️ Watch Demo
-      </a>
-    <p><strong>Tech:</strong> Python, OpenAI GPT-4, Yahoo Finance API, LangGraph, Plotly</p>
-    <a href="https://github.com/dneish2/Infera" target="_blank">View on GitHub</a>
-  </div>
-</div>
-
-  <div class="project">
-    <img src="https://raw.githubusercontent.com/dneish2/RoboAdvisor/main/riskbot.png" alt="Risky Portfolio Screenshot" />
-    <div class="project-content">
-      <h2>Risky 🤖</h2>
-      <p>
-        Risky uses real-time financials and a custom investment engine to recommend high-fit assets based on your goals. 
-        Great for investors, analysts, and product teams building finance tools.
-      </p>
-        </p>
-      <a href="https://youtu.be/ZJJTWE1hNQE" target="_blank" rel="noopener noreferrer">
-    ▶️ Watch Demo
-      </a>
-      <p><strong>Tech:</strong> Python, Streamlit, NVIDIA NIM, LLaMA Index</p>
-      <a href="https://github.com/dneish2/RoboAdvisor" target="_blank">View on GitHub</a>
+  <!-- ============================== ORIGIN ============================== -->
+  <section class="origin" id="about">
+    <div class="container">
+      <div class="beats">
+        <div class="beat" data-reveal style="--i:0">
+          <span class="mark">15 &rarr;</span>
+          <p><strong>Built my first PC to win, not to browse.</strong> Grinding League and Minecraft tournaments taught me game theory and optimization under pressure.</p>
+        </div>
+        <div class="beat" data-reveal style="--i:1">
+          <span class="mark">&rarr; Mastercard</span>
+          <p><strong>The same instincts, at enterprise scale.</strong> Components I&rsquo;ve built power edge microservices on Mastercard&rsquo;s payment network &mdash; billions of transactions, no room for guesses.</p>
+        </div>
+        <div class="beat" data-reveal style="--i:2">
+          <span class="mark">&rarr; Now</span>
+          <p><strong>AI decision systems, end to end.</strong> Finance, language, research &mdash; built in the open, measured honestly, written up here.</p>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="project">
-    <img src="https://raw.githubusercontent.com/dneish2/HoodMatcher/main/output/neighborhood.png" alt="Neighborhood Screenshot" />
-    <div class="project-content">
-      <h2>Neighborhood Matchmaker 🏘️</h2>
-      <p>
-        Streamlit app recommending neighborhoods for homebuyers and renters using GPT-4 and Gemini's Imagen image generation API. 
-        Users can search based on amenities, proximity, and lifestyle preferences.
-      </p>
-        <a href="https://youtu.be/C_eU21nwR-8" target="_blank" rel="noopener noreferrer">
-    ▶️ Watch Demo
+  <!-- ============================== WORK ============================== -->
+  <section class="work-section" id="work">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <span class="kicker" style="margin:0">Selected work</span>
+        <span class="rule"></span>
+        <span class="kicker mono" style="margin:0">01 &ndash; 04</span>
+      </div>
+
+      <!-- 01 · finplatform (flagship) -->
+      <article class="showcase" id="finplatform" style="--proj-accent: var(--c-finplatform)">
+        <div class="flagship-grid">
+          <div>
+            <span class="kicker" data-reveal><span class="idx">01</span> &mdash; AI research terminal &middot; Flagship</span>
+            <h2 data-reveal>finplatform &mdash; research that tells you the truth</h2>
+            <p class="one-liner" data-reveal>An AI financial research terminal: one place to screen stocks, price options, research private companies, and pressure-test your own ideas.</p>
+
+            <div class="proof-row" data-reveal>
+              <div class="stat"><span class="n">5&rarr;1</span><span class="l">apps consolidated into one terminal</span></div>
+              <div class="stat"><span class="n">16</span><span class="l">backtest configurations, reported honestly</span></div>
+              <div class="stat"><span class="n">local &rarr; Claude</span><span class="l">tiered model router, pick honored end-to-end</span></div>
+              <div class="stat"><span class="n">4</span><span class="l">behavior invariants under continuous eval</span></div>
+            </div>
+
+            <div data-reveal>
+              <p>Every request rides a tiered router &mdash; from a local model on my own GPU up to Claude &mdash; and the model you pick is honored by every feature, with credits metered per model. Nothing is hidden behind a vague &ldquo;AI&rdquo; label: the interface tells you which model answered and what it cost.</p>
+              <p>The surfaces: a metric-driven screener where adding one metric definition buys filter, sort, and column for free; an options clarity panel on live chains &mdash; expected move, move needed, odds; a private-company research pipeline with a market map; auth with server-side JWT verification.</p>
+              <p>Under it all is an honesty layer: a custom test harness and an LLM behavior eval that holds every answer to four invariants &mdash; no fabrication, injection resistance, honest caveats, and abstention when the data isn&rsquo;t there.</p>
+            </div>
+
+            <aside class="verdict" data-reveal>
+              <span class="verdict-kicker">Honest verdict</span>
+              <p>A 16-configuration swing-trade backtest found <em>no significant edge</em>. finplatform reports that plainly &mdash; the product&rsquo;s job is truth, not comfort.</p>
+            </aside>
+
+            <p class="stack-line" data-reveal>Python (stdlib backend) &middot; React + Vite &middot; Ollama&rarr;Claude router &middot; Supabase</p>
+            <div class="cta-row" data-reveal>
+              <a class="btn btn-primary" href="/writing/finplatform-architecture.html">Architecture notes &rarr;</a>
+              <a class="btn btn-ghost" href="https://www.youtube.com/watch?v=3lWuJoMPnBc" rel="noopener">Lineage: Infera demo</a>
+              <a class="btn btn-ghost" href="https://youtu.be/ZJJTWE1hNQE" rel="noopener">Lineage: Risky demo</a>
+            </div>
+          </div>
+
+          <figure class="diagram-panel" data-reveal>
+            <svg viewBox="0 0 360 320" role="img" aria-label="finplatform request routing: a request with a model pick flows through the router to one of four model tiers; credits are metered per model">
+              <!-- request -->
+              <rect x="10" y="130" width="92" height="56" rx="4" fill="none" stroke="rgba(237,232,222,0.25)"/>
+              <text x="56" y="152" text-anchor="middle" fill="#EDE8DE" font-family="Consolas,monospace" font-size="11">REQUEST</text>
+              <text x="56" y="170" text-anchor="middle" fill="#9C9485" font-family="Consolas,monospace" font-size="9">pick: sonnet</text>
+              <!-- router -->
+              <rect x="140" y="130" width="76" height="56" rx="4" fill="none" stroke="#E3A83B"/>
+              <text x="178" y="162" text-anchor="middle" fill="#E3A83B" font-family="Consolas,monospace" font-size="11">ROUTER</text>
+              <!-- request -> router -->
+              <line x1="102" y1="158" x2="140" y2="158" stroke="#E3A83B" stroke-width="1.5"/>
+              <!-- tiers -->
+              <g font-family="Consolas,monospace">
+                <rect x="254" y="28" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.18)"/>
+                <text x="302" y="46" text-anchor="middle" fill="#9C9485" font-size="10">T0 LOCAL</text>
+                <text x="302" y="61" text-anchor="middle" fill="#9C9485" font-size="9">ollama &middot; 0 cr</text>
+
+                <rect x="254" y="98" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.18)"/>
+                <text x="302" y="116" text-anchor="middle" fill="#9C9485" font-size="10">T1 FAST</text>
+                <text x="302" y="131" text-anchor="middle" fill="#9C9485" font-size="9">haiku &middot; 2 cr</text>
+
+                <rect x="254" y="168" width="96" height="44" rx="4" fill="none" stroke="#E3A83B"/>
+                <text x="302" y="186" text-anchor="middle" fill="#E3A83B" font-size="10">T2 CORE</text>
+                <text x="302" y="201" text-anchor="middle" fill="#E3A83B" font-size="9">sonnet &middot; 5 cr</text>
+
+                <rect x="254" y="238" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.18)"/>
+                <text x="302" y="256" text-anchor="middle" fill="#9C9485" font-size="10">T3 DEEP</text>
+                <text x="302" y="271" text-anchor="middle" fill="#9C9485" font-size="9">research &middot; 10 cr</text>
+              </g>
+              <!-- router -> tiers -->
+              <line x1="216" y1="146" x2="254" y2="50"  stroke="rgba(237,232,222,0.14)"/>
+              <line x1="216" y1="152" x2="254" y2="120" stroke="rgba(237,232,222,0.14)"/>
+              <line x1="216" y1="164" x2="254" y2="190" stroke="#E3A83B" stroke-width="1.5"/>
+              <line x1="216" y1="170" x2="254" y2="260" stroke="rgba(237,232,222,0.14)"/>
+              <!-- chosen node pulse -->
+              <circle cx="254" cy="190" r="3" fill="#E3A83B"/>
+              <!-- footer note -->
+              <text x="180" y="312" text-anchor="middle" fill="#9C9485" font-family="Consolas,monospace" font-size="9">credits metered per model &middot; behavior evals on every answer</text>
+            </svg>
+            <figcaption>The request path. Your model pick is honored end-to-end.</figcaption>
+          </figure>
+        </div>
+      </article>
+
+      <!-- 02 · Passage -->
+      <article class="showcase" id="passage" style="--proj-accent: var(--c-passage)">
+        <span class="kicker" data-reveal><span class="idx">02</span> &mdash; Translation workspace</span>
+        <h2 data-reveal>Passage &mdash; translation that shows its work</h2>
+        <p class="one-liner" data-reveal>A translation workspace for text, documents, images, and voice &mdash; with a human in the review loop, segment by segment.</p>
+
+        <div class="proof-row" data-reveal>
+          <div class="stat"><span class="n">96.86%</span><span class="l">cost reduction vs agency translation</span></div>
+          <div class="stat"><span class="n">57</span><span class="l">tests gating every deploy</span></div>
+          <div class="stat"><span class="n">4</span><span class="l">input modes: text, document, image, voice</span></div>
+          <div class="stat"><span class="n">0</span><span class="l">silent failures &mdash; it raises, never fakes</span></div>
+        </div>
+
+        <div data-reveal>
+          <p>Passage doesn&rsquo;t hand you a wall of translated text and hope. It shows every segment side by side with its source so you can review, refine, and trust the result. Photograph a sign and it composites the translation back onto the image. Speak, and it speaks back.</p>
+          <p>The part I&rsquo;m proudest of is a contract, not a feature: when a translation fails, Passage raises an honest error instead of echoing your source text back disguised as output. The public API is signed, rate-limited, and hardened against prompt injection &mdash; embedded instructions get translated literally, not obeyed.</p>
+        </div>
+
+        <p class="stack-line" data-reveal>Python 3.12 &middot; NiceGUI &middot; OpenAI + Whisper &middot; Cloud Run, CI-gated</p>
+        <div class="cta-row" data-reveal>
+          <a class="btn btn-primary" href="https://github.com/dneish2/LanguageTranslation" rel="noopener">View on GitHub</a>
+        </div>
+      </article>
+
+      <!-- 03 · Prompting-101 (field guide) -->
+      <article class="showcase field-guide" id="prompting" style="--proj-accent: var(--c-prompting)">
+        <span class="kicker" data-reveal><span class="idx">03</span> &mdash; Field guide</span>
+        <blockquote data-reveal>
+          &ldquo;Prompting is not asking a machine to think. It is <em>learning to think clearly yourself</em>.&rdquo;
+          <cite>The Neish Principle &middot; Prompting-101</cite>
+        </blockquote>
+        <div class="guide-meta" data-reveal>
+          <span><b>10</b> techniques, arXiv-cited</span>
+          <span><b>8</b> domains templated</span>
+          <span><b>3</b> guides: foundations &rarr; copiloting &rarr; mastery</span>
+        </div>
+        <p data-reveal>A working field guide, not a listicle: strategic prompting techniques grounded in the research, a copiloting model for daily workflows, and domain templates you can deploy as-is. Start at foundations, leave with a system.</p>
+        <div class="cta-row" data-reveal>
+          <a class="btn btn-primary" href="https://github.com/dneish2/Prompting-101" rel="noopener">Read the guide &rarr;</a>
+        </div>
+      </article>
+
+      <!-- 04 · Real estate / design -->
+      <article class="showcase" id="realestate" style="--proj-accent: var(--c-realestate)">
+        <span class="kicker" data-reveal><span class="idx">04</span> &mdash; Real estate &middot; Design</span>
+        <h2 data-reveal>Land, deals, and interfaces</h2>
+        <p class="one-liner" data-reveal>Real-estate work in the open: a land tax sale interface for St. Louis, an end-to-end product design, and the tools around them.</p>
+
+        <div class="card" data-reveal style="margin-top: var(--s-3)">
+          <h3>Land Tax Sale &mdash; St. Louis</h3>
+          <p class="muted">A working interface for navigating the City of St. Louis land tax sale &mdash; the Sheriff&rsquo;s auctions of tax-delinquent properties &mdash; built on <a href="https://www.stlouis-mo.gov/government/departments/sheriff/land-tax/" rel="noopener">the City&rsquo;s published process</a>. Parcels, timelines, and the decision of whether a property is worth bidding on.</p>
+          <div class="cta-row">
+            <span class="chip chip-soon">Prototype &mdash; publishing soon</span>
+          </div>
+        </div>
+
+        <div class="cluster-grid">
+          <div class="mini-card" data-reveal style="--i:0">
+            <h4>End-to-end product design</h4>
+            <p>A complete real-estate product design in Figma &mdash; research, flows, and high-fidelity frames.</p>
+            <span class="chip chip-soon">Case study &mdash; publishing soon</span>
+          </div>
+          <div class="mini-card" data-reveal style="--i:1">
+            <h4>Design deck</h4>
+            <p>The thinking behind the work &mdash; a design walkthrough from problem to prototype.</p>
+            <span class="chip chip-soon">Deck &mdash; publishing soon</span>
+          </div>
+          <div class="mini-card" data-reveal style="--i:2">
+            <h4>Neighborhood Matchmaker</h4>
+            <p>AI neighborhood recommendations from amenities, proximity, and lifestyle &mdash; GPT-4 plus image generation.</p>
+            <span><a href="https://youtu.be/C_eU21nwR-8" rel="noopener">Demo</a> &middot; <a href="https://github.com/dneish2/HoodMatcher" rel="noopener">GitHub</a></span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============================== WRITING ============================== -->
+  <section class="work-section" id="writing" style="padding-top:0">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <span class="kicker" style="margin:0">Notes &amp; deep dives</span>
+        <span class="rule"></span>
+        <a class="kicker mono" style="margin:0" href="/writing/">All writing &rarr;</a>
+      </div>
+
+      <div class="writing-list">
+        <a class="writing-row" href="/writing/article-1.html" data-reveal style="--i:0">
+          <span class="chip chip-soon">In draft</span>
+          <span>
+            <h3>Essay No. 1</h3>
+            <p class="dek">The first piece is being written. The outline lands here before the full essay does.</p>
+          </span>
+          <span class="arrow">&rarr;</span>
         </a>
-      <p><strong>Tech:</strong> Streamlit, Python, FAISS, OpenAI API, Docker</p>
-      <a href="https://github.com/dneish2/HoodMatcher" target="_blank">View on GitHub</a>
+        <a class="writing-row" href="/writing/finplatform-architecture.html" data-reveal style="--i:1">
+          <span class="chip chip-soon">In draft</span>
+          <span>
+            <h3>finplatform: a reference architecture</h3>
+            <p class="dek">How one terminal routes local models to frontier models, meters credits per model, and keeps itself honest with behavior evals.</p>
+          </span>
+          <span class="arrow">&rarr;</span>
+        </a>
+        <a class="writing-row" href="/writing/real-estate-playbook.html" data-reveal style="--i:2">
+          <span class="chip chip-soon">In draft</span>
+          <span>
+            <h3>The real estate playbook</h3>
+            <p class="dek">A structured plan for the St. Louis land tax sale market &mdash; the process, the data, and the interfaces it deserves.</p>
+          </span>
+          <span class="arrow">&rarr;</span>
+        </a>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="project">
-        <img src="https://raw.githubusercontent.com/dneish2/Prompting-101/main/masteryMap.png" alt="The Future of Thinking" />
-    <div class="project-content">
-      <h2>Prompting-101 📜 </h2>
-      <p>
-        A practical guide to prompting large language models for reasoning, retrieval, transformation, and creative outputs.
-      </p>
-      <p><strong>Tech:</strong> Markdown, NLP Concepts, ChatGPT</p>
-      <a href="https://github.com/dneish2/Prompting-101" target="_blank">View on GitHub</a>
+</main>
+
+<!-- SITE-FOOTER v1 -->
+<footer class="site-footer">
+  <div class="container">
+    <p class="signoff">If you&rsquo;re building decision systems, let&rsquo;s talk.</p>
+    <div class="links">
+      <a href="mailto:david.neishm@gmail.com">david.neishm@gmail.com</a>
+      <a href="https://github.com/dneish2" rel="noopener">GitHub</a>
     </div>
+    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; Plain HTML, no framework &middot; The work speaks.</p>
   </div>
-
-</div>
-
-<footer>
-  &copy; 2026 David Neish • Built with 💡 and a dash of 🔥
 </footer>
+<!-- /SITE-FOOTER -->
 
+<script src="/assets/js/main.js" defer></script>
+<script src="/assets/js/hero.js" defer></script>
 </body>
 </html>
