@@ -286,8 +286,11 @@ img { max-width: 100%; height: auto; display: block; }
   border-radius: var(--radius-chip);
   padding: 0.2rem 0.6rem;
   white-space: nowrap;
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease;
 }
 .chip-live { color: var(--ok); border-color: rgba(127, 176, 105, 0.4); }
+a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: var(--ok); }
 .chip-soon { border-style: dashed; border-color: var(--line-strong); }
 
 /* proof row — numbers in mono, no adjectives allowed */
@@ -451,6 +454,12 @@ img { max-width: 100%; height: auto; display: block; }
   margin-bottom: var(--s-4);
 }
 .hero .tagline .accent { color: var(--accent); }
+.hero-role {
+  font-size: var(--text-small);
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  margin-bottom: var(--s-4);
+}
 
 /* origin strip */
 .origin {
@@ -632,6 +641,47 @@ img { max-width: 100%; height: auto; display: block; }
 }
 .mini-card .chip { align-self: flex-start; margin-top: var(--s-1); }
 .mini-card a { font-family: var(--font-mono); font-size: var(--text-micro); }
+
+/* currently exploring — deliberately outside the 01-04 numbered grammar */
+.exploring {
+  max-width: 640px;
+  padding: var(--s-4) 0 0;
+  margin-top: calc(-1 * var(--s-4));
+  border-top: 1px dashed var(--line);
+}
+.exploring h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--text-h3);
+  margin: 0 0 var(--s-2);
+}
+.exploring p {
+  font-size: var(--text-small);
+  color: var(--ink-muted);
+}
+
+/* resume card */
+.resume-section { padding: var(--s-6) 0; }
+.resume-card {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  background: var(--bg-raised);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: var(--s-4);
+  transition: border-color 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.resume-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.resume-icon { flex-shrink: 0; line-height: 0; }
+.resume-meta { flex: 1; min-width: 0; }
+.resume-meta h3 { font-size: var(--text-h3); margin: 0 0 var(--s-1); }
+.resume-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  flex-shrink: 0;
+}
 
 /* writing teasers */
 .writing-list { display: flex; flex-direction: column; }
@@ -883,6 +933,8 @@ img { max-width: 100%; height: auto; display: block; }
   .origin .beats { grid-template-columns: 1fr; gap: var(--s-3); }
   .writing-row { grid-template-columns: 1fr; gap: 0.5rem; }
   .writing-row .arrow { display: none; }
+  .resume-card { flex-direction: column; text-align: center; }
+  .resume-actions { flex-direction: row; }
   .site-nav { gap: var(--s-2); }
   .site-nav a.nav-cta { padding: 0.3rem 0.6rem; }
   .proof-row { grid-template-columns: 1fr 1fr; }

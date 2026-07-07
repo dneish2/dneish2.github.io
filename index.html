@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>David Neish — Decision Systems</title>
-  <meta name="description" content="David Neish builds AI decision systems for finance, language, and research. Portfolio and writing: finplatform, Passage, real estate tools, and a prompting field guide." />
+  <meta name="description" content="David Neish is an AI Solutions Engineer working in distributed systems and decision systems for finance, language, and real estate. Portfolio and writing: finplatform, Passage, Deal Lens, and a prompting field guide." />
   <link rel="canonical" href="https://dneish2.github.io/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="David Neish — Decision Systems" />
@@ -26,6 +26,7 @@
       <a href="#work">Work</a>
       <a href="writing/index.html">Writing</a>
       <a href="#about">About</a>
+      <a href="#resume">R&eacute;sum&eacute;</a>
       <a class="nav-cta" href="mailto:david.neishm@gmail.com">Email</a>
     </nav>
   </div>
@@ -38,9 +39,10 @@
   <section class="hero">
     <canvas id="hero-canvas" class="hero-canvas" aria-hidden="true"></canvas>
     <div class="container">
-      <span class="kicker">Decision systems &middot; AI &middot; Finance</span>
+      <span class="kicker">Decision Systems &middot; Distributed Systems &middot; AI</span>
       <h1>David Neish</h1>
       <p class="tagline" data-scramble="I build systems that make better decisions under pressure.">I build systems that make better decisions under pressure.</p>
+      <p class="hero-role mono" data-reveal>AI Solutions Engineer @ Mastercard &middot; Greater St. Louis</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#work">See the work &darr;</a>
         <a class="btn btn-ghost" href="writing/index.html">Read the writing &rarr;</a>
@@ -193,30 +195,32 @@
         </div>
       </article>
 
-      <!-- 03 · Real estate / design -->
+      <!-- 03 · Real estate / Deal Lens -->
       <article class="showcase" id="realestate" style="--proj-accent: var(--c-realestate)">
-        <span class="kicker" data-reveal><span class="idx">03</span> &mdash; Real estate &middot; Design</span>
-        <h2 data-reveal>Land, deals, and interfaces</h2>
-        <p class="one-liner" data-reveal>I invest in St. Louis real estate and build the tools I wish existed when I started.</p>
+        <span class="kicker" data-reveal><span class="idx">03</span> &mdash; Real estate &middot; Deal Lens</span>
+        <h2 data-reveal>Deal Lens. Know what a property is worth before you bid.</h2>
+        <p class="one-liner" data-reveal>I invest in St. Louis tax-sale real estate. Deal Lens is the underwriting tool I wished existed on my first bid.</p>
 
         <div class="card" data-reveal style="margin-top: var(--s-3)">
-          <h3>Land Tax Sale &mdash; St. Louis</h3>
-          <p>Every year the City of St. Louis auctions tax-delinquent properties through the Sheriff&rsquo;s <a href="https://www.stlouis-mo.gov/government/departments/sheriff/land-tax/" rel="noopener">land tax sale</a>. The process is public. The tooling is a PDF. I&rsquo;m building the interface I wanted as a bidder: parcels, liens, timelines, and a straight answer to the only question that matters. Is this worth bidding on, and at what price do you walk?</p>
+          <h3>The vision, and what&rsquo;s real today</h3>
+          <p>Every year the City of St. Louis auctions tax-delinquent properties through the Sheriff&rsquo;s <a href="https://www.stlouis-mo.gov/government/departments/sheriff/land-tax/" rel="noopener">land tax sale</a>. The process is public. The tooling is a PDF. Deal Lens takes a whole sale list, ranks it, and lets you underwrite one property &mdash; comps, math, a verified-deal number &mdash; before you decide whether to bid. A free concierge search finds candidates beyond the tax-sale list too, and asks consent before it ever contacts a person on your behalf.</p>
+          <p class="muted">Honest status: the consent-first concierge flow below is a real, working prototype. The underwriting engine is designed end to end &mdash; pricing, credits, system architecture included &mdash; but going from design to product needs one thing I don&rsquo;t have yet: MLS data access.</p>
           <div class="cta-row">
-            <span class="chip chip-soon">Prototype &middot; publishing soon</span>
+            <a class="chip chip-live" href="work/deal-lens/index.html">Prototype: consent-first concierge flow &rarr;</a>
+            <span class="chip chip-soon">Underwriting engine &middot; blocked on MLS access</span>
           </div>
         </div>
 
         <div class="cluster-grid">
           <div class="mini-card" data-reveal style="--i:0">
             <h4>End-to-end product design</h4>
-            <p>A complete real-estate product design in Figma. Research, flows, high-fidelity frames.</p>
-            <span class="chip chip-soon">Case study &middot; publishing soon</span>
+            <p>Every screen in the Deal Lens flow, onboarding to pricing, in Figma.</p>
+            <span><a href="https://www.figma.com/design/0eq7oAzPJAXl2CMdizThrB/Real-Estate-%E2%80%94-Deal-Lens?m=auto&amp;t=VyfwRrhJrGrJViNT-6" rel="noopener">Open in Figma</a></span>
           </div>
           <div class="mini-card" data-reveal style="--i:1">
-            <h4>Design deck</h4>
-            <p>The thinking behind the work, from problem to prototype.</p>
-            <span class="chip chip-soon">Deck &middot; publishing soon</span>
+            <h4>Interactive walkthrough</h4>
+            <p>Click through the real Figma prototype: login, paywall, deal cockpit.</p>
+            <span><a href="https://www.figma.com/proto/0v0CEnBK8G07Vl0bvgppOV?node-id=0-1&amp;t=VyfwRrhJrGrJViNT-6" rel="noopener">Open the prototype</a></span>
           </div>
           <div class="mini-card" data-reveal style="--i:2">
             <h4>Neighborhood Matchmaker</h4>
@@ -225,6 +229,14 @@
           </div>
         </div>
       </article>
+
+      <!-- currently exploring -->
+      <div class="exploring" data-reveal>
+        <span class="kicker">Currently exploring</span>
+        <h4>MAGE &mdash; a domain router for coaching</h4>
+        <p>Point it at any footage &mdash; a jump shot, a golf swing, someone detangling hair &mdash; and a domain router figures out what it&rsquo;s even looking at, then hands it to the right motion-tracking pipeline for real-time, corrective feedback. Same routing instinct as finplatform, aimed at something completely different: closing the gap between how you move and how you&rsquo;re supposed to move. Right now it&rsquo;s a design, not a build &mdash; coursework from my HCI work at Indiana.</p>
+        <span class="chip">Concept &middot; HCI coursework, Indiana University</span>
+      </div>
 
       <!-- 04 · Prompting-101 (field guide) -->
       <article class="showcase field-guide" id="prompting" style="--proj-accent: var(--c-prompting)">
@@ -281,6 +293,34 @@
           </span>
           <span class="arrow">&rarr;</span>
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== RESUME ============================== -->
+  <section class="resume-section" id="resume">
+    <div class="container">
+      <div class="resume-card" data-reveal>
+        <div class="resume-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 80" width="64" height="80">
+            <path d="M8 2h34l14 14v62H8z" fill="none" stroke="#E3A83B" stroke-width="2"/>
+            <path d="M42 2v14h14" fill="none" stroke="#E3A83B" stroke-width="2"/>
+            <line x1="16" y1="34" x2="48" y2="34" stroke="rgba(237,232,222,0.4)" stroke-width="2"/>
+            <line x1="16" y1="42" x2="48" y2="42" stroke="rgba(237,232,222,0.4)" stroke-width="2"/>
+            <line x1="16" y1="50" x2="40" y2="50" stroke="rgba(237,232,222,0.4)" stroke-width="2"/>
+            <line x1="16" y1="58" x2="44" y2="58" stroke="rgba(237,232,222,0.25)" stroke-width="2"/>
+            <line x1="16" y1="66" x2="36" y2="66" stroke="rgba(237,232,222,0.25)" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="resume-meta">
+          <span class="kicker">R&eacute;sum&eacute;</span>
+          <h3>David Neish &mdash; the one-page version</h3>
+          <p class="one-liner" style="margin-bottom:0">Five years at Mastercard, four shipped AI products, one page. Everything above, minus the animation.</p>
+        </div>
+        <div class="resume-actions">
+          <a class="btn btn-primary" href="assets/resume/david-neish-resume.pdf" target="_blank" rel="noopener">View r&eacute;sum&eacute; &rarr;</a>
+          <a class="btn btn-ghost" href="assets/resume/david-neish-resume.pdf" download>Download PDF</a>
+        </div>
       </div>
     </div>
   </section>
@@ -369,6 +409,7 @@
       <a href="mailto:david.neishm@gmail.com">david.neishm@gmail.com</a>
       <a href="https://github.com/dneish2" rel="noopener">GitHub</a>
       <a href="https://www.linkedin.com/in/david-neish-298b1a16b" rel="noopener">LinkedIn</a>
+      <a href="assets/resume/david-neish-resume.pdf" target="_blank" rel="noopener">R&eacute;sum&eacute;</a>
     </div>
     <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; St. Louis &middot; Plain HTML, no framework.</p>
   </div>
