@@ -67,6 +67,29 @@
     .envs td:first-child { color: var(--ink); white-space: nowrap; }
     .envs-scroll { overflow-x: auto; }
 
+    /* Flow diagrams: a vertical rail of nodes with labeled edges, metro-map style. */
+    .rail { margin: 2rem 0; max-width: 660px; }
+    .rail .node { display: grid; grid-template-columns: 26px 1fr; gap: 0 16px; }
+    .rail .dot { position: relative; }
+    .rail .dot::before { content: ''; position: absolute; left: 11px; top: 6px; width: 12px; height: 12px;
+      border: 2px solid var(--accent); border-radius: 50%; background: var(--bg); z-index: 1; box-sizing: border-box; }
+    .rail .node:not(:last-child) .dot::after { content: ''; position: absolute; left: 16px; top: 18px; bottom: -6px;
+      width: 2px; background: linear-gradient(var(--accent) 0%, var(--line-soft) 60%); }
+    .rail .node.branch .dot::before { border-color: var(--ink-muted); width: 10px; height: 10px; left: 12px; }
+    .rail .body { padding-bottom: 1.35rem; min-width: 0; }
+    .rail .t { font-family: var(--font-mono); font-size: .82rem; color: var(--ink); }
+    .rail .t em { font-style: normal; color: var(--accent); }
+    .rail .d { font-size: .85rem; color: var(--ink-muted); margin-top: .15rem; max-width: 58ch; }
+    .rail .edge { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--ink-muted); margin: .1rem 0 .45rem; }
+    .rail .edge::before { content: '\2193  '; color: var(--accent); }
+    .rail .fork { display: flex; flex-wrap: wrap; gap: 8px; margin-top: .5rem; }
+    .rail .fork span { font-family: var(--font-mono); font-size: .7rem; border: 1px solid var(--line-soft);
+      border-radius: var(--radius-chip); padding: 3px 9px; color: var(--ink-muted); }
+    .rail .fork span b { color: var(--accent); font-weight: 600; }
+    .figtitle { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--accent); margin: 2.2rem 0 .2rem; }
+
     .trace { border-left: 2px solid var(--accent); padding: 2px 0 2px 20px; margin: 1.6rem 0; max-width: 64ch; }
     .trace .turn { margin-bottom: 1rem; }
     .trace .who { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); }
@@ -110,6 +133,47 @@
         <img src="assets/pf_stock.png" alt="The finplatform stock page: NVDA candlestick chart with 50 and 200 day moving averages, earnings markers on the price history, and key insights below." loading="lazy" />
         <figcaption>The stock surface. Every candle is a real trading day; the E markers are earnings dates with the move that followed. No downsampling, no smoothing.</figcaption>
       </figure>
+
+      <p class="figtitle">Figure 1 &middot; the life of a request</p>
+      <p>Every read on the site walks the same path. The order is the architecture: cheap and honest checks first, paid work last, and nothing reaches the reader without provenance.</p>
+
+      <div class="rail">
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">Browser <em>&middot; React SPA</em></span>
+          <div class="d">TanStack Query issues the read; the user&rsquo;s model cap rides along as a header.</div>
+          <div class="edge">https &middot; json</div>
+        </div></div>
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">Throttle <em>&middot; per-IP, shared bucket</em></span>
+          <div class="d">Every model-touching GET shares one 20-per-60s budget with the metered POSTs. Over budget answers 429 with a retry hint, before anything costs money.</div>
+          <div class="edge">under budget</div>
+        </div></div>
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">Cache <em>&middot; memory, then shared Postgres</em></span>
+          <div class="d">A hit ends the walk here and the page says &ldquo;as of 14:02.&rdquo; A miss continues down, and whatever comes back is written through both tiers for everyone.</div>
+          <div class="edge">miss</div>
+        </div></div>
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">Data ladder <em>&middot; budgeted, ranked</em></span>
+          <div class="d">Free sources first, paid rungs only when needed and only under the day&rsquo;s spend cap. A quota response benches the provider instead of retrying into it.</div>
+          <div class="fork"><span>yfinance <b>$0</b></span><span>EDGAR <b>$0</b></span><span>Tavily <b>rung 1</b></span><span>Serper <b>rung 2</b></span><span>SearXNG <b>floor</b></span></div>
+          <div class="edge">rows in hand</div>
+        </div></div>
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">Model router <em>&middot; task-tiered</em></span>
+          <div class="d">Classification goes to the local 7B, briefs to Haiku, heavy synthesis to Sonnet, capped by the user&rsquo;s pick. Retrieved text enters the prompt marked untrusted. No rows, no call: the router abstains rather than let a model answer from priors.</div>
+          <div class="edge">model text</div>
+        </div></div>
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">Invariants <em>&middot; enforced in code</em></span>
+          <div class="d">Markdown stripped, banned phrasing scrubbed, grounding checked, whichever model answered. The prompt asks; this layer makes it so.</div>
+          <div class="edge">clean text</div>
+        </div></div>
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">Report envelope <em>&middot; &sect;4</em></span>
+          <div class="d">kind, as_of, status, data, provenance: model named, credits charged, sources attached. This is the only shape the browser ever renders.</div>
+        </div></div>
+      </div>
 
       <h2><span class="num">2.</span> The data ledger</h2>
       <p>Before any AI, the honest question is what the data costs and where it comes from. This is the actual ledger. Each row expands into the decision record behind it: the context, the call I made, and what that call cost or saved in practice.</p>
@@ -189,6 +253,34 @@
         </dl></div>
       </details>
       </div></div>
+
+      <p class="figtitle">Figure 2 &middot; one dataset, bought once: the earnings tape</p>
+      <p>The ledger above covers live reads. Bought data works differently: it is measured once, receipted, committed, and re-derived for free forever. This is the pipeline behind the earnings anatomy, 961 measured earnings events across 121 tickers on licensed tape, lifetime spend $0.91.</p>
+
+      <div class="rail">
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">Licensed tape <em>&middot; Databento</em></span>
+          <div class="d">Minute bars around each earnings print. Priced before every pull; a hard cap inside the generator stops the run, not the invoice.</div>
+          <div class="edge">measure &middot; billable, deduped</div>
+        </div></div>
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">events ledger <em>&middot; committed JSON, append-only</em></span>
+          <div class="d">Every event row carries its numbers and its spend receipt. Committed to git, so the dataset&rsquo;s history is diffable and the receipts are part of the record.</div>
+          <div class="edge">derive &middot; $0, deterministic</div>
+        </div></div>
+        <div class="node"><div class="dot"></div><div class="body">
+          <span class="t">anatomy asset <em>&middot; frozen definitions</em></span>
+          <div class="d">Gap, first-30-minutes fade, day move, implied-vs-realized, per ticker. The definitions are named constants, and a byte-for-byte reproduction test pins them: if a definition drifts, the build goes red.</div>
+          <div class="fork"><span>/api/stock/prints</span><span>chat grounding</span><span>earnings brief</span></div>
+          <div class="edge">refresh &middot; a bot proposes, the merge is a human click</div>
+        </div></div>
+        <div class="node branch"><div class="dot"></div><div class="body">
+          <span class="t">Scheduled refresh <em>&middot; GitHub Action</em></span>
+          <div class="d">In season, a workflow measures only the events never bought before (~$0.55 a quarter), re-derives, runs the gates, and opens a PR with the spend receipt in the body. It cannot merge itself.</div>
+        </div></div>
+      </div>
+
+      <p>The statistical claim this bought: in the mega-caps, options price earnings moves about right (36% outside implied, consistent with fair pricing). In the broader 100-name universe, stocks closed outside the implied band 48% of the time. Pooled 45.8%, 95% CI 42.7&ndash;49.0. The tiers matter more than the pooled number, and the method (closing straddle mid &times; 0.85) ships with the claim.</p>
 
       <h2><span class="num">3.</span> Two environments, different hardware on purpose</h2>
       <p>Development had to cost nothing per iteration and work offline. Production had to survive spiky, mostly idle traffic without a standing bill. Those are different problems, so the environments differ deliberately, and every gap between them has to be visible in the UI rather than papered over.</p>
