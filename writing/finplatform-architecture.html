@@ -4,15 +4,74 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>finplatform: a reference architecture — David Neish</title>
-  <meta name="description" content="How one AI research terminal routes local models to frontier models, meters credits per model, and keeps itself honest with behavior evals." />
+  <meta name="description" content="An architecture case study: what the data costs, the one report contract every surface returns, tiered model routing from a local GPU to Claude, and the trace of a single output." />
   <link rel="canonical" href="https://dneish2.github.io/writing/finplatform-architecture.html" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="finplatform: a reference architecture" />
-  <meta property="og:description" content="Tiered model routing, per-model credits, and an honesty layer of behavior evals — the architecture of an AI research terminal." />
+  <meta property="og:description" content="What the data costs, one report contract, tiered model routing, and the full trace of a single output." />
   <meta name="theme-color" content="#0E0D0B" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23E3A83B' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23E3A83B'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="../assets/css/main.css" />
   <script>document.documentElement.classList.add('js');</script>
+  <style>
+    /* Article-local styles, built on main.css tokens. */
+    .arch { max-width: 880px; }
+    /* Prose keeps the reading measure; ledgers, tables, figures and code use the full width. */
+    .arch .article-body { max-width: none; }
+    .arch .article-body > p, .arch .article-head .dek { max-width: var(--measure); }
+    .arch .figure { margin: 2.2rem 0; }
+    .arch .figure img { border: 1px solid var(--line-soft); border-radius: var(--radius); }
+    .arch .figure figcaption { font-family: var(--font-mono); font-size: var(--text-micro); color: var(--ink-muted); margin-top: .6rem; letter-spacing: .04em; }
+
+    .arch pre { background: var(--bg-inset); border: 1px solid var(--line-soft); border-left: 2px solid var(--accent);
+      padding: 1rem 1.2rem; overflow-x: auto; font-family: var(--font-mono); font-size: .78rem; line-height: 1.65;
+      color: var(--ink-muted); border-radius: var(--radius); }
+    .arch pre .k { color: var(--accent); } .arch pre .s { color: var(--ink); } .arch pre .c { color: var(--ink-muted); opacity: .7; }
+
+    .ledger-scroll { overflow-x: auto; margin: 1.6rem 0 .4rem; }
+    .ledger-min { min-width: 660px; }
+    .ledger-head { display: grid; grid-template-columns: 175px 1fr 125px 110px; gap: 14px; padding: 7px 4px;
+      font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--ink-muted); border-bottom: 1px solid var(--accent); }
+    .ledger-head span:nth-child(3) { text-align: right; }
+    details.row { border-bottom: 1px solid var(--line-soft); }
+    details.row summary { display: grid; grid-template-columns: 175px 1fr 125px 110px; gap: 14px; align-items: center;
+      padding: 11px 4px; cursor: pointer; list-style: none; font-family: var(--font-mono); font-size: .8rem; }
+    details.row summary::-webkit-details-marker { display: none; }
+    details.row summary:hover { background: var(--bg-raised); }
+    details.row summary .src { color: var(--ink); }
+    details.row summary .src::before { content: '\25B8  '; color: var(--ink-muted); }
+    details.row[open] summary .src { color: var(--accent); }
+    details.row[open] summary .src::before { content: '\25BE  '; color: var(--accent); }
+    details.row summary .what { color: var(--ink-muted); font-size: .74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    details.row summary .cost { font-variant-numeric: tabular-nums; color: var(--ink); text-align: right; white-space: nowrap; }
+    .st { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase;
+      border-radius: var(--radius-chip); padding: 2px 7px; white-space: nowrap; justify-self: end; }
+    .st.prod { color: var(--ok); border: 1px solid rgba(127,176,105,.4); }
+    .st.local { color: #D98E73; border: 1px solid rgba(217,142,115,.4); }
+
+    .adr { padding: 4px 4px 18px; max-width: 72ch; }
+    .adr dl { margin: 0; display: grid; grid-template-columns: 118px 1fr; gap: 7px 16px; font-size: .88rem; }
+    .adr dt { font-family: var(--font-mono); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); padding-top: 4px; }
+    .adr dd { margin: 0; color: var(--ink-muted); }
+    @media (max-width: 620px) { .adr dl { grid-template-columns: 1fr; gap: 2px 0; } .adr dd { margin-bottom: 8px; } }
+
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; margin: 1.4rem 0; }
+    @media (max-width: 760px) { .twocol { grid-template-columns: 1fr; } }
+    .cap { font-family: var(--font-mono); font-size: .64rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); margin: 0 0 .5rem; }
+
+    .envs { border-collapse: collapse; width: 100%; font-family: var(--font-mono); font-size: .78rem; margin: 1.4rem 0; }
+    .envs th { font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); text-align: left;
+      font-weight: 600; padding: 7px 14px 7px 0; border-bottom: 1px solid var(--accent); }
+    .envs td { padding: 8px 14px 8px 0; border-bottom: 1px solid var(--line-soft); color: var(--ink-muted); vertical-align: top; }
+    .envs td:first-child { color: var(--ink); white-space: nowrap; }
+    .envs-scroll { overflow-x: auto; }
+
+    .trace { border-left: 2px solid var(--accent); padding: 2px 0 2px 20px; margin: 1.6rem 0; max-width: 64ch; }
+    .trace .turn { margin-bottom: 1rem; }
+    .trace .who { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); }
+    .trace p { margin: .3rem 0 0; font-size: .92rem; color: var(--ink-muted); }
+  </style>
 </head>
 <body>
 
@@ -32,38 +91,206 @@
 <!-- /SITE-HEADER -->
 
 <main>
-  <div class="container">
+  <div class="container arch">
     <header class="article-head">
-      <span class="kicker">Reference architecture &middot; finplatform</span>
+      <span class="kicker">Architecture case study &middot; finplatform</span>
       <h1>finplatform: a reference architecture</h1>
-      <p class="dek">One terminal, five consolidated apps, a router that spans a local GPU to Claude, and an eval suite that holds every answer to four invariants.</p>
+      <p class="dek">One terminal, five consolidated apps, a router that spans a local GPU to Claude. This walks the system the way I would in a design review: what the data costs, the one contract every surface returns, and the full trace of a single output.</p>
       <div class="byline">
         <span>David Neish</span>
-        <span class="chip chip-soon">Draft &middot; full piece in progress</span>
       </div>
     </header>
 
     <article class="article-body">
-      <p class="abstract">This is the outline the essay will keep. Each section below states what it will argue; the full piece replaces this page.</p>
 
       <h2><span class="num">1.</span> One terminal beats five demos</h2>
-      <p class="abstract">Infera, RoboAdvisor, Earnings-Digest, Morsel, and proTerminal each proved a capability; none was a product. Consolidation forced one data layer, one design system, and one opinion about what a research answer owes its reader.</p>
+      <p>Infera, RoboAdvisor, Earnings-Digest, Morsel, and proTerminal each proved a capability; none was a product. Consolidating them forced one data layer, one design system, and one opinion about what a research answer owes its reader. The result runs as a React SPA over a Python backend on Cloud Run, with Supabase holding accounts, credits, reports, and the shared caches.</p>
 
-      <h2><span class="num">2.</span> The router: local GPU to frontier model, one contract</h2>
-      <p class="abstract">Requests ride a tiered router from a local Ollama model to Claude. The load-bearing rule is that the user&rsquo;s model pick is honored end to end by every feature. A routing contract, not a routing suggestion.</p>
+      <figure class="figure">
+        <img src="assets/pf_stock.png" alt="The finplatform stock page: NVDA candlestick chart with 50 and 200 day moving averages, earnings markers on the price history, and key insights below." loading="lazy" />
+        <figcaption>The stock surface. Every candle is a real trading day; the E markers are earnings dates with the move that followed. No downsampling, no smoothing.</figcaption>
+      </figure>
 
-      <h2><span class="num">3.</span> Credits as an honesty mechanism</h2>
-      <p class="abstract">Per-model credits make cost legible instead of gamified: a cheap model costs little, a deep research run costs ten times more, and the interface says so before you spend. Pricing design is product design.</p>
+      <h2><span class="num">2.</span> The data ledger</h2>
+      <p>Before any AI, the honest question is what the data costs and where it comes from. This is the actual ledger. Each row expands into the decision record behind it: the context, the call I made, and what that call cost or saved in practice.</p>
 
-      <h2><span class="num">4.</span> The behavior eval: four invariants</h2>
-      <p class="abstract">Every answer is held to no-fabrication, injection resistance, honest caveats, and abstention when the data isn&rsquo;t there. This section shows real failures the eval caught and how a single compose-answer path makes the invariants enforceable.</p>
+      <div class="ledger-scroll"><div class="ledger-min">
+      <div class="ledger-head"><span>Source</span><span>Carries</span><span>Unit cost</span><span>Status</span></div>
 
-      <h2><span class="num">5.</span> Shipping &ldquo;no edge&rdquo; as a feature</h2>
-      <p class="abstract">I built a swing-trade signal engine, tested it properly, and it found no real edge. The product reports exactly that. Honest measurement is the moat, and a research tool owes you the truth even when the truth is &ldquo;don&rsquo;t.&rdquo;</p>
+      <details class="row">
+        <summary><span class="src">yfinance</span><span class="what">quotes &middot; chains &middot; fundamentals</span><span class="cost">$0</span><span class="st prod">prod</span></summary>
+        <div class="adr"><dl>
+          <dt>Context</dt><dd>The spine of every price on the site. Free, delayed about 15 minutes, and it throttles hard under load.</dd>
+          <dt>Decision</dt><dd>Serve the last real value with a visible timestamp instead of retrying into the throttle. A licensed feed is validated in a sandbox but is not the spine yet: free data plus honest staleness labels covers the current surface, and live redistribution carries licensing constraints.</dd>
+          <dt>Consequences</dt><dd>Under heavy load the site shows &ldquo;as of 14:02&rdquo; rather than a spinner or a fake tick. Long chart windows route to a separate series so adjusted and unadjusted bars never splice inside one chart.</dd>
+        </dl></div>
+      </details>
 
-      <div class="ship-callout">
-        <p><span class="mono">SHIPPING SOON &middot;</span> Want this when it lands? <a href="mailto:david.neishm@gmail.com?subject=Send%20me%20the%20finplatform%20architecture%20piece">Email me</a> and I&rsquo;ll send it.</p>
+      <details class="row">
+        <summary><span class="src">SEC EDGAR</span><span class="what">10-K/Q &middot; 8-K &middot; ownership</span><span class="cost">$0</span><span class="st prod">prod</span></summary>
+        <div class="adr"><dl>
+          <dt>Context</dt><dd>Filings power the earnings and leadership surfaces. Vendor APIs summarize; the primary source is checkable.</dd>
+          <dt>Decision</dt><dd>Parse EDGAR directly. Accept slower parsing in exchange for citations that point at the actual filing.</dd>
+          <dt>Consequences</dt><dd>The parser only exists in the project virtualenv. Run the server under the wrong interpreter and SEC features silently go empty: no error, just thinner pages. That happened, and it is now a documented run rule with a check.</dd>
+        </dl></div>
+      </details>
+
+      <details class="row">
+        <summary><span class="src">SearXNG</span><span class="what">self-hosted metasearch</span><span class="cost">$0 marginal</span><span class="st local">degraded in prod</span></summary>
+        <div class="adr"><dl>
+          <dt>Context</dt><dd>I wanted a search floor with no API key, so development and the free tier never hard-depend on a vendor.</dd>
+          <dt>Decision</dt><dd>Self-host SearXNG: a Podman container on my workstation, a Cloud Run service in production.</dd>
+          <dt>Consequences</dt><dd>On my desk it works. In production it starves: Google and Bing block requests from datacenter IP ranges, so the deployed instance returns a trickle. It stays as the dev default and the last rung, and its production failure is the direct reason the two paid rungs below exist. One config trap cost real debugging time: JSON output is off by default, and a stock container answers 403 in a way that looks exactly like &ldquo;no news today.&rdquo;</dd>
+        </dl></div>
+      </details>
+
+      <details class="row">
+        <summary><span class="src">Tavily</span><span class="what">search + article extraction</span><span class="cost">~$0.008 / query</span><span class="st prod">rung 1</span></summary>
+        <div class="adr"><dl>
+          <dt>Context</dt><dd>LLM synthesis needs article text, not links. Tavily returns extracted content with a news filter.</dd>
+          <dt>Decision</dt><dd>First paid rung: called only on cache miss, only under a per-day budget. A quota response marks the source exhausted for the day or month, so the ladder stops paying to be told no.</dd>
+          <dt>Consequences</dt><dd>Quotas do hit, and the ladder degrades one rung instead of failing. One measured foot-gun: sending an empty <code>include_domains: []</code> silently degraded results to a months-stale corpus. Deleting that one line moved the newest article for the same query from January to same-day.</dd>
+        </dl></div>
+      </details>
+
+      <details class="row">
+        <summary><span class="src">Serper</span><span class="what">Google News SERP</span><span class="cost">$0.0003 / query</span><span class="st prod">rung 2</span></summary>
+        <div class="adr"><dl>
+          <dt>Context</dt><dd>Needed volume roughly 25&times; cheaper than rung 1 for when it is empty or exhausted: 2,500 free queries a month, then $0.30 per thousand.</dd>
+          <dt>Decision</dt><dd>Use it for headlines and accept thin snippets. Article text, when a reader wants it, comes from the page itself.</dd>
+          <dt>Consequences</dt><dd>Dates arrive relative, like &ldquo;3 hours ago.&rdquo; Unconverted, those items rank as undated and lose their freshness weight, so the fallback rung scored worse than the rung it replaced until dates were absolutized at ingest. It also returns an image per story, which currently supplies most of the card art.</dd>
+        </dl></div>
+      </details>
+
+      <details class="row">
+        <summary><span class="src">Search cache</span><span class="what">memory &rarr; Postgres &middot; 2h TTL</span><span class="cost">amortizer</span><span class="st prod">prod</span></summary>
+        <div class="adr"><dl>
+          <dt>Context</dt><dd>Cloud Run instances are ephemeral. A per-instance cache re-pays every provider cost on every cold start, and per-user caching multiplies cost by audience size.</dd>
+          <dt>Decision</dt><dd>Two tiers: in-process memory for the hot path, then a shared Postgres table keyed by normalized query. One user&rsquo;s NVDA search serves every user, on every instance, for the TTL.</dd>
+          <dt>Consequences</dt><dd>Provider spend scales with distinct stories, not with readers. Cache-served pages carry an &ldquo;as of&rdquo; stamp instead of a LIVE badge. Freshness is shown, never implied.</dd>
+        </dl></div>
+      </details>
+
+      <details class="row">
+        <summary><span class="src">Ollama &middot; qwen2.5 7B</span><span class="what">classify &middot; route &middot; fallback</span><span class="cost">$0 marginal</span><span class="st local">dev floor</span></summary>
+        <div class="adr"><dl>
+          <dt>Context</dt><dd>Small classification and routing calls happen constantly. Paying API rates for them adds up, and development should run keyless.</dd>
+          <dt>Decision</dt><dd>A local 7B on my own GPU handles classify and route, and is the full fallback when no API key is configured.</dd>
+          <dt>Consequences</dt><dd>It follows format instructions unreliably, which forced a rule I now apply to every model: output invariants are enforced in code after the call, not requested in the prompt. Section 5 is that rule, generalized.</dd>
+        </dl></div>
+      </details>
+
+      <details class="row">
+        <summary><span class="src">Anthropic API</span><span class="what">extraction &middot; synthesis</span><span class="cost">$0.002&ndash;$0.03 / call</span><span class="st prod">tiers 2&ndash;3</span></summary>
+        <div class="adr"><dl>
+          <dt>Context</dt><dd>Different tasks deserve different models. Entity extraction is cheap-model work; a cross-article synthesis is not.</dd>
+          <dt>Decision</dt><dd>Route by task: Haiku for extraction and briefs at fractions of a cent, Sonnet for heavy synthesis only. The serving model is recorded in every artifact&rsquo;s provenance, and the user can cap the tier per request.</dd>
+          <dt>Consequences</dt><dd>Cost stays proportional to task difficulty. And because passive page loads reach models too, every model-touching endpoint shares one per-IP throttle with the metered ones. Without it, an anonymous visitor rotating tickers buys unbounded inference at my expense.</dd>
+        </dl></div>
+      </details>
+      </div></div>
+
+      <h2><span class="num">3.</span> Two environments, different hardware on purpose</h2>
+      <p>Development had to cost nothing per iteration and work offline. Production had to survive spiky, mostly idle traffic without a standing bill. Those are different problems, so the environments differ deliberately, and every gap between them has to be visible in the UI rather than papered over.</p>
+
+      <div class="envs-scroll">
+      <table class="envs">
+        <thead><tr><th></th><th>Development (workstation)</th><th>Production (GCP)</th></tr></thead>
+        <tbody>
+          <tr><td>Compute</td><td>Python 3.13 venv, Windows</td><td>Cloud Run containers, scale to zero</td></tr>
+          <tr><td>Local model</td><td>Ollama qwen2.5 7B on the GPU</td><td>none; API tiers with a deterministic fallback</td></tr>
+          <tr><td>Search floor</td><td>SearXNG in Podman</td><td>SearXNG on Cloud Run, degraded (&sect;2)</td></tr>
+          <tr><td>Database</td><td colspan="2">one shared Supabase project, so dev exercises the same RLS policies and cache tables prod depends on</td></tr>
+          <tr><td>Secrets</td><td>.env, gitignored</td><td>GCP Secret Manager, referenced by the deploy</td></tr>
+          <tr><td>Deploy</td><td>run locally</td><td>GitHub Actions &rarr; prod + a private sandbox off the develop branch</td></tr>
+        </tbody>
+      </table>
       </div>
+
+      <h2><span class="num">4.</span> The report contract</h2>
+      <p>Every artifact the API returns, from a news brief to a research dossier, uses one envelope. Here is a real instance first, from the morning brief traced in section 7, then the shape.</p>
+
+      <div class="twocol">
+        <div>
+          <p class="cap">Instance &middot; /api/news/brief</p>
+          <pre>{
+  <span class="k">"kind"</span>: <span class="s">"news_brief"</span>,
+  <span class="k">"as_of"</span>: <span class="s">"2026-07-28T21:33:41Z"</span>,
+  <span class="k">"status"</span>: <span class="s">"complete"</span>,
+  <span class="k">"data"</span>: {
+    <span class="k">"subject"</span>: <span class="s">"the markets"</span>,
+    <span class="k">"brief"</span>: <span class="s">"U.S. equities are mixed:
+      the S&amp;P 500 and Dow flat to higher
+      on solid earnings, the Nasdaq down
+      over 1% on a semiconductor
+      selloff&hellip;"</span>
+  },
+  <span class="k">"provenance"</span>: {
+    <span class="k">"model"</span>: <span class="s">"claude-haiku-4-5"</span>,
+    <span class="k">"tier"</span>: <span class="s">"T2_MID"</span>,
+    <span class="k">"elapsed_ms"</span>: <span class="s">2141</span>,
+    <span class="k">"sources"</span>: [
+      { <span class="k">"domain"</span>: <span class="s">"finance.yahoo.com"</span>,
+        <span class="k">"title"</span>: <span class="s">"Nasdaq pares losses
+         as chip stocks sell off"</span>,
+        <span class="k">"published_at"</span>: <span class="s">"2026-07-28"</span> },
+      <span class="c">&hellip; 7 more</span>
+    ]
+  }
+}</pre>
+        </div>
+        <div>
+          <p class="cap">Shape &middot; every artifact</p>
+          <pre><span class="k">Report</span> {
+  kind, as_of
+  status      <span class="c"># complete | partial
+              # | unavailable</span>
+  notes[]     <span class="c"># why, when partial</span>
+  data        <span class="c"># typed per kind</span>
+  provenance {
+    model, tier, credits, elapsed_ms
+    sources[] { url, title,
+                domain, published_at }
+  }
+}</pre>
+          <div class="adr"><dl>
+            <dt>Context</dt><dd>Before this, about twenty endpoints had grown five shapes for &ldquo;sources&rdquo; (including a bare integer on four of them) and four names for &ldquo;when is this from.&rdquo; An integer source count is the one version of a citation a reader cannot click or check.</dd>
+            <dt>Decision</dt><dd>One envelope. A report that fails is still a report: same keys, <code>status: "unavailable"</code>, the reason written for a person.</dd>
+            <dt>Consequences</dt><dd>The client never branches on shape, empty pages explain themselves, and a saved report can be frozen and shared because it is self-contained. Credits in provenance make cost legible per artifact: a cheap model costs little, a deep research run costs ten times more, and the interface says so before you spend.</dd>
+          </dl></div>
+        </div>
+      </div>
+
+      <h2><span class="num">5.</span> The behavior eval: four invariants</h2>
+      <p>LLMs lie confidently, so every answer is held to four invariants. No fabrication. No obeying instructions injected through retrieved text. Honest caveats. Abstain when the data isn&rsquo;t there. The eval runs offline in CI against a single compose-answer path, which is what makes the invariants enforceable rather than aspirational: there is exactly one place where model output becomes user-facing text.</p>
+      <p>The rule underneath it came from the local 7B and generalized to every model: a prompt is a request, not a mechanism. Anything that must be true of the output, no markdown in prose, no banned phrasing, grounding present, gets checked or enforced in code after the call. The prompt asks nicely; the code makes it so.</p>
+
+      <h2><span class="num">6.</span> Shipping &ldquo;no edge&rdquo; as a feature</h2>
+      <p>I built a swing-trade signal engine for this platform and tested it hard: sixteen configurations against real data. The verdict was no real edge. finplatform says that to your face, and the options surface was rebuilt around that honesty. Instead of predictions, it shows what the market already prices: the expected move, the move you need, the chance of profit, and the flags working against you.</p>
+
+      <figure class="figure">
+        <img src="assets/pf_options.png" alt="The Options Lab clarity panel for an AAPL call: expected move, required move, chance of profit, and a flag list including time decay and earnings before expiry, with a red banner reading several factors work against this setup." loading="lazy" />
+        <figcaption>The clarity panel on a long AAPL call. The red banner is the product doing its job: several factors work against this setup, weigh the flags.</figcaption>
+      </figure>
+
+      <p>I&rsquo;d rather ship the truth than a demo that flatters you. A research tool owes you the truth even when the truth is &ldquo;don&rsquo;t.&rdquo;</p>
+
+      <h2><span class="num">7.</span> One morning brief, end to end</h2>
+      <p>The clearest way to show the system is to trace one thing it made. This shipped on July 28: the market brief, with its receipts open.</p>
+
+      <figure class="figure">
+        <img src="assets/newsq_sources.png" alt="The finplatform news page: a synthesized market brief with the sources panel expanded, showing eight dated articles with publishers, each listing what it contributed to the take." loading="lazy" />
+        <figcaption>The brief and its receipts: our take &middot; 8 sources, each dated, linked, and annotated with what it contributed.</figcaption>
+      </figure>
+
+      <div class="trace">
+        <div class="turn"><span class="who">09:31 &middot; retrieve</span><p>Six fixed entity queries warm the market pool through the ladder in &sect;2. Rung 1 was quota-exhausted that morning, so rung 2 served all six: $0.0018 total, then cached. The next reader triggers zero provider calls.</p></div>
+        <div class="turn"><span class="who">09:31 &middot; filter and rank</span><p>Section indexes, symbol pages, and anything dated outside the week are dropped before ranking. Relevance multiplies the score blend, so a fresh, reputable, off-topic page cannot outrank an on-topic one. Eight rows survive.</p></div>
+        <div class="turn"><span class="who">09:32 &middot; synthesize</span><p>Haiku writes the take over the eight rows. Headlines enter the prompt marked untrusted; markdown and banned phrasing are stripped in code after the call.</p></div>
+        <div class="turn"><span class="who">09:32 &middot; render</span><p>It ships as the Report instance in &sect;4: model named, eight sources one click away with publisher, date, and contribution. Total model and data cost on screen: under a cent.</p></div>
+      </div>
+
+      <p>That is the whole architecture in one artifact: paid data entering through a budgeted ladder, a shared cache making it cheap, a routed model synthesizing it, invariants enforced in code, and provenance carried all the way to the pixel a reader can click.</p>
 
       <nav class="article-nav">
         <a href="article-1.html">&larr; Essay No. 1</a>
