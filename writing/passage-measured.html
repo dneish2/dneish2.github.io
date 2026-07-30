@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A prompt is not a mechanism — David Neish</title>
+  <meta name="description" content="Engineering notes from Passage: six of seven models ignored an explicit instruction, a thinking model spent 8,786 characters answering nothing, a 4B beat a 27B, and one defect took six review rounds because every instance had the same shape." />
+  <link rel="canonical" href="https://dneish2.github.io/writing/passage-measured.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="A prompt is not a mechanism" />
+  <meta property="og:description" content="What building Passage actually measured: where models ignored instructions, where a number didn't replicate, and why one defect took six rounds." />
+  <meta name="theme-color" content="#0E0D0B" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23E3A83B' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23E3A83B'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    /* Article-local styles, built on main.css tokens — same vocabulary as the
+       finplatform case study so the two read as one body of work. */
+    .arch { max-width: 880px; }
+    .arch .article-body { max-width: none; }
+    .arch .article-body > p, .arch .article-head .dek { max-width: var(--measure); }
+
+    .arch pre { background: var(--bg-inset); border: 1px solid var(--line-soft); border-left: 2px solid var(--accent);
+      padding: 1rem 1.2rem; overflow-x: auto; font-family: var(--font-mono); font-size: .78rem; line-height: 1.65;
+      color: var(--ink-muted); border-radius: var(--radius); }
+    .arch pre b { color: var(--accent); font-weight: 600; }
+    .arch pre i { color: var(--ink); font-style: normal; }
+    .arch pre u { text-decoration: none; opacity: .65; }
+
+    .envs { border-collapse: collapse; width: 100%; font-family: var(--font-mono); font-size: .78rem; margin: 1.4rem 0; }
+    .envs th { font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); text-align: left;
+      font-weight: 600; padding: 7px 14px 7px 0; border-bottom: 1px solid var(--accent); }
+    .envs td { padding: 8px 14px 8px 0; border-bottom: 1px solid var(--line-soft); color: var(--ink-muted); vertical-align: top;
+      font-variant-numeric: tabular-nums; }
+    .envs td:first-child { color: var(--ink); white-space: nowrap; }
+    .envs tr.win td { color: var(--ink); }
+    .envs tr.win td:first-child { color: var(--accent); }
+    .envs tr.dim td { opacity: .62; }
+    .envs-scroll { overflow-x: auto; }
+    .envs td.n, .envs th.n { text-align: right; }
+
+    .figtitle { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--accent); margin: 2.2rem 0 .2rem; }
+
+    .pull { border-left: 2px solid var(--accent); padding: 2px 0 2px 20px; margin: 1.8rem 0; max-width: 62ch; }
+    .pull p { margin: 0; font-size: 1.06rem; color: var(--ink); line-height: 1.45; }
+    .pull .who { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--ink-muted); display: block; margin-bottom: .4rem; }
+
+    .statrow { display: flex; flex-wrap: wrap; gap: 1.6rem 2.6rem; margin: 1.6rem 0; }
+    .statrow .s { display: flex; flex-direction: column; gap: .1rem; }
+    .statrow .s b { font-size: 2rem; line-height: 1; color: var(--accent); font-weight: 600;
+      font-variant-numeric: tabular-nums; }
+    .statrow .s span { font-family: var(--font-mono); font-size: .64rem; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--ink-muted); }
+
+    /* main.css has no visually-hidden utility; table captions need one or they
+       render as stray visible text above each table. */
+    .arch .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+    .arch .article-body > ul { max-width: var(--measure); color: var(--ink-muted); }
+    .arch .article-body > ul li { margin-bottom: .5rem; }
+    .arch .article-body > ul li b { color: var(--ink); }
+  </style>
+</head>
+<body>
+
+<!-- SITE-HEADER v1 -->
+<header class="site-header">
+  <div class="inner">
+    <a class="wordmark" href="../index.html">DN<span class="tick">_</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html#work">Work</a>
+      <a href="index.html" aria-current="page">Writing</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#resume">R&eacute;sum&eacute;</a>
+      <a class="nav-cta" href="mailto:david.neishm@gmail.com">Email</a>
+    </nav>
+  </div>
+</header>
+<!-- /SITE-HEADER -->
+
+<main>
+  <div class="container arch">
+    <header class="article-head">
+      <span class="kicker">Engineering notes &middot; <a href="../index.html#passage">Passage</a></span>
+      <h1>A prompt is not a mechanism</h1>
+      <p class="dek">Four measurements from building a translation workspace, each of which changed the code: where models ignored an explicit instruction, where a purpose-built small model beat a big one, where my own headline number failed to replicate, and why one defect took six review rounds to kill.</p>
+      <div class="byline">
+        <span>David Neish</span>
+      </div>
+    </header>
+
+    <article class="article-body">
+
+      <p><a href="https://github.com/dneish2/LanguageTranslation" rel="noopener">Passage</a> translates text, documents, photographs and speech. It runs on a local model when one is reachable, on your own endpoint if you bring one, and on a hosted model otherwise &mdash; and it names, per request, which of those actually answered. It began as an internal tool for people doing real translation work, and it was paid for.</p>
+
+      <p>None of that is what makes it worth writing about. What follows is the handful of times a measurement contradicted something I believed, including the times the thing I believed was my own previously published number.</p>
+
+      <h2><span class="num">1.</span> Six of seven models ignored the instruction</h2>
+
+      <p>Translation has a class of spans that must survive untouched: URLs, email addresses, figures, currency. The obvious approach is to say so in the prompt. I did, explicitly, and then measured whether it held.</p>
+
+      <div class="statrow">
+        <div class="s"><b>6 / 7</b><span>models altered protected spans</span></div>
+        <div class="s"><b>1</b><span>line of prompt saying not to</span></div>
+      </div>
+
+      <p>Every model in the roster got one sentence containing a URL, an email address and a figure, plus an instruction to leave them alone. Six of the seven mangled them anyway. Which one complied isn&rsquo;t interesting and I didn&rsquo;t record it: one pass on one sentence is a coin that landed the right way, not a compliant model. The six failures are the finding, and they are a property of the model <em>class</em> rather than of six bad models.</p>
+
+      <p>So the instruction stopped being an instruction. Fragile spans are extracted before the call, replaced with opaque placeholders, and restored after:</p>
+
+      <pre>mask    see <i>https://a.co/x</i> for &euro;1,200
+        &darr;   deterministic, pre-flight
+        see <u>&#10214;P0&#10215;</u> for <u>&#10214;P1&#10215;</u>
+        &darr;   the model never sees the span
+unmask  see <i>https://a.co/x</i> for &euro;1,200</pre>
+
+      <p>The model is now handed text it <em>cannot</em> corrupt, because the corruptible parts aren&rsquo;t in it. And because masking is deterministic, it is testable once rather than sampled across runs &mdash; the test asserts the mechanism, not the wording of a prompt that the next model upgrade could quietly stop honouring.</p>
+
+      <div class="pull">
+        <span class="who">the rule this produced</span>
+        <p>Never enforce a model invariant by asking for it. Mask it, route it, or validate it &mdash; then test the mechanism.</p>
+      </div>
+
+      <p>It has since paid off twice more in the same codebase. Local speech synthesis uses Piper, a VITS model rather than a language model, so it is <em>structurally incapable</em> of answering the text instead of reading it aloud &mdash; where a general TTS model needs a prompt asking it to behave, a small specialised one makes the failure unreachable. And prompt-injection defence translates embedded instructions literally rather than trusting a model to decline them.</p>
+
+      <h2><span class="num">2.</span> Thinking models are the wrong tool &mdash; for this task</h2>
+
+      <p>The qwen3 family looked like a silent failure through Ollama&rsquo;s OpenAI-compatible endpoint: <code>content</code> came back empty every time. The answer was going to a reasoning channel that endpoint doesn&rsquo;t expose. Through the native API the channels stay separate and the answer arrives &mdash; which is how I found the actual problem.</p>
+
+      <p><code>qwen3:30b</code> spent <b>8,786 characters deliberating a one-line translation and still produced no answer</b>, on top of a 2,048-token reserve. That isn&rsquo;t a budget you tune. Translation is transduction, not reasoning; there is no reserve that reliably bounds deliberation a task never needed.</p>
+
+      <p>The tempting fix is <code>think: false</code>. On a translation prompt it makes things worse &mdash; the model writes its reasoning <em>into</em> the answer. But the same flag on the same model class is exactly right for <strong>extraction</strong>, where deliberation is pure cost: with it, <code>qwen3-vl:8b</code> reads a full menu photograph, accents and currency intact, in 2.6 seconds, entirely offline.</p>
+
+      <p>Same model, same flag, opposite verdicts, decided by the shape of the job. Thinking models are kept out of the default translation roster and left selectable.</p>
+
+      <h2><span class="num">3.</span> A purpose-built 4B beat a general 27B</h2>
+
+      <div class="envs-scroll">
+        <table class="envs">
+          <caption class="sr-only">Local translation models: agreement, size and median latency</caption>
+          <thead>
+            <tr><th>Model</th><th class="n">Agreement</th><th class="n">Size</th><th class="n">p50</th><th>Verdict</th></tr>
+          </thead>
+          <tbody>
+            <tr class="win"><td>translategemma:4b</td><td class="n">0.788</td><td class="n">3.3 GB</td><td class="n">368 ms</td><td>the default</td></tr>
+            <tr><td>gemma3:12b</td><td class="n">0.787</td><td class="n">8.2 GB</td><td class="n">582 ms</td><td>best generalist</td></tr>
+            <tr><td>translategemma:12b</td><td class="n">0.779</td><td class="n">8.1 GB</td><td class="n">495 ms</td><td></td></tr>
+            <tr><td>qwen2.5:7b</td><td class="n">0.763</td><td class="n">4.7 GB</td><td class="n">237 ms</td><td>fastest usable</td></tr>
+            <tr><td>gemma4:latest</td><td class="n">0.741</td><td class="n">9.6 GB</td><td class="n">398 ms</td><td></td></tr>
+            <tr><td>translategemma:27b</td><td class="n">0.734</td><td class="n">17.4 GB</td><td class="n">679 ms</td><td>beaten by its own 4B</td></tr>
+            <tr class="dim"><td>gemma3:1b</td><td class="n">0.668</td><td class="n">0.8 GB</td><td class="n">334 ms</td><td>not usable</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The 4B outscores the 27B from its own family at a fifth of the size and nearly twice the speed. Before spending VRAM on a bigger model, check whether someone has built a small one for your actual task.</p>
+
+      <p>The floor is more interesting than the ceiling. <code>gemma3:1b</code> rendered &ldquo;the board pushed back on the buyback&rdquo; as <em>&ldquo;el consejo regul&oacute; la compra de acciones&rdquo;</em> &mdash; &ldquo;the council regulated the share purchase.&rdquo; That is not a rougher translation. It is a different claim, stated with identical confidence. Reaching for the tiniest model to save memory buys a confidently wrong answer, which is worse than a slow one.</p>
+
+      <p>One caveat I&rsquo;d want applied to my own table: <em>agreement</em> means mean similarity to the other models on the same input. There is no reference translation to score against, so it rewards the mainstream reading and flags the outlier. It is triage, not a leaderboard &mdash; a model can be right and alone.</p>
+
+      <h2><span class="num">4.</span> One run is not a result</h2>
+
+      <p>An overlay-alignment fix &mdash; painting translated text back onto a photograph in the right place &mdash; measured 17.5&nbsp;px error before and 9.2&nbsp;px after. A halving. I nearly shipped that number.</p>
+
+      <div class="envs-scroll">
+        <table class="envs">
+          <caption class="sr-only">Overlay error: one run versus the median of five</caption>
+          <thead><tr><th>Reported from</th><th class="n">Before</th><th class="n">After</th><th>What it actually says</th></tr></thead>
+          <tbody>
+            <tr class="dim"><td>a single run</td><td class="n">17.5 px</td><td class="n">9.2 px</td><td>a halving &mdash; and not reproducible</td></tr>
+            <tr class="win"><td>median of five</td><td class="n">23.5 px</td><td class="n">20.5 px</td><td>~13%, better in 4 of 5 runs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The vision model&rsquo;s box predictions vary noticeably run to run, so a single before/after pair mostly measures which run you got. The fix shipped anyway &mdash; it is cheap, it degrades gracefully, it helps most of the time &mdash; but the honest headline is &ldquo;somewhat better on average,&rdquo; and one of the five runs got worse.</p>
+
+      <div class="pull">
+        <span class="who">the rule this produced</span>
+        <p>Anything whose result depends on a model&rsquo;s output gets reported as the median across at least five runs, together with how many runs improved. Deterministic changes &mdash; masking, routing, parsing &mdash; can be measured once. The distinction is whether sampling is in the loop.</p>
+      </div>
+
+      <p>The same discipline is why a shipped default in that repo carries a written note that <strong>the evidence under it doesn&rsquo;t count</strong>. Every speech measurement so far used a fixture generated by a text-to-speech model: no accent, no background noise, no clipping, no phone-mic band limiting. That is structurally the easiest possible input for a recogniser, and the gap between Whisper sizes is precisely the gap that only opens on hard audio. So the small model stays, the protocol that would settle it is written down, and the claim above it is marked unproven rather than quietly inherited.</p>
+
+      <p>A related habit, from the same instinct: a screenshot difference is not a bug report until the computed style is checked. Two &ldquo;bugs&rdquo; found during a UI pass turned out to be hover artifacts from the automation driving the browser.</p>
+
+      <h2><span class="num">5.</span> 419 passing tests, and one defect wearing four costumes</h2>
+
+      <p>An adversarial review &mdash; agents that hadn&rsquo;t written the code, driving the real app in a real browser, one per modality plus degradation and cross-user &mdash; found a cross-user data leak and three privacy overclaims. The suite was green throughout. The tests weren&rsquo;t wrong; they were <em>narrow</em>, and narrowness looks exactly like correctness until someone opens a browser.</p>
+
+      <p>The worst finding: user A&rsquo;s translation, produced on A&rsquo;s own private endpoint, served verbatim to user B and labelled as B&rsquo;s engine. The cache key was <code>(text, target, mode)</code> on one shared backend &mdash; no provider, no session. Zero outbound calls for B, so nothing looked wrong from any angle a single-session test can see.</p>
+
+      <p>It took <b>six rounds to converge</b>, and that is the part worth writing down. Not because the defects were hard, but because they were all the same defect:</p>
+
+      <div class="envs-scroll">
+        <table class="envs">
+          <caption class="sr-only">Four defects and the single shape they share</caption>
+          <thead><tr><th>Where it surfaced</th><th>The claim it made</th><th>Derived from</th></tr></thead>
+          <tbody>
+            <tr><td>cache hit</td><td>&ldquo;no model ran, nothing was sent&rdquo;</td><td>a process-wide counter every session bumps</td></tr>
+            <tr><td>response body</td><td>&ldquo;runs on this machine&rdquo;</td><td>a capability probe taken at page render</td></tr>
+            <tr><td>voice engine line</td><td>&ldquo;this machine&rdquo;</td><td>two of three steps, not the middle one</td></tr>
+            <tr class="win"><td>a failed photo</td><td>&ldquo;nothing translated yet&rdquo;</td><td>a row that was never written at all</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pull">
+        <span class="who">the shape</span>
+        <p>The app deriving a privacy claim from state read at render time, instead of recording what happened when it happened.</p>
+      </div>
+
+      <p>Six rounds is what fixing a shape one surface at a time costs. Each round closed the instance in front of it and wrote a test that passed honestly; the reviewer then found the next surface. The lesson isn&rsquo;t &ldquo;review more&rdquo; &mdash; it&rsquo;s that when the third instance of a defect arrives, the defect you are looking at is not the one to fix.</p>
+
+      <p>The last instance is my favourite, because it is the same mistake twice. Photograph a blank wall: the vision model receives the image, answers &ldquo;no text here,&rdquo; the backend raises, and the exception escapes past the bookkeeping at the end of the function. The page then reported <em>&ldquo;Nothing translated yet&rdquo;</em> about a photograph that had demonstrably been sent to a hosted model on the app&rsquo;s key.</p>
+
+      <pre>with capture_provenance() as prov:
+    result = fn(*args)
+<u># &larr; the exception escaped past everything below</u>
+record(engine=&hellip;, chars=&hellip;)</pre>
+
+      <p>A call that was <b>delivered and then failed</b> is still a disclosure &mdash; a 429, a timeout, an empty reply all happen after your text is on someone else&rsquo;s computer. A connection that <b>never opened</b> is not, and saying otherwise would tell an offline user their words had left, which is a lie told to precisely the person who chose the app for that reason. So the fix catches, books and re-raises, on the path every surface shares.</p>
+
+      <p>And then the first version of that fix reproduced the original defect one level up. It named the engine from the label the caller <em>expected</em> to use &mdash; an expectation formed before the call &mdash; and so disclosed a send for a file that validation had rejected before a single byte left. An existing test caught it, one whose docstring had already stated the rule: <em>rejected before anything leaves, and nothing is booked.</em> Provenance written at the moment of the outbound call is now the only accepted proof of departure.</p>
+
+      <h2><span class="num">6.</span> What I didn&rsquo;t build</h2>
+
+      <p>Named because they were tempting, not because they were forgotten.</p>
+
+      <ul>
+        <li><b>Accounts, billing, durable storage.</b> The auth verification is ported and tested, and deliberately unwired. A signup wall in front of a demo mostly measures who bounces at it. Abuse prevention lives where the actual risk is: a signed page token, per-IP rate limits, size caps.</li>
+        <li><b>A traces dashboard.</b> The plumbing records machine output, human edits and edit rate per engine. There are no real human edits yet, so a chart over that data would be a chart computed from nothing.</li>
+        <li><b>A third overlay heuristic.</b> Two were tried, one made it worse, a third measured no better and was reverted rather than kept for the idea&rsquo;s sake. The residual error needs real OCR line geometry, which is a dependency decision and not a tuning one. Three attempts was enough to learn <em>what kind</em> of problem it is.</li>
+        <li><b>A minimum instance on Cloud Run.</b> Two of the three config defaults that hurt a stateful WebSocket app cost nothing to change and are set. The third bills continuously, and this app has no users yet.</li>
+      </ul>
+
+      <p>The thread through all of it: the useful output of a project like this isn&rsquo;t the feature list, it&rsquo;s the set of beliefs it forced me to drop. Four of them are above, along with the evidence that killed each one.</p>
+
+      <p><a href="https://claude.ai/code/artifact/1d14890b-cb38-4fae-94fd-d1afb96394d4" rel="noopener">The full deck &mdash; twelve slides, with the routing diagrams and the negative results &rarr;</a><br />
+      <a href="https://github.com/dneish2/LanguageTranslation/blob/main/RESEARCH.md" rel="noopener">RESEARCH.md &mdash; every measurement and how it was taken &rarr;</a><br />
+      <a href="https://github.com/dneish2/LanguageTranslation/blob/main/DECISIONS.md" rel="noopener">DECISIONS.md &mdash; every open call, resolved, with the reasoning &rarr;</a></p>
+
+      <nav class="article-nav">
+        <a href="finplatform-architecture.html">&larr; finplatform: a reference architecture</a>
+        <a href="real-estate-playbook.html">The real estate playbook &rarr;</a>
+      </nav>
+    </article>
+  </div>
+</main>
+
+<!-- SITE-FOOTER v1 -->
+<footer class="site-footer">
+  <div class="container">
+    <p class="signoff">If you&rsquo;re building decision systems, let&rsquo;s talk.</p>
+    <div class="links">
+      <a href="mailto:david.neishm@gmail.com">david.neishm@gmail.com</a>
+      <a href="https://github.com/dneish2" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/david-neish-298b1a16b" rel="noopener">LinkedIn</a>
+      <a href="../assets/resume/david-neish-resume.pdf" target="_blank" rel="noopener">R&eacute;sum&eacute;</a>
+    </div>
+    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; St. Louis &middot; Plain HTML, no framework.</p>
+  </div>
+</footer>
+<!-- /SITE-FOOTER -->
+
+<script src="../assets/js/main.js" defer></script>
+</body>
+</html>
