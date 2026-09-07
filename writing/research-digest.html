@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A research library that shows its work &mdash; David Neish</title>
+  <meta name="description" content="A personal arXiv library exposed to AI agents over MCP. Why the ranking is arithmetic instead of a model, why the vector store refuses to append, and what a fresh clone actually did." />
+  <link rel="canonical" href="https://dneish2.github.io/writing/research-digest.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="A research library that shows its work" />
+  <meta property="og:description" content="Ranking you can check by hand, a vector store that refuses to lie, and an MCP server in 300 lines." />
+  <meta name="theme-color" content="#0E0D0B" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23E3A83B' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23E3A83B'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    .rd { max-width: 880px; }
+    .rd .article-body { max-width: none; }
+    .rd .article-body > p, .rd .article-head .dek { max-width: var(--measure); }
+
+    .rd pre { background: var(--bg-inset); border: 1px solid var(--line-soft); border-left: 2px solid var(--accent);
+      padding: 1rem 1.2rem; overflow-x: auto; font-family: var(--font-mono); font-size: .78rem; line-height: 1.65;
+      color: var(--ink-muted); border-radius: var(--radius); margin: 1.4rem 0; }
+    .rd pre b { color: var(--accent); font-weight: 600; }
+    .rd pre i { color: var(--ink); font-style: normal; }
+
+    /* the scoring ledger */
+    .rules { margin: 1.6rem 0; border-top: 1px solid var(--accent); }
+    .rules div { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 9px 4px;
+      border-bottom: 1px solid var(--line-soft); font-family: var(--font-mono); font-size: .8rem; }
+    .rules div span:last-child { color: var(--accent); }
+
+    .pipeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px;
+      background: var(--line-soft); border: 1px solid var(--line-soft); border-radius: var(--radius);
+      overflow: hidden; margin: 1.8rem 0; }
+    .pipeline div { background: var(--bg-inset); padding: 14px 16px; }
+    .pipeline b { display: block; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; font-weight: 400; }
+    .pipeline span { font-size: .86rem; }
+
+    .verdict { border-left: 2px solid var(--accent); padding: .2rem 0 .2rem 1.1rem; margin: 1.8rem 0;
+      max-width: var(--measure); }
+    .verdict p { margin: 0 0 .6rem; }
+    .verdict p:last-child { margin-bottom: 0; }
+
+    .tally { margin: 1.6rem 0; border-top: 1px solid var(--line-soft); }
+    .tally div { display: grid; grid-template-columns: 190px 1fr; gap: 16px; padding: 9px 4px;
+      border-bottom: 1px solid var(--line-soft); font-size: .86rem; }
+    .tally div span:first-child { font-family: var(--font-mono); font-size: .76rem; color: var(--ink-muted); }
+    @media (max-width: 560px) { .tally div { grid-template-columns: 1fr; gap: 3px; } }
+  </style>
+</head>
+<body>
+
+<!-- SITE-HEADER v1 -->
+<header class="site-header">
+  <div class="inner">
+    <a class="wordmark" href="../index.html">DN<span class="tick">_</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html#work">Work</a>
+      <a href="index.html" aria-current="page">Writing</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#resume">R&eacute;sum&eacute;</a>
+      <a class="nav-cta" href="mailto:david.neishm@gmail.com">Email</a>
+    </nav>
+  </div>
+</header>
+<!-- /SITE-HEADER -->
+
+<main>
+  <div class="container rd">
+    <header class="article-head">
+      <span class="kicker">Case study &middot; research-digest</span>
+      <h1>A research library that shows its work</h1>
+      <p class="dek">Twelve hundred papers a week arrive in the categories I follow. This keeps the ones worth reading, and hands them to whichever AI assistant I am working in. The interesting part is not the retrieval. It is that every ranking decision can be checked by hand.</p>
+      <div class="byline"><span>David Neish</span></div>
+      <p style="font-family: var(--font-mono); font-size: .74rem; color: var(--ink-muted); border-left: 2px solid var(--accent); padding: .5rem 0 .5rem 1rem; margin: 1.4rem 0 0; max-width: 62ch; line-height: 1.6;">
+        Source is public: <a href="https://github.com/dneish2/research-digest-mcp" rel="noopener">github.com/dneish2/research-digest-mcp</a> &middot; MIT &middot; <code>pip install -e .</code> and one command to a working library.
+      </p>
+    </header>
+
+    <article class="article-body">
+
+      <div class="pipeline">
+        <div><b>fetch</b><span>arXiv Atom, standard library only</span></div>
+        <div><b>score</b><span>hand-built IDF, no model</span></div>
+        <div><b>embed</b><span>TF-IDF then SVD to 384</span></div>
+        <div><b>serve</b><span>MCP over stdio, 6 tools</span></div>
+      </div>
+
+      <h2>The ranking is arithmetic</h2>
+
+      <p>The obvious way to rank papers is to ask a model which ones matter. I did not do that, and the reason is not cost. It is that a model gives you an ordering you cannot argue with. When a paper you expected to see is missing, there is nothing to inspect.</p>
+
+      <p>So the score is six rules over words you chose:</p>
+
+      <div class="rules">
+        <div><span>a multi-word topic appearing verbatim</span><span>1.00</span></div>
+        <div><span>a single distinctive word</span><span>0.60</span></div>
+        <div><span>a single common word</span><span>0.20</span></div>
+        <div><span>three or more of your topics matched</span><span>+0.30</span></div>
+        <div><span>exactly two matched</span><span>+0.15</span></div>
+        <div><span>published today, decaying over 30 days</span><span>+0.20</span></div>
+      </div>
+
+      <p>The 0.20 is the line that earns its keep. In this literature a word like <i>learning</i> appears in nearly every abstract, so matching it carries almost no information. That discount is a hand-built inverse document frequency, and without it the ranking fills with papers that matched nothing but boilerplate.</p>
+
+      <p>Every result carries its own derivation, through the MCP tools and in the interface:</p>
+
+      <pre>matched <i>agentic</i> (distinctive word), <i>evaluation</i> (distinctive word);
+<b>+0.15</b> for spanning 2 topics; <b>+0.18</b> for being 3 days old.
+
+term matches <b>0.48</b>   breadth bonus <b>0.15</b>   recency <b>0.18</b>   =  <b>0.810</b></pre>
+
+      <p>The interface has a tab where you edit a title, an abstract and your topic list, and watch the arithmetic recompute. It is the part I would show someone first. A ranking you can take apart is a different kind of object from one you have to trust.</p>
+
+      <h2>The vector store refuses to append</h2>
+
+      <p>Similarity search uses TF-IDF followed by SVD, which compresses a few thousand sparse word columns into 384 dense ones that capture how terms actually co-vary. It runs offline, needs no model download, and works the same on any machine with Python.</p>
+
+      <p>It also has a property that is easy to miss: <b>it is fitted to a corpus.</b> Each run derives its own 384 directions from the documents it saw. Vectors from two runs are not comparable even when both are 384 wide.</p>
+
+      <p>I know this because the version I was porting from had been appending. Two small incremental batches had written vectors of 16 and 17 columns next to 1,185 of 384, and the index raised on load, which meant two of its five tools failed for every paper while the status endpoint reported ninety-two percent healthy.</p>
+
+      <div class="verdict">
+        <p>The tempting fix is to force the width to 384 and move on. That converts a loud failure into a silent one: the vectors would stack cleanly and the similarity scores would be meaningless.</p>
+        <p>The crash was the only reason anyone noticed.</p>
+      </div>
+
+      <p>So this store records the encoder and a fingerprint of the fit on every row, and <code>replace_all</code> is the only write path. There is deliberately no append.</p>
+
+      <pre><b>CREATE TABLE</b> vectors (
+    paper_id  TEXT PRIMARY KEY,
+    vector    BLOB    NOT NULL,
+    dims      INTEGER NOT NULL,
+    <i>encoder   TEXT    NOT NULL,</i>
+    <i>basis     TEXT    NOT NULL,</i>
+    coded_at  TEXT
+);</pre>
+
+      <p>Find two fits in the store and it refuses to compare them, and says which command rebuilds. Refitting thirteen hundred documents takes about a second. A wrong answer you cannot see costs considerably more.</p>
+
+      <h2>Absence is not a decline</h2>
+
+      <p>The trends view compares concept counts this week against last. The version I started from would report every concept at minus one hundred percent whenever the fetch had not run, which is not a measurement of the field. It is a measurement of uptime, presented as a finding.</p>
+
+      <p>Now a thin week returns <code>no_data</code> and says so in words: <i>not enough papers in this week to compare, 0 this week, 165 previous. This measures how recently you fetched, not what the field is doing.</i></p>
+
+      <h2>Nothing in the core</h2>
+
+      <p>Fetching, scoring, search, trends, the web interface and the MCP server itself are standard library only. No SDK, no framework, no build step. The MCP protocol is one JSON object per line each way, which fits in about three hundred lines and can be driven from a shell when something looks wrong:</p>
+
+      <pre>$ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | research-digest mcp</pre>
+
+      <p>numpy and scikit-learn are an optional extra, needed only for similarity. That is not a stylistic preference. It means the install cannot fail on a machine behind a proxy, and it means the tool degrades to a working keyword library rather than to nothing. CI proves it by running the suite twice, the second time after uninstalling both.</p>
+
+      <h2>What a fresh clone did</h2>
+
+      <p>Before writing any of this down I cloned the public repository into an empty directory and followed my own README as though I had never seen it.</p>
+
+      <div class="tally">
+        <div><span>core install</span><span>zero third-party packages</span></div>
+        <div><span>first fetch</span><span>56 papers from arXiv</span></div>
+        <div><span>first search</span><span>24 of 56 matched, each with its derivation</span></div>
+        <div><span>embed, extra absent</span><span>named the exact command to install it</span></div>
+        <div><span>MCP handshake</span><span>6 tools listed</span></div>
+      </div>
+
+      <p>That pass found two things worth fixing. A message that said <i>similarity needs numpy</i> without saying how to get it, and a progress line printed before a flush, so an error on standard error overtook it and appeared above the step it belonged to. Neither is interesting. Both are the kind of thing you only see by being a stranger to your own tool for twenty minutes.</p>
+
+      <h2>Why it is shaped this way</h2>
+
+      <p>There is a pattern underneath this that I keep arriving at from different directions: a deterministic substrate with a thin generated layer on top, arranged so the generated layer can fail without taking the facts down with it. The papers are fetched, scored and ranked by code. A model is welcome to summarise them afterwards, and if it is unavailable, the library still works.</p>
+
+      <p>The same shape holds in the trading terminal, where panels are built from real chain data and only the narrative is a model call. Getting it right here was cheaper, because the cost of a bad answer is a wasted afternoon rather than a wrong number on a screen someone is making decisions from.</p>
+
+      <nav class="article-nav">
+        <a href="finplatform-architecture.html">&larr; finplatform architecture</a>
+        <a href="passage-measured.html">Passage, measured &rarr;</a>
+      </nav>
+    </article>
+  </div>
+</main>
+
+<!-- SITE-FOOTER v1 -->
+<footer class="site-footer">
+  <div class="container">
+    <p class="signoff">If you&rsquo;re building decision systems, let&rsquo;s talk.</p>
+    <div class="links">
+      <a href="mailto:david.neishm@gmail.com">david.neishm@gmail.com</a>
+      <a href="https://github.com/dneish2" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/david-neish-298b1a16b" rel="noopener">LinkedIn</a>
+      <a href="../assets/resume/david-neish-resume.pdf" target="_blank" rel="noopener">R&eacute;sum&eacute;</a>
+    </div>
+    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; St. Louis &middot; Plain HTML, no framework.</p>
+  </div>
+</footer>
+<!-- /SITE-FOOTER -->
+
+<script src="../assets/js/main.js" defer></script>
+</body>
+</html>

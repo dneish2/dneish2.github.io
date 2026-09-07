@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Price of a Question &mdash; David Neish</title>
+  <meta name="description" content="An interactive case study on finplatform: what one question costs to answer, why five different models answer different parts of it, which hardware is worth owning, and what has to be true for the price to hold as it scales." />
+  <link rel="canonical" href="https://dneish2.github.io/work/price-of-a-question/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The Price of a Question" />
+  <meta property="og:description" content="Pricing every task on a finance desk against the machine that does a slice of it. Interactive: a router simulator and a unit-economics model, both running the real constants." />
+  <meta name="theme-color" content="#0E0D0B" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23E3A83B' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23E3A83B'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../../assets/css/main.css" />
+  <link rel="stylesheet" href="page.css" />
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body class="pq">
+
+<!-- SITE-HEADER v1 -->
+<header class="site-header">
+  <div class="inner">
+    <a class="wordmark" href="../../index.html">DN<span class="tick">_</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../../index.html#work" aria-current="page">Work</a>
+      <a href="../../writing/index.html">Writing</a>
+      <a href="../../index.html#about">About</a>
+      <a href="../../index.html#resume">R&eacute;sum&eacute;</a>
+      <a class="nav-cta" href="mailto:david.neishm@gmail.com">Email</a>
+    </nav>
+  </div>
+</header>
+<!-- /SITE-HEADER -->
+
+<div class="rail-mobile" aria-hidden="true">
+  <span class="m-act">The question</span>
+  <span><span class="m-label">one question</span> <span class="m-total">$0.019</span></span>
+</div>
+
+<main>
+<div class="pq-shell">
+
+  <!-- ── THE LEDGER RAIL: the receipt, printing as you read ──────────────── -->
+  <nav class="rail-ledger" aria-label="Contents">
+    <div class="rl-cap">Running total</div>
+    <div class="rl-total" id="rlTotal">$0.019</div>
+    <div class="rl-sub" id="rlLabel">to answer one question</div>
+    <ol>
+      <li><a href="#question" data-act="question"><span>The question</span><span class="amt">$0.019</span></a></li>
+      <li><a href="#ledger" data-act="ledger"><span>The task ledger</span><span class="amt">12 tasks</span></a></li>
+      <li><a href="#deck" data-act="deck"><span>The deck</span><span class="amt">17 cards</span></a></li>
+      <li><a href="#line" data-act="line"><span>The line</span><span class="amt">7 stations</span></a></li>
+      <li><a href="#tree" data-act="tree"><span>The tree</span><span class="amt">5 gates</span></a></li>
+      <li><a href="#bill" data-act="bill"><span>The bill</span><span class="amt" id="railBill">&mdash;</span></a></li>
+      <li><a href="#rig" data-act="rig"><span>The rig</span><span class="amt" id="railRig">&mdash;</span></a></li>
+      <li><a href="#broke" data-act="broke"><span>What broke</span><span class="amt">4</span></a></li>
+    </ol>
+  </nav>
+
+  <div class="pq-main">
+
+    <!-- ═══ 00 · THE QUESTION ═══════════════════════════════════════════════ -->
+    <section class="act" id="question">
+      <header class="act-head">
+        <span class="kicker">Interactive case study &middot; finplatform</span>
+        <h1 style="font-family: var(--font-display); font-size: var(--text-hero); line-height: 1.03; letter-spacing: -0.02em; margin: 0 0 1rem;">The Price of a&nbsp;Question</h1>
+        <p class="dek">A finance desk is a machine for turning questions into answers, and every answer has a price. I built one that answers a slice of those questions for fractions of a cent. This is what the slice costs, why it takes five different models to serve it, and what has to stay true for the price to hold.</p>
+      </header>
+
+      <div class="req" data-reveal>GET /api/research?t=MU&amp;depth=deep</div>
+
+      <div class="twoprice" data-reveal style="--i:1">
+        <div class="human">
+          <div class="side-cap">The desk version</div>
+          <div class="big" id="cpHuman">&mdash;</div>
+          <p style="font-size:.88rem; color:var(--ink-muted); line-height:1.55; margin:0;">Write the full research note on Micron. Four hours of an equity research associate, at a fully loaded rate.</p>
+          <div class="breakdown" id="cpHumanBd"></div>
+        </div>
+        <div class="machine">
+          <div class="side-cap">The measured version</div>
+          <div class="big" id="cpMachine">&mdash;</div>
+          <p style="font-size:.88rem; color:var(--ink-muted); line-height:1.55; margin:0;">One search, one large-model call, twelve seconds, and a report envelope that shows its own sources.</p>
+          <div class="breakdown" id="cpMachineBd"></div>
+        </div>
+      </div>
+
+      <p data-reveal style="--i:2">Those two numbers are not doing the same work, and this page is not going to pretend otherwise. The desk version includes judgment, a phone call, and someone whose name is on the note. The measured version does retrieval, synthesis, and a first draft. <strong>The interesting question is not which is cheaper. It is what the cheap one actually costs to keep running.</strong></p>
+
+      <div class="legend" data-reveal style="--i:3">
+        <span><span class="n m">&nbsp;</span><b>Measured.</b> Lifted from the repo. Hover for the file.</span>
+        <span><span class="n e">&nbsp;</span><b>Estimated.</b> Click to see the arithmetic.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 01 · THE TASK LEDGER ════════════════════════════════════════════ -->
+    <section class="act" id="ledger">
+      <header class="act-head">
+        <span class="kicker">The task ledger</span>
+        <h2>Price the task, not the person</h2>
+        <p class="dek">Nobody is replaced by a table. But desk work decomposes into tasks, tasks take time, and time on a desk has a rate. That makes every row here comparable, as long as the arithmetic is on the page.</p>
+      </header>
+
+      <p data-reveal>The human column is an estimate and it is built the same way every time. Take a public base-comp band, load it for the things a seat actually costs beyond salary, and divide by a year that reflects how a desk really runs.</p>
+
+      <div class="deriv" data-reveal style="--i:1">
+        <div class="row"><span>base comp band, equity research associate</span><span>$130k to $160k</span></div>
+        <div class="row"><span>&times; 1.35 loaded: benefits, payroll tax, seat, terminal</span><span>$176k to $216k</span></div>
+        <div class="row"><span>&divide; desk hours a year, not the 2,080 office default</span><span>2,600</span></div>
+        <div class="rule"></div>
+        <div class="row out"><span>fully loaded hourly</span><span>$68 to $83</span></div>
+      </div>
+
+      <p data-reveal style="--i:2">Run that for every seat on the desk and you get the rates the ledger uses. Midpoints, so the table stays readable.</p>
+
+      <div class="seat-rates" id="seatRates" data-reveal style="--i:3"></div>
+
+      <p data-reveal style="--i:4">The machine column is not an estimate. Each row charges a fixed number of credits, and the credit weight is set by the model that actually ran, so the price tracks the real cost rather than a flat guess.</p>
+
+      <div class="tl-scroll" data-reveal style="--i:5">
+        <table class="tl">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Seat</th>
+              <th class="t-num">Human</th>
+              <th>Surface</th>
+              <th>Tier</th>
+              <th class="t-num">Credits</th>
+              <th class="t-num">Machine</th>
+            </tr>
+          </thead>
+          <tbody id="tlBody"></tbody>
+        </table>
+      </div>
+
+      <div class="aside" data-reveal>
+        <b>Two rows cost nothing, and they are not the boring ones.</b> Classifying whether a name is even publicly traded, and grading how a trade was exited, are both real work done with no model at all. A deterministic action is the only genuinely free thing on this list. Everything else, including the local model, draws a credit, because the local model is not free to the platform either.
+      </div>
+    </section>
+
+    <!-- ═══ 02 · THE DECK ═══════════════════════════════════════════════════ -->
+    <section class="act" id="deck">
+      <header class="act-head">
+        <span class="kicker">The deck</span>
+        <h2>Five models, six machines, six feeds</h2>
+        <p class="dek">Every card here has a back, and the back is the interesting side. A spec sheet that only lists what something can do is marketing. The reason these choices are defensible is that the limits were measured too.</p>
+      </header>
+
+      <p data-reveal>Feature code in finplatform never names a model. It names a <em>task</em>, and two tables decide the rest: what tier a task wants, and which model currently serves that tier. Swapping a model is a string edit in one file. That is what makes the cards below interchangeable rather than load-bearing.</p>
+
+      <div class="suit-head" data-reveal style="--i:1">
+        <h3>Models</h3><span class="line"></span><span class="hint">click a card to flip it</span>
+      </div>
+      <div class="deck" id="deckModels"></div>
+
+      <div class="suit-head" data-reveal>
+        <h3>Machines</h3><span class="line"></span><span class="hint">one is chosen, one is dead</span>
+      </div>
+      <div class="deck" id="deckHardware"></div>
+
+      <div class="suit-head" data-reveal>
+        <h3>Feeds</h3><span class="line"></span><span class="hint">every rung is budget-gated</span>
+      </div>
+      <div class="deck" id="deckData"></div>
+    </section>
+
+    <!-- ═══ 03 · THE LINE ═══════════════════════════════════════════════════ -->
+    <section class="act" id="line">
+      <header class="act-head">
+        <span class="kicker">The line</span>
+        <h2>One request, station by station</h2>
+        <p class="dek">The bill from the cold open does not arrive in one piece. It accumulates across seven stations, and only two of them cost anything.</p>
+      </header>
+
+      <div class="belt" id="belt" data-reveal></div>
+
+      <p data-reveal>Five of seven stations are free, and they are the ones that keep the other two from running away. The throttle stops a read from costing more than a write. The cache means a repeated question is answered without spending again. The retrieval budget caps how much context a call can carry, which caps the input bill before a single token is generated.</p>
+
+      <p data-reveal style="--i:1"><strong>The router is the station worth opening.</strong> It makes six decisions in a fixed order, and the order is the whole design: what the task wants, what the plan allows, what the day's budget allows, whether the answer already exists, what to do when a provider fails, and what to tell the user if the result is not what they asked for.</p>
+
+      <div class="sim" data-reveal style="--i:2">
+        <div class="sim-head">
+          <span class="t">Router simulator</span>
+          <span class="presets">
+            <button class="preset" type="button" data-preset="leak">Try to leak Qwen into Sonnet</button>
+            <button class="preset" type="button" data-preset="clamp">Spend $0.49 as Options</button>
+            <button class="preset" type="button" data-preset="down">Take the provider down</button>
+          </span>
+        </div>
+        <div class="sim-body">
+          <div class="sim-ctls">
+            <div class="ctl">
+              <label for="simRole">Who is asking</label>
+              <select id="simRole"></select>
+            </div>
+            <div class="ctl">
+              <label for="simPick">Model they picked</label>
+              <select id="simPick"></select>
+            </div>
+            <div class="ctl">
+              <label for="simTask">What they asked for</label>
+              <select id="simTask"></select>
+            </div>
+            <div class="ctl">
+              <label for="simSpend">Spent today</label>
+              <input type="range" id="simSpend" min="0" max="0.5" step="0.01" value="0" />
+              <span class="ctl-val" id="simSpendVal">$0.00</span>
+            </div>
+            <div class="ctl">
+              <span class="lb">Conditions</span>
+              <label style="display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:.7rem; color:var(--ink-muted); text-transform:none; letter-spacing:0;">
+                <input type="checkbox" id="simCache" /> answer is cached
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:.7rem; color:var(--ink-muted); text-transform:none; letter-spacing:0; margin-top:6px;">
+                <input type="checkbox" id="simDown" /> provider is down
+              </label>
+            </div>
+          </div>
+          <div class="trace-steps">
+            <div id="simSteps"></div>
+            <div class="verdict-row">
+              <span class="served" id="simServed">&mdash;</span>
+              <span class="charge" id="simCharge">&mdash;</span>
+            </div>
+            <div class="reason" id="simReason" hidden></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aside" data-reveal>
+        <b>The invariant worth the whole simulator:</b> picking the free model can never become a paid call. Fallback normally walks a tier down, but the local tier's fallback points <em>up</em> to Haiku, because in production there is no local model to fall back to. That upward step is capped the moment a user makes an explicit pick, so the convenience never turns into a bill the user did not choose.
+      </div>
+    </section>
+
+    <!-- ═══ 04 · THE TREE ═══════════════════════════════════════════════════ -->
+    <section class="act" id="tree">
+      <header class="act-head">
+        <span class="kicker">The tree</span>
+        <h2>What a plan actually buys</h2>
+        <p class="dek">Five roles, and between each one a gate that exists in code rather than in a pricing page. A ceiling on which models you can reach, a monthly credit budget, and a daily dollar clamp that bounds the worst case.</p>
+      </header>
+
+      <div class="tree" id="tree" data-reveal></div>
+
+      <p data-reveal>The paywall does not just buy a bigger model. On prose tasks the router appends a depth directive keyed to the tier that actually served the request, so the free tier gets the core read, Pro gets one or two forward-looking signals, and Analyst gets historical precedent and scenario sensitivities. Same scaffold, escalating substance. That is a deliberate choice about what a subscription should feel like, and it is enforced by the same table that picks the model.</p>
+
+      <div class="aside" data-reveal>
+        <b>A small thing that says a lot.</b> The file that defines all of this opens with a docstring advertising 20 credits a month for Pro and unlimited for Options. The enforced table two hundred lines below says 40 and 300. The number a user actually receives was right the entire time. Only the prose describing it drifted, which is the argument for putting invariants in code instead of in documentation.
+      </div>
+    </section>
+
+    <!-- ═══ 05 · THE BILL ═══════════════════════════════════════════════════ -->
+    <section class="act" id="bill">
+      <header class="act-head">
+        <span class="kicker">The bill</span>
+        <h2>Does the desk pay for itself</h2>
+        <p class="dek">This is the number the whole page drives toward. Move the sliders: the model runs on the real credit weights, the real per-call costs, and the real search caps.</p>
+      </header>
+
+      <div class="calc" data-reveal>
+        <div class="calc-ctls" id="calcCtls"></div>
+        <div class="calc-out">
+          <div class="kpis" id="calcKpis"></div>
+          <div class="chart-wrap">
+            <div class="chart-title">Where the money goes, as it scales</div>
+            <div id="chartComposition"></div>
+            <div class="chart-key">
+              <span><i style="background:#B8842B"></i>Model calls</span>
+              <span><i style="background:#4E86C4"></i>Search</span>
+              <span><i style="background:#A0524F"></i>Infrastructure</span>
+            </div>
+          </div>
+
+          <div class="chart-wrap" style="margin-top:1.8rem">
+            <div class="chart-title">Does it pay for itself</div>
+            <div id="chartMargin"></div>
+            <div class="chart-key">
+              <span><i style="background:#B8842B; height:3px; border-radius:2px"></i>Total cost</span>
+              <span><i style="background:#5D9B4A; height:3px; border-radius:2px"></i>Revenue</span>
+              <span style="opacity:.7">Revenue outruns cost by roughly 60x at the right edge, which is why these two need their own chart and a log axis.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p data-reveal><strong>The shape is the argument.</strong> Model cost is a straight line, because it scales with actions. Search cost bends and then flattens, because one search serves every user for the length of the cache window. Feed, brief, and coverage on the same ticker is exactly one paid search, verified live. Search spend tracks distinct questions per window, not how many people asked them, and it is hard capped anyway.</p>
+
+      <div class="chart-wrap" data-reveal style="--i:1">
+        <div class="chart-title">Cost per subscriber, same model</div>
+        <div id="chartPerUser"></div>
+      </div>
+
+      <p data-reveal>So the per-subscriber cost falls as the product grows, which is the good version of this curve and the reason the break-even sits so low.</p>
+
+      <div class="aside" data-reveal>
+        <b>One plan can go negative, and the reason is more interesting than the number.</b> Options is sold as unlimited. Thirty large-model calls a day costs about <span class="n m" title="llm/tiers.py:61">$9.90</span> a month at the typical call size, which is fine against $24 of revenue. The same thirty calls carrying near the full retrieval ceiling costs about <button class="n e" type="button" aria-expanded="false" aria-controls="whyHeavy" data-why="whyHeavy">$27</button><span class="why" id="whyHeavy" role="note">30 calls a day &times; 30 days &times; roughly $0.030 for a prompt near the 30,000-character ceiling, which is about 3&times; the typical $0.011 call. This is the rate the economics notes reason with.</span>, which is not. Same user, same call count, opposite verdict.
+      </div>
+
+      <p data-reveal>That is why the clamp is denominated in dollars rather than in calls. A call limit would have to assume a prompt size; a dollar limit does not. Two mitigations ship: a daily spend cap that degrades the model rather than blocking the action, and a quota of 300 credits, roughly four times what a heavy user actually does.</p>
+
+      <p data-reveal>There is also money on the table that has not been picked up. Prompt caching reads at about a tenth of input cost, is documented in the economics notes, and is not implemented. That is 20 to 40 percent of the input bill sitting unharvested, and saying so is more useful than quietly rounding the margin up.</p>
+    </section>
+
+    <!-- ═══ 06 · THE RIG ════════════════════════════════════════════════════ -->
+    <section class="act" id="rig">
+      <header class="act-head">
+        <span class="kicker">The rig</span>
+        <h2>The GPU is a development asset</h2>
+        <p class="dek">There is a 5090 in the room and a vLLM profile ready for it. Here is the arithmetic on whether it should ever serve production, plotted against the two alternatives and the thing production actually does.</p>
+      </header>
+
+      <div class="chart-wrap" data-reveal>
+        <div class="chart-title">Monthly cost against model calls served</div>
+        <div id="chartCrossover"></div>
+      </div>
+
+      <div class="kpis" id="rigKpis" data-reveal style="--i:1"></div>
+
+      <p data-reveal>Below the crossover, paying per call is simply cheaper, and the crossover is a long way from where this product sits. But the arithmetic is not even the strongest argument. <strong>Cloud Run has no GPU at any memory size.</strong> Serving a local model means a second always-on machine, on a home connection, carrying an availability guarantee that does not exist. The capex is the small problem. The uptime is the real one.</p>
+
+      <p data-reveal>Which is why production runs the free tier on Haiku, and why the two open-model rows disappear from the model picker entirely when the local provider is not configured. Asking Anthropic for Gemma is an error, not a fallback, so the option is removed rather than left to fail. "Free and open" is a development-time truth on this project, and the honest version of the case study says so.</p>
+
+      <div class="aside" data-reveal>
+        <b>This is an open gate, not a settled answer.</b> The repo names the production T1 provider as an undecided launch decision. The arithmetic above says rent until roughly fifty thousand calls a month. What would change the call is not a cheaper card, it is having enough traffic that the always-on machine stops being idle most of the day.
+      </div>
+    </section>
+
+    <!-- ═══ 07 · WHAT BROKE ═════════════════════════════════════════════════ -->
+    <section class="act" id="broke">
+      <header class="act-head">
+        <span class="kicker">What broke</span>
+        <h2>Four failures worth keeping</h2>
+        <p class="dek">A case study that only lists what worked is a brochure. These are the ones that changed how the system is built.</p>
+      </header>
+
+      <div class="fails" id="fails" data-reveal></div>
+
+      <div class="act-head" style="margin-top:3.5rem;">
+        <span class="kicker">Still open</span>
+        <h2>What is not decided</h2>
+      </div>
+      <ul class="gates" id="gates" data-reveal></ul>
+
+      <div class="closer" data-reveal>
+        <div class="ck">The question this page did not answer</div>
+        <p>This priced tasks. It did not price quality. The only quality-per-dollar findings here were discovered by necessity rather than by design: a 7B model that could not hold a JSON contract, a prose path deleted because small models wrote bad analysis, and a depth ladder that makes the paywall buy visibly more words rather than provably better ones.</p>
+        <p><b>What I would instrument next is the part a user can feel.</b> Not tokens per dollar, but whether the answer at the higher tier changed what someone did. That takes a different kind of measurement than any of the tables above: paired reads on the same question, and a way to ask whether the extra depth was worth the extra charge. It is a marketing and user-research problem wearing an engineering costume, and it is the honest next chapter.</p>
+        <p>The verdict on the part that <em>was</em> measured: break-even at <b>three to six Pro subscribers</b>, a cost curve that falls per user as it grows, and one plan whose margin depends on a clamp rather than on optimism.</p>
+      </div>
+
+      <div class="cta-row" style="margin-top:2.5rem; display:flex; gap:12px; flex-wrap:wrap;">
+        <a class="btn btn-ghost" href="../../writing/finplatform-architecture.html">Read the architecture companion</a>
+        <a class="btn btn-ghost" href="../../index.html#work">Back to work</a>
+      </div>
+    </section>
+
+  </div>
+</div>
+</main>
+
+<!-- SITE-FOOTER v1 -->
+<footer class="site-footer">
+  <div class="inner">
+    <p class="signoff" data-type>Numbers first, adjectives later.</p>
+    <div class="links">
+      <a href="mailto:david.neishm@gmail.com">Email</a>
+      <a href="https://github.com/dneish2">GitHub</a>
+      <a href="../../index.html#resume">R&eacute;sum&eacute;</a>
+    </div>
+    <p class="colophon">Built without a framework. Every measured figure links to the file it came from.</p>
+  </div>
+</footer>
+<!-- /SITE-FOOTER -->
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
