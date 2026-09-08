@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case studies &mdash; David Neish</title>
+  <meta name="description" content="Build logs from decision systems: what one question costs to answer, a research library that shows its ranking, a reference architecture, and what happens when you measure a prompt instead of trusting it." />
+  <link rel="canonical" href="https://dneish2.github.io/work/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Case studies — David Neish" />
+  <meta property="og:description" content="Build logs from decision systems. Measured, not asserted." />
+  <meta name="theme-color" content="#0d1117" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%2358a6ff' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%2358a6ff'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    /* Case studies run the product colourway. Writing stays amber. */
+    :root {
+      --bg:          #0d1117;
+      --bg-raised:   #161b22;
+      --bg-inset:    #010409;
+      --ink:         #e6edf3;
+      --ink-muted:   #8b949e;
+      --line:        rgba(240, 246, 252, 0.24);
+      --line-soft:   rgba(240, 246, 252, 0.12);
+      --line-strong: rgba(240, 246, 252, 0.36);
+      --accent:      #58a6ff;
+      --accent-hi:   #79c0ff;
+      --ok:          #3fb950;
+    }
+
+    .hub { max-width: 960px; }
+    .hub-head { padding: 3.4rem 0 2.2rem; }
+    .hub-head h1 { font-family: var(--font-display); font-size: clamp(2.1rem, 5vw, 3rem);
+      letter-spacing: -.015em; margin: .5rem 0 0; line-height: 1.08; }
+    .hub-head .line { color: var(--ink-muted); font-size: 1.08rem; max-width: 58ch;
+      margin: 1rem 0 0; line-height: 1.65; }
+
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.7rem; }
+    .pill { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .04em;
+      padding: 4px 11px; border-radius: 99px; border: 1px solid var(--line-soft);
+      color: var(--ink-muted); background: var(--bg-raised); }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+      gap: 16px; padding-bottom: 4.5rem; }
+
+    .card { display: flex; flex-direction: column; gap: 9px;
+      background: var(--bg-raised); border: 1px solid var(--line-soft);
+      border-radius: 12px; padding: 22px 24px; text-decoration: none; color: inherit;
+      position: relative; overflow: hidden; }
+    .card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 2px;
+      background: var(--accent); opacity: 0; transition: opacity .18s ease; }
+    a.card:hover { border-color: var(--line-strong); }
+    a.card:hover::before { opacity: 1; }
+    a.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .card .kind { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--accent); }
+    .card h2 { font-family: var(--font-display); font-size: 1.22rem; line-height: 1.3;
+      margin: 0; color: var(--ink); }
+    .card p { margin: 0; font-size: .92rem; color: var(--ink-muted); line-height: 1.6; }
+    .card .stats { font-family: var(--font-mono); font-size: .73rem; color: var(--ink-muted);
+      border-top: 1px solid var(--line-soft); padding-top: 10px; margin-top: auto;
+      line-height: 1.7; }
+    .card .go { font-family: var(--font-mono); font-size: .74rem; color: var(--accent); }
+
+    .card--soon { opacity: .55; }
+    .card--soon .kind { color: var(--ink-muted); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      a.card { transition: border-color .18s ease, transform .18s ease; }
+      a.card:hover { transform: translateY(-2px); }
+    }
+    @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- SITE-HEADER v1 -->
+<header class="site-header">
+  <div class="inner">
+    <a class="wordmark" href="../index.html">DN<span class="tick">_</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html" aria-current="page">Work</a>
+      <a href="../writing/index.html">Writing</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#resume">R&eacute;sum&eacute;</a>
+      <a class="nav-cta" href="mailto:david.neishm@gmail.com">Email</a>
+    </nav>
+  </div>
+</header>
+<!-- /SITE-HEADER -->
+
+<main>
+  <div class="container hub">
+
+    <header class="hub-head">
+      <span class="kicker">Case studies</span>
+      <h1>Build logs from decision systems</h1>
+      <p class="line">Each of these is a system I built and then measured. Where the measurement disagreed with what I expected, the write-up says so, because that is usually the part worth reading.</p>
+      <div class="pills">
+        <span class="pill">MCP</span>
+        <span class="pill">Embeddings</span>
+        <span class="pill">LLM routing</span>
+        <span class="pill">Explainable ranking</span>
+        <span class="pill">Distributed systems</span>
+        <span class="pill">HCI</span>
+        <span class="pill">Agentic systems</span>
+      </div>
+    </header>
+
+    <div class="grid">
+
+      <a class="card" href="price-of-a-question/">
+        <span class="kind">Interactive</span>
+        <h2>The Price of a Question</h2>
+        <p>What a single question costs to answer, why it takes five models to serve one desk, and which hardware is actually worth owning. Ships with a working router simulator.</p>
+        <div class="stats">
+          5 model tiers &middot; measured vs estimated marked separately<br />
+          live unit-economics model
+        </div>
+        <span class="go">Open the model &rarr;</span>
+      </a>
+
+      <a class="card" href="../writing/research-digest.html">
+        <span class="kind">Case study</span>
+        <h2>A research library that shows its work</h2>
+        <p>A personal arXiv library any AI assistant can read. The ranking is arithmetic you can check by hand, and the vector store refuses to append rather than return a confident wrong answer.</p>
+        <div class="stats">
+          1,320 papers &middot; 6 tools over MCP<br />
+          0 third-party packages in the core
+        </div>
+        <span class="go">Read the case study &rarr;</span>
+      </a>
+
+      <a class="card" href="../writing/finplatform-architecture.html">
+        <span class="kind">Architecture</span>
+        <h2>finplatform: a reference architecture</h2>
+        <p>Five consolidated apps behind one terminal, with a router that spans a local GPU to Claude. What the data costs, the one contract every surface returns, and the full trace of a single output.</p>
+        <div class="stats">
+          local GPU to frontier, metered per model<br />
+          one report contract &middot; evals gate every ship
+        </div>
+        <span class="go">Walk the system &rarr;</span>
+      </a>
+
+      <a class="card" href="../writing/passage-measured.html">
+        <span class="kind">Engineering notes</span>
+        <h2>A prompt is not a mechanism</h2>
+        <p>Six of seven models ignored an explicit instruction. A 4B model beat a 27B. My own headline number did not replicate. The fix was to stop asking and enforce it in code.</p>
+        <div class="stats">
+          7 models tested &middot; 6 ignored the instruction<br />
+          one defect took six review rounds
+        </div>
+        <span class="go">Read the notes &rarr;</span>
+      </a>
+
+      <a class="card" href="deal-lens/index.html">
+        <span class="kind">Prototype</span>
+        <h2>Deal Lens</h2>
+        <p>Tax-sale property underwriting, designed end to end. The consent-first concierge flow is live and clickable; the underwriting engine is fully designed and waiting on MLS data access.</p>
+        <div class="stats">
+          concierge flow: live prototype<br />
+          runs on Austin TX sample data
+        </div>
+        <span class="go">Open the prototype &rarr;</span>
+      </a>
+
+      <div class="card card--soon">
+        <span class="kind">In progress</span>
+        <h2>The real estate playbook</h2>
+        <p>The St. Louis land tax sale, mapped. The process, the data, and the plan I am actually running.</p>
+        <div class="stats">in draft</div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- SITE-FOOTER v1 -->
+<footer class="site-footer">
+  <div class="container">
+    <p class="signoff">If you&rsquo;re building decision systems, let&rsquo;s talk.</p>
+    <div class="links">
+      <a href="mailto:david.neishm@gmail.com">david.neishm@gmail.com</a>
+      <a href="https://github.com/dneish2" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/david-neish-298b1a16b" rel="noopener">LinkedIn</a>
+      <a href="../assets/resume/david-neish-resume.pdf" target="_blank" rel="noopener">R&eacute;sum&eacute;</a>
+    </div>
+    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; St. Louis &middot; Plain HTML, no framework.</p>
+  </div>
+</footer>
+<!-- /SITE-FOOTER -->
+
+<script src="../assets/js/main.js" defer></script>
+</body>
+</html>
