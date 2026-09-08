@@ -3,22 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A research library that shows its work &mdash; David Neish</title>
-  <meta name="description" content="A personal arXiv library exposed to AI agents over MCP. Why the ranking is arithmetic instead of a model, why the vector store refuses to append, and what a fresh clone actually did." />
+  <title>Research Digest &mdash; David Neish</title>
+  <meta name="description" content="A personal arXiv library with an MCP interface, so Claude Code and Copilot CLI can search the papers you actually keep instead of the open web. Install, commands, and the prompts it answers." />
   <link rel="canonical" href="https://dneish2.github.io/writing/research-digest.html" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="A research library that shows its work" />
-  <meta property="og:description" content="Ranking you can check by hand, a vector store that refuses to lie, and an MCP server in 300 lines." />
+  <meta property="og:title" content="Research Digest — a paper library your AI agent can read" />
+  <meta property="og:description" content="From 1,200 papers a week to the five that matter, exposed to any MCP client." />
   <meta name="theme-color" content="#0d1117" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%2358a6ff' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%2358a6ff'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="../assets/css/main.css" />
   <script>document.documentElement.classList.add('js');</script>
   <style>
-    /* ------------------------------------------------------------------
-       This page runs its own colourway. The writing is editorial and amber;
-       a build log is a product surface, so it borrows the palette of the
-       tools it describes. Structure and type stay the site's.
-       ------------------------------------------------------------------ */
     :root {
       --bg:          #0d1117;
       --bg-raised:   #161b22;
@@ -34,85 +29,67 @@
       --violet:      #bc8cff;
     }
 
-    .cs { max-width: 860px; }
+    .cs { max-width: 900px; }
     .cs .article-body { max-width: none; }
     .cs .article-body > p, .cs .article-head .dek { max-width: var(--measure); }
     .cs h2 { margin-top: 3.2rem; }
-
-    /* stat row */
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft);
-      border-radius: 10px; overflow: hidden; margin: 2.2rem 0; }
-    .stats div { background: var(--bg-raised); padding: 18px 20px; }
-    .stats .n { font-family: var(--font-mono); font-size: 1.55rem; color: var(--accent);
-      line-height: 1.1; font-variant-numeric: tabular-nums; }
-    .stats .l { font-size: .82rem; color: var(--ink-muted); margin-top: 5px; }
+    .cs h3 { font-family: var(--font-display); font-size: 1.14rem; margin: 0 0 .6rem; }
 
     /* pipeline */
-    .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+    .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
       gap: 12px; margin: 2rem 0; }
     .node { background: var(--bg-raised); border: 1px solid var(--line-soft);
-      border-radius: 10px; padding: 16px 18px; position: relative; }
-    .node b { display: block; font-family: var(--font-mono); font-size: .68rem;
+      border-radius: 10px; padding: 15px 17px; }
+    .node b { display: block; font-family: var(--font-mono); font-size: .66rem;
       letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
-      margin-bottom: 7px; font-weight: 500; }
-    .node span { font-size: .88rem; color: var(--ink-muted); }
+      margin-bottom: 6px; font-weight: 500; }
+    .node span { font-size: .86rem; color: var(--ink-muted); }
+
+    /* screenshots */
+    figure { margin: 2rem 0; }
+    figure img { width: 100%; height: auto; display: block; border-radius: 10px;
+      border: 1px solid var(--line-soft); }
+    figcaption { font-size: .84rem; color: var(--ink-muted); margin-top: .8rem;
+      line-height: 1.6; max-width: 68ch; }
+    figcaption b { color: var(--ink); font-weight: 600; }
 
     /* code */
     .cs pre { background: var(--bg-inset); border: 1px solid var(--line-soft);
       border-left: 2px solid var(--accent); padding: 1rem 1.2rem; overflow-x: auto;
-      font-family: var(--font-mono); font-size: .78rem; line-height: 1.7;
-      color: var(--ink-muted); border-radius: 8px; margin: 1.5rem 0; }
+      font-family: var(--font-mono); font-size: .78rem; line-height: 1.75;
+      color: var(--ink-muted); border-radius: 8px; margin: 1.4rem 0; }
     .cs pre .k { color: var(--violet); }
-    .cs pre .f { color: var(--accent-hi); }
     .cs pre .s { color: #a5d6ff; }
-    .cs pre .n { color: #ffa657; }
     .cs pre .c { color: #6e7681; }
     .cs pre .hl { color: var(--ink); }
+    .cs pre .p { color: var(--accent-hi); }
 
-    /* decision cards */
     .card { background: var(--bg-raised); border: 1px solid var(--line-soft);
-      border-radius: 10px; padding: 22px 24px; margin: 1.5rem 0; }
-    .card > h3 { margin: 0 0 .7rem; font-family: var(--font-display); font-size: 1.16rem;
-      color: var(--ink); }
-    .card p { margin: 0 0 .8rem; }
+      border-radius: 10px; padding: 20px 24px; margin: 1.4rem 0; }
+    .card p { margin: 0 0 .75rem; }
     .card p:last-child { margin-bottom: 0; }
-    .card.flag { border-left: 2px solid var(--accent); }
+    .card.lead { border-left: 2px solid var(--accent); }
 
-    /* the score bar */
-    .score { background: var(--bg-raised); border: 1px solid var(--line-soft);
-      border-radius: 10px; padding: 20px 22px; margin: 1.8rem 0; }
-    .score .top { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; }
-    .score .val { font-family: var(--font-mono); font-size: 1.7rem; color: var(--accent);
-      font-variant-numeric: tabular-nums; }
-    .score .ttl { font-size: .88rem; color: var(--ink-muted); }
-    .bar { height: 12px; border-radius: 6px; overflow: hidden; display: flex;
-      background: var(--bg-inset); }
-    .bar i { display: block; height: 100%; }
-    .key { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px;
-      font-family: var(--font-mono); font-size: .72rem; color: var(--ink-muted); }
-    .key i { display: inline-block; width: 10px; height: 10px; border-radius: 2px;
-      margin-right: 6px; vertical-align: middle; }
+    /* prompts */
+    .prompts { display: flex; flex-direction: column; gap: 9px; margin: 1.4rem 0; }
+    .prompt { background: var(--bg-raised); border: 1px solid var(--line-soft);
+      border-radius: 999px; padding: 10px 18px; font-size: .92rem; color: var(--ink);
+      display: flex; gap: 11px; align-items: baseline; }
+    .prompt::before { content: "you"; font-family: var(--font-mono); font-size: .64rem;
+      letter-spacing: .12em; text-transform: uppercase; color: var(--accent); flex: none; }
 
-    /* rules ledger */
-    .rules { margin: 1.6rem 0; border-top: 1px solid var(--accent); }
-    .rules div { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 9px 2px;
-      border-bottom: 1px solid var(--line-soft); font-family: var(--font-mono); font-size: .8rem; }
-    .rules div span:last-child { color: var(--accent); }
-    .rules div.em span:last-child { color: var(--accent-hi); }
-
-    /* onboarding tally */
-    .tally { margin: 1.6rem 0; border-top: 1px solid var(--line-soft); }
-    .tally div { display: grid; grid-template-columns: 200px 1fr; gap: 16px; padding: 10px 2px;
-      border-bottom: 1px solid var(--line-soft); font-size: .88rem; }
-    .tally div span:first-child { font-family: var(--font-mono); font-size: .76rem;
-      color: var(--ink-muted); }
-    .tally div span:last-child { color: var(--ink); }
-    @media (max-width: 560px) { .tally div { grid-template-columns: 1fr; gap: 3px; } }
+    /* stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft);
+      border-radius: 10px; overflow: hidden; margin: 2rem 0; }
+    .stats div { background: var(--bg-raised); padding: 17px 19px; }
+    .stats .n { font-family: var(--font-mono); font-size: 1.5rem; color: var(--accent);
+      line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .stats .l { font-size: .8rem; color: var(--ink-muted); margin-top: 5px; }
 
     .repo { font-family: var(--font-mono); font-size: .78rem; color: var(--ink-muted);
       background: var(--bg-raised); border: 1px solid var(--line-soft); border-radius: 8px;
-      padding: .8rem 1.1rem; margin: 1.6rem 0 0; line-height: 1.8; }
+      padding: .75rem 1.1rem; margin: 1.5rem 0 0; }
   </style>
 </head>
 <body>
@@ -122,7 +99,7 @@
   <div class="inner">
     <a class="wordmark" href="../index.html">DN<span class="tick">_</span></a>
     <nav class="site-nav" aria-label="Site">
-      <a href="../index.html#work">Work</a>
+      <a href="../work/index.html">Work</a>
       <a href="index.html" aria-current="page">Writing</a>
       <a href="../index.html#about">About</a>
       <a href="../index.html#resume">R&eacute;sum&eacute;</a>
@@ -135,144 +112,126 @@
 <main>
   <div class="container cs">
     <header class="article-head">
-      <span class="kicker">Case study &middot; research-digest</span>
-      <h1>A research library that shows its work</h1>
-      <p class="dek">Twelve hundred papers a week arrive in the categories I follow. This keeps the ones worth reading and hands them to whichever AI assistant I am working in. The interesting part is not the retrieval. It is that every ranking decision can be checked by hand.</p>
+      <span class="kicker">Case study &middot; Research Digest</span>
+      <h1>From 1,200 papers a week to the five that matter</h1>
+      <p class="dek">A personal arXiv library with an MCP interface, so Claude Code and Copilot CLI can search the papers you actually keep instead of the open web. Ask your agent what you have on retrieval and it answers from your library, not from a search engine.</p>
       <div class="byline"><span>David Neish</span></div>
       <p class="repo">
-        Source: <a href="https://github.com/dneish2/research-digest-mcp" rel="noopener">github.com/dneish2/research-digest-mcp</a><br />
-        MIT &middot; Python 3.9+ &middot; <span class="hl">pip install -e .</span> then one command to a working library
+        <a href="https://github.com/dneish2/research-digest-mcp" rel="noopener">github.com/dneish2/research-digest-mcp</a> &middot; MIT &middot; Python 3.9+ &middot; macOS, Linux, Windows
       </p>
     </header>
 
     <article class="article-body">
 
-      <div class="stats">
-        <div><div class="n">0</div><div class="l">third-party packages in the core</div></div>
-        <div><div class="n">6</div><div class="l">tools over MCP</div></div>
-        <div><div class="n">1,320</div><div class="l">papers in the working library</div></div>
-        <div><div class="n">6/6</div><div class="l">CI jobs green, 3 OSes</div></div>
-      </div>
-
       <div class="flow">
-        <div class="node"><b>fetch</b><span>arXiv Atom over urllib. No SDK.</span></div>
-        <div class="node"><b>score</b><span>Hand-built IDF. No model call.</span></div>
-        <div class="node"><b>embed</b><span>TF-IDF, then SVD to 384 columns.</span></div>
-        <div class="node"><b>serve</b><span>JSON-RPC on stdin and stdout.</span></div>
+        <div class="node"><b>fetch</b><span>arXiv, by the categories you track</span></div>
+        <div class="node"><b>rank</b><span>Keyword scoring against your topics</span></div>
+        <div class="node"><b>embed</b><span>TF-IDF and SVD, cosine similarity</span></div>
+        <div class="node"><b>expose</b><span>MCP, 6 tools, over stdio</span></div>
       </div>
 
-      <h2>The ranking is arithmetic</h2>
+      <h2>Why MCP instead of a REST API</h2>
 
-      <p>The obvious way to rank papers is to ask a model which ones matter. I did not do that, and the reason is not cost. It is that a model hands you an ordering you cannot argue with. When a paper you expected to see is missing, there is nothing to inspect.</p>
-
-      <p>So the score is six rules over words you chose:</p>
-
-      <div class="rules">
-        <div><span>a multi-word topic appearing verbatim</span><span>1.00</span></div>
-        <div><span>a single distinctive word</span><span>0.60</span></div>
-        <div class="em"><span>a single common word</span><span>0.20</span></div>
-        <div><span>three or more of your topics matched</span><span>+0.30</span></div>
-        <div><span>exactly two matched</span><span>+0.15</span></div>
-        <div><span>published today, decaying over 30 days</span><span>+0.20</span></div>
+      <div class="card lead">
+        <p><strong>REST APIs serve apps. MCP serves agents.</strong></p>
+        <p>The library already has a browser interface. The reason to also speak MCP is that it removes a context switch. You are in Claude Code working on something, you want to know what you have read about evaluation harnesses, and you ask. The agent calls <code>search_papers</code> behind the scenes and answers from your shelf.</p>
+        <p>Without it you stop, open a tab, search, skim, and come back having lost your place. That is the whole pitch.</p>
       </div>
 
-      <p>That third line is the one that earns its keep. In this literature a word like <em>learning</em> appears in nearly every abstract, so matching it carries almost no information. The discount is a hand-built inverse document frequency. Without it the ranking fills with papers that matched nothing but boilerplate.</p>
+      <p>Connecting it is one command:</p>
 
-      <p>Every result carries its own derivation, through the MCP tools and on screen:</p>
+      <pre><span class="c"># Claude Code</span>
+$ <span class="hl">claude mcp add research-digest -- research-digest mcp</span></pre>
 
-      <div class="score">
-        <div class="top">
-          <span class="val">0.810</span>
-          <span class="ttl">Agentic evaluation of multi-turn conversations</span>
-        </div>
-        <div class="bar">
-          <i style="width:59%;background:#58a6ff"></i>
-          <i style="width:19%;background:#bc8cff"></i>
-          <i style="width:22%;background:#6e7681"></i>
-        </div>
-        <div class="key">
-          <span><i style="background:#58a6ff"></i>term matches 0.48</span>
-          <span><i style="background:#bc8cff"></i>breadth bonus 0.15</span>
-          <span><i style="background:#6e7681"></i>recency 0.18</span>
-        </div>
+      <p>Or one entry, for a client that wants JSON:</p>
+
+      <pre>{
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"research-digest"</span>: {
+      <span class="s">"command"</span>: <span class="s">"research-digest"</span>,
+      <span class="s">"args"</span>: [<span class="s">"mcp"</span>]
+    }
+  }
+}</pre>
+
+      <p>Then you talk to it in normal language:</p>
+
+      <div class="prompts">
+        <div class="prompt">What papers do I have about retrieval?</div>
+        <div class="prompt">Find papers similar to that agentic framework one</div>
+        <div class="prompt">What have I saved on multi-agent systems?</div>
+        <div class="prompt">Suggest reading for what I am building right now</div>
+        <div class="prompt">What is rising in my feed this week?</div>
       </div>
 
-      <p>The interface has a tab where you edit a title, an abstract and your topic list and watch the arithmetic recompute. It is the part I would show someone first. A ranking you can take apart is a different kind of object from one you have to trust.</p>
+      <p>Those map to the six tools: <code>search_papers</code>, <code>get_similar</code>, <code>get_saved</code>, <code>suggest_reading</code>, <code>get_trends</code> and <code>library_status</code>. The server is plain JSON-RPC over stdin and stdout, no SDK, so you can drive it from a shell when something looks wrong:</p>
 
-      <h2>The vector store refuses to append</h2>
+      <pre>$ <span class="hl">echo</span> <span class="s">'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</span> | research-digest mcp</pre>
 
-      <p>Similarity search uses TF-IDF followed by SVD, which compresses a few thousand sparse word columns into 384 dense ones that capture how terms actually co-vary. It runs offline, needs no model download, and behaves the same on any machine with Python.</p>
+      <h2>What it looks like</h2>
 
-      <p>It also has a property that is easy to miss. <strong>It is fitted to a corpus.</strong> Each run derives its own 384 directions from the documents it saw, so vectors from two runs are not comparable even when both are 384 wide.</p>
+      <figure>
+        <img src="../assets/img/research-digest/search.jpg" alt="The Research Digest search view: a query for agentic evaluation returning 444 of 1,320 papers, each with a score bar, the matched terms, and a plain-English line explaining the ranking." loading="lazy" />
+        <figcaption><b>Search.</b> Every result says why it is there. The chips are the terms that matched and what each was worth, and the line underneath reads the ranking back in plain English. When a paper you expected is missing, you can see which term failed to hit instead of guessing.</figcaption>
+      </figure>
 
-      <p>I know this because the version I was porting from had been appending. Two small incremental batches had written vectors of 16 and 17 columns alongside 1,185 of 384:</p>
+      <figure>
+        <img src="../assets/img/research-digest/similar.jpg" alt="A paper expanded to show its nearest neighbours by embedding similarity, each with a similarity score and a small gauge." loading="lazy" />
+        <figcaption><b>Find similar.</b> Cosine similarity over the whole library. Under a millisecond once the index is warm, so it is fast enough to use as a browsing gesture rather than a search you commit to.</figcaption>
+      </figure>
 
-      <pre><span class="c"># embeddings.py, the line that did it</span>
-n_components = min(384, matrix.shape[1] - 1, <span class="hl">matrix.shape[0] - 1</span>)
+      <figure>
+        <img src="../assets/img/research-digest/trends.jpg" alt="The trends view reporting no_data, explaining that too few papers were fetched this week to compare against last week." loading="lazy" />
+        <figcaption><b>Trends,</b> caught being honest. Week over week on concepts in your own feed. If you have not fetched recently it says so, rather than reporting the gap as every topic collapsing. The version I ported from showed <code>-100%</code> across the board, which was measuring my uptime, not the field.</figcaption>
+      </figure>
 
-<span class="c"># batch 2026-08-25   1185 rows   384 dims   ok</span>
-<span class="c"># batch 2026-08-26     17 rows    16 dims   17 docs, so 16 components</span>
-<span class="c"># batch 2026-08-27     18 rows    17 dims   18 docs, so 17 components</span>
-
-<span class="k">ValueError</span>: array at index 0 has size <span class="n">384</span> and the array at index 1145 has size <span class="n">17</span></pre>
-
-      <p>The index raised on load, so two of the five tools failed for every paper, while the status endpoint reported ninety-two percent coverage. It counted the broken rows as successes.</p>
-
-      <div class="card flag">
-        <h3>The obvious fix makes it worse</h3>
-        <p>Forcing the width to a fixed 384 stops the crash. It does not fix the data. The vectors would stack cleanly and the similarity scores would be meaningless, because the columns mean different things in each fit.</p>
-        <p>The crash was the only reason anyone noticed.</p>
-      </div>
-
-      <p>So this store records the encoder and a fingerprint of the fit on every row, and <code>replace_all</code> is the only write path. There is deliberately no append.</p>
-
-      <pre><span class="k">CREATE TABLE</span> vectors (
-    paper_id  <span class="f">TEXT</span> <span class="k">PRIMARY KEY</span>,
-    vector    <span class="f">BLOB</span>    <span class="k">NOT NULL</span>,
-    dims      <span class="f">INTEGER</span> <span class="k">NOT NULL</span>,
-    <span class="hl">encoder   <span class="f">TEXT</span>    <span class="k">NOT NULL</span>,</span>
-    <span class="hl">basis     <span class="f">TEXT</span>    <span class="k">NOT NULL</span>,</span>
-    coded_at  <span class="f">TEXT</span>
-);</pre>
-
-      <p>Find two fits in the store and it refuses to compare them, and names the command that rebuilds. Refitting thirteen hundred documents takes about a second. A wrong answer you cannot see costs considerably more.</p>
-
-      <h2>Absence is not a decline</h2>
+      <h2>Why TF-IDF instead of transformer embeddings</h2>
 
       <div class="card">
-        <h3>Why does the trends view report <code>no_data</code>?</h3>
-        <p>It compares concept counts this week against last. The version I started from reported every concept at minus one hundred percent whenever the fetch had not run, which is not a measurement of the field. It is a measurement of uptime, presented as a finding.</p>
-        <p>A thin week now returns <code>no_data</code> and says so in words: <em>not enough papers in this week to compare, 0 this week, 165 previous. This measures how recently you fetched, not what the field is doing.</em></p>
+        <p>Both give you vectors for cosine similarity. TF-IDF plus SVD wins on three practical points for a personal tool: <strong>nothing to download</strong>, so no 90 MB model fetch; <strong>works offline</strong>, including on a corporate network that blocks model registries; and <strong>no GPU</strong>, so it behaves the same on any machine with Python.</p>
+        <p>The tradeoff is real. TF-IDF matches vocabulary, not meaning, so "reinforcement learning" and "reward optimisation" will not find each other. For a daily feed where papers in a field share vocabulary, that is usually fine. If you want the semantic version, install sentence-transformers and pass <code>--engine minilm</code>.</p>
       </div>
 
-      <h2>Nothing in the core</h2>
+      <p>One thing worth knowing if you use it: TF-IDF is fitted to your corpus, so adding papers changes the vector space. <code>research-digest embed</code> therefore rebuilds the whole index rather than appending, and the store records which fit produced each row. If it ever finds two, it refuses to compare them and tells you to re-embed instead of quietly returning nonsense.</p>
 
-      <p>Fetching, scoring, search, trends, the web interface and the MCP server are standard library only. No SDK, no framework, no build step. The protocol is one JSON object per line each way, which fits in about three hundred lines and can be driven from a shell when something looks wrong:</p>
+      <h2>Getting it running</h2>
 
-      <pre>$ <span class="hl">echo</span> <span class="s">'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</span> | research-digest mcp
-<span class="c">-> search_papers, get_similar, get_trends, get_saved, suggest_reading, library_status</span></pre>
+      <pre>$ <span class="hl">git clone</span> https://github.com/dneish2/research-digest-mcp
+$ <span class="hl">cd</span> research-digest-mcp
+$ <span class="hl">pip install -e .</span>
 
-      <p>numpy and scikit-learn are an optional extra, needed only for similarity. That is not a stylistic preference. It means the install cannot fail on a machine behind a proxy, and it means the tool degrades to a working keyword library rather than to nothing. CI proves it by running the suite twice, the second time after uninstalling both, across three operating systems and two Python versions.</p>
+<span class="c"># pull today's papers, then check what you have</span>
+$ <span class="hl">research-digest fetch</span>
+<span class="c">Fetched 56, 56 new. Library now holds 56 papers.</span>
+$ <span class="hl">research-digest status</span>
 
-      <h2>What a fresh clone did</h2>
+<span class="c"># optional: similarity search needs numpy and scikit-learn</span>
+$ <span class="hl">pip install -e</span> <span class="s">".[embeddings]"</span>
+$ <span class="hl">research-digest embed</span>
 
-      <p>Before writing any of this down I cloned the public repository into an empty directory and followed my own README as though I had never seen it.</p>
+<span class="c"># browse it, or wire it to your agent</span>
+$ <span class="hl">research-digest web</span>
+$ <span class="hl">claude mcp add research-digest -- research-digest mcp</span></pre>
 
-      <div class="tally">
-        <div><span>core install</span><span>zero third-party packages</span></div>
-        <div><span>first fetch</span><span>56 papers from arXiv</span></div>
-        <div><span>first search</span><span>24 of 56 matched, each with its derivation</span></div>
-        <div><span>embed, extra absent</span><span>named the exact command to install it</span></div>
-        <div><span>MCP handshake</span><span>6 tools listed</span></div>
+      <p><code>fetch</code> is safe to run daily and only adds papers you have not seen. Run it across a week and the trends view starts meaning something. Everything lives in <code>~/.research-digest</code>, or wherever you point <code>RESEARCH_DIGEST_HOME</code>. There is no account and no API key.</p>
+
+      <p>Pick the categories and topics you care about:</p>
+
+      <pre>$ <span class="hl">research-digest config --add-category</span> cs.CV
+$ <span class="hl">research-digest config --add-topic</span> <span class="s">"world model"</span></pre>
+
+      <div class="stats">
+        <div><div class="n">1,320</div><div class="l">papers in my library</div></div>
+        <div><div class="n">6</div><div class="l">tools over MCP</div></div>
+        <div><div class="n">40ms</div><div class="l">to search all of it</div></div>
+        <div><div class="n">0</div><div class="l">API keys required</div></div>
       </div>
 
-      <p>That pass found two things worth fixing. A message that said <em>similarity needs numpy</em> without saying how to get it, and a progress line printed before a flush, so an error on standard error overtook it and appeared above the step it belonged to. Neither is interesting. Both are the kind of thing you only see by being a stranger to your own tool for twenty minutes.</p>
+      <h2>What it does not do</h2>
 
-      <h2>Why it is shaped this way</h2>
+      <p>It reads arXiv, not Semantic Scholar or your PDF folder. It does not summarise papers for you, because the agent you connected it to already does that better and you can ask it to. And the similarity is vocabulary-based by default, so it is a good way to find the neighbours of a paper and a poor way to find the paper you cannot remember the words for.</p>
 
-      <p>There is a pattern underneath this that I keep arriving at from different directions: a deterministic substrate with a thin generated layer on top, arranged so the generated layer can fail without taking the facts down with it. The papers are fetched, scored and ranked by code. A model is welcome to summarise them afterwards, and if it is unavailable, the library still works.</p>
-
-      <p>The same shape holds in the trading terminal, where panels are built from real chain data and only the narrative is a model call. Getting it right here was cheaper, because the cost of a bad answer is a wasted afternoon rather than a wrong number on a screen someone is trading against.</p>
+      <p>What it is good at is the thing it was built for: you have read a few hundred papers, you half-remember one, and you would like the assistant you are already talking to be able to go and get it.</p>
 
       <nav class="article-nav">
         <a href="finplatform-architecture.html">&larr; finplatform architecture</a>
