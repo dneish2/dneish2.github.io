@@ -138,21 +138,29 @@
         <p>Without it you stop, open a tab, search, skim, and come back having lost your place. That is the whole pitch.</p>
       </div>
 
-      <p>Connecting it is one command:</p>
+      <p>Claude Code takes one command:</p>
 
-      <pre><span class="c"># Claude Code</span>
-$ <span class="hl">claude mcp add research-digest -- research-digest mcp</span></pre>
+      <pre>$ <span class="hl">claude mcp add research-digest -- research-digest mcp</span></pre>
 
-      <p>Or one entry, for a client that wants JSON:</p>
+      <p>Codex reads <code>~/.codex/config.toml</code>:</p>
+
+      <pre>[<span class="hl">mcp_servers.research-digest</span>]
+command = <span class="s">"research-digest"</span>
+args = [<span class="s">"mcp"</span>]</pre>
+
+      <p>Copilot CLI reads <code>~/.copilot/mcp-config.json</code>:</p>
 
       <pre>{
   <span class="s">"mcpServers"</span>: {
     <span class="s">"research-digest"</span>: {
       <span class="s">"command"</span>: <span class="s">"research-digest"</span>,
-      <span class="s">"args"</span>: [<span class="s">"mcp"</span>]
+      <span class="s">"args"</span>: [<span class="s">"mcp"</span>],
+      <span class="s">"tools"</span>: [<span class="s">"*"</span>]
     }
   }
 }</pre>
+
+      <p>Any other MCP client takes the same two fields: run <code>research-digest</code> with the argument <code>mcp</code>.</p>
 
       <p>Then you talk to it in normal language:</p>
 
