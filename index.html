@@ -170,19 +170,52 @@
       <article class="showcase" id="passage" style="--proj-accent: var(--c-passage)">
         <span class="kicker" data-reveal><span class="idx">02</span> &mdash; Translation workspace</span>
         <h2 data-reveal>Passage. Translation that shows its work.</h2>
-        <p class="one-liner" data-reveal>Translate text, documents, photos, and voice. A human stays in the loop the whole way through.</p>
+        <p class="one-liner" data-reveal>Translate a document, a photo, or your voice, and see every line next to the original so you can check it.</p>
 
         <div class="proof-row" data-reveal>
+          <div class="stat"><span class="n">4</span><span class="l">ways in: type it, drop a file, photograph it, say it</span></div>
+          <div class="stat"><span class="n">side by side</span><span class="l">every segment sits next to its source</span></div>
           <div class="stat"><span class="n">96.86%</span><span class="l">cheaper than the agency quote it replaced</span></div>
-          <div class="stat"><span class="n">57</span><span class="l">tests that must pass before any deploy</span></div>
-          <div class="stat"><span class="n">4</span><span class="l">ways in: type it, drop it, photograph it, say it</span></div>
-          <div class="stat"><span class="n">0</span><span class="l">silent failures. It raises, it never fakes.</span></div>
         </div>
 
         <div data-reveal>
-          <p>Most translation tools hand you a wall of text and hope. Passage shows every segment next to its source so you can check the work, fix one line, and keep moving. Photograph a street sign and it paints the translation back onto the image. Speak to it and it speaks back.</p>
-          <p>My favorite part is a rule, not a feature. When a translation fails, Passage tells you. It will never echo your source text back and call it done. The public API is token-signed and rate-limited, prompt injection gets translated instead of obeyed, and every push runs the full test suite in GitHub Actions before Cloud Run sees it.</p>
+          <p>You paste a page of Portuguese and get back a page of English. The question you cannot answer is whether the third paragraph is right. Passage puts every segment next to its source, so you can check one line, fix it, and keep going rather than trusting the whole thing at once.</p>
+          <p>Point your camera at a street sign and the translation is painted back onto the photo. Speak and it speaks back. And when a translation fails it says so, rather than handing your own sentence back and calling it done.</p>
         </div>
+
+        <figure class="diagram-panel" data-reveal style="margin-top: var(--s-3)">
+          <svg viewBox="0 0 620 150" role="img" aria-label="Passage flow: text, a file, a photo or speech enter, are split into segments, translated, then shown next to their source for review">
+            <g font-family="Consolas,monospace" font-size="10.5">
+              <rect x="8" y="30" width="104" height="86" rx="5" fill="none" stroke="rgba(237,232,222,0.3)"/>
+              <text x="60" y="50" text-anchor="middle" fill="#EDE8DE" font-size="11">IN</text>
+              <text x="60" y="68" text-anchor="middle" fill="#ACA599">text</text>
+              <text x="60" y="83" text-anchor="middle" fill="#ACA599">file</text>
+              <text x="60" y="98" text-anchor="middle" fill="#ACA599">photo</text>
+              <text x="60" y="113" text-anchor="middle" fill="#ACA599">voice</text>
+
+              <line x1="112" y1="73" x2="152" y2="73" stroke="#A34A58" stroke-width="1.5"/>
+              <rect x="152" y="48" width="108" height="50" rx="5" fill="none" stroke="rgba(237,232,222,0.3)"/>
+              <text x="206" y="70" text-anchor="middle" fill="#EDE8DE" font-size="11">SEGMENT</text>
+              <text x="206" y="86" text-anchor="middle" fill="#ACA599">line by line</text>
+
+              <line x1="260" y1="73" x2="300" y2="73" stroke="#A34A58" stroke-width="1.5"/>
+              <rect x="300" y="48" width="108" height="50" rx="5" fill="none" stroke="#A34A58"/>
+              <text x="354" y="70" text-anchor="middle" fill="#A34A58" font-size="11">TRANSLATE</text>
+              <text x="354" y="86" text-anchor="middle" fill="#ACA599">or say it failed</text>
+
+              <line x1="408" y1="73" x2="448" y2="73" stroke="#A34A58" stroke-width="1.5"/>
+              <rect x="448" y="38" width="164" height="70" rx="5" fill="none" stroke="rgba(237,232,222,0.3)"/>
+              <text x="530" y="58" text-anchor="middle" fill="#EDE8DE" font-size="11">REVIEW</text>
+              <line x1="530" y1="68" x2="530" y2="100" stroke="rgba(237,232,222,0.22)"/>
+              <text x="489" y="84" text-anchor="middle" fill="#ACA599">source</text>
+              <text x="571" y="84" text-anchor="middle" fill="#ACA599">yours</text>
+              <text x="530" y="100" text-anchor="middle" fill="#ACA599" font-size="9.5">edit one line, keep going</text>
+
+              <text x="310" y="136" text-anchor="middle" fill="#ACA599" font-size="10">a failed segment is reported, never echoed back as a translation</text>
+            </g>
+          </svg>
+          <figcaption>Nothing reaches you as a finished block. It arrives as lines you can check.</figcaption>
+        </figure>
 
         <p class="stack-line" data-reveal>Python 3.12 &middot; NiceGUI &middot; OpenAI + Whisper &middot; GitHub Actions &rarr; Cloud Run</p>
         <div class="cta-row" data-reveal>
@@ -271,8 +304,8 @@
         <a class="writing-row" href="writing/passage-measured.html" data-reveal style="--i:0">
           <span class="chip">Engineering notes</span>
           <span>
-            <h3>A prompt is not a mechanism</h3>
-            <p class="dek">Six of seven models ignored an explicit instruction. A 4B beat a 27B. My headline number didn&rsquo;t replicate. And one defect took six review rounds.</p>
+            <h3>A 4B model beat a 27B</h3>
+            <p class="dek">The best translation model I tested was the smallest one, and it beat the 27B from its own family. Picking the right model beat every prompt I wrote.</p>
           </span>
           <span class="arrow">&rarr;</span>
         </a>

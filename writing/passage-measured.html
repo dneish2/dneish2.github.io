@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A prompt is not a mechanism — David Neish</title>
-  <meta name="description" content="Engineering notes from Passage: six of seven models ignored an explicit instruction, a thinking model spent 8,786 characters answering nothing, a 4B beat a 27B, and one defect took six review rounds because every instance had the same shape." />
+  <title>A 4B model beat a 27B — David Neish</title>
+  <meta name="description" content="Three things building a translation tool measured: the smallest model won, six of seven ignored an explicit instruction, and a reasoning model spent 8,786 characters producing nothing." />
   <link rel="canonical" href="https://dneish2.github.io/writing/passage-measured.html" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="A prompt is not a mechanism" />
-  <meta property="og:description" content="What building Passage actually measured: where models ignored instructions, where a number didn't replicate, and why one defect took six rounds." />
+  <meta property="og:title" content="A 4B model beat a 27B" />
+  <meta property="og:description" content="The best model for the job was the smallest. Picking it beat every prompt I wrote." />
   <meta name="theme-color" content="#0E0D0B" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23E3A83B' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23E3A83B'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="../assets/css/main.css" />
@@ -62,6 +62,34 @@
     .arch .article-body > ul { max-width: var(--measure); color: var(--ink-muted); }
     .arch .article-body > ul li { margin-bottom: .5rem; }
     .arch .article-body > ul li b { color: var(--ink); }
+
+    /* agreement chart */
+    .chart { margin: 1.8rem 0; display: flex; flex-direction: column; gap: 10px; }
+    .crow { display: grid; grid-template-columns: 168px 1fr 52px 136px; gap: 12px;
+      align-items: center; font-family: var(--font-mono); font-size: .78rem; }
+    .cname { color: var(--ink); }
+    .cbar { height: 10px; background: var(--bg-inset); border-radius: 5px; overflow: hidden;
+      border: 1px solid var(--line-soft); }
+    .cbar i { display: block; height: 100%; background: var(--ink-muted); }
+    .cval { color: var(--accent); text-align: right; font-variant-numeric: tabular-nums; }
+    .cnote { color: var(--ink-muted); }
+    @media (max-width: 680px) {
+      .crow { grid-template-columns: 1fr 52px; grid-template-areas: "n v" "b b" "o o"; gap: 6px; }
+      .cname { grid-area: n; } .cval { grid-area: v; }
+      .cbar { grid-area: b; } .cnote { grid-area: o; }
+    }
+
+    /* six of seven */
+    .tally { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin: 1.6rem 0; }
+    .pip { width: 26px; height: 26px; border-radius: 5px; display: inline-block; }
+    .pip.miss { background: var(--accent); opacity: .85; }
+    .pip.hit { background: none; border: 1px solid var(--line-strong); }
+    .tally-note { font-size: .88rem; color: var(--ink-muted); margin-left: 10px; }
+    .tally-note b { color: var(--ink); }
+
+    .lesson { border-left: 2px solid var(--accent); padding: .2rem 0 .2rem 1.1rem;
+      margin: 1.8rem 0; max-width: var(--measure); }
+    .lesson p { margin: 0; color: var(--ink); }
   </style>
 </head>
 <body>
@@ -85,8 +113,8 @@
   <div class="container arch">
     <header class="article-head">
       <span class="kicker">Engineering notes &middot; <a href="../index.html#passage">Passage</a></span>
-      <h1>A prompt is not a mechanism</h1>
-      <p class="dek">Four measurements from building a translation workspace, each of which changed the code: where models ignored an explicit instruction, where a purpose-built small model beat a big one, where my own headline number failed to replicate, and why one defect took six review rounds to kill.</p>
+      <h1>A 4B model beat a 27B</h1>
+      <p class="dek">Three things building a translation tool measured, each of which changed the code. The biggest one: the best model for the job was the smallest, and picking it was worth more than any amount of prompting.</p>
       <div class="byline">
         <span>David Neish</span>
       </div>
@@ -94,155 +122,89 @@
 
     <article class="article-body">
 
-      <p><a href="https://github.com/dneish2/LanguageTranslation" rel="noopener">Passage</a> translates text, documents, photographs and speech. It runs on a local model when one is reachable, on your own endpoint if you bring one, and on a hosted model otherwise &mdash; and it names, per request, which of those actually answered. It began as an internal tool for people doing real translation work, and it was paid for.</p>
+      <p><a href="https://github.com/dneish2/LanguageTranslation" rel="noopener">Passage</a> translates text, documents, photos and speech, and it runs on whatever model is reachable: something local, your own endpoint, or a hosted one. Which meant I had to find out which model to actually use.</p>
 
-      <p>None of that is what makes it worth writing about. What follows is the handful of times a measurement contradicted something I believed, including the times the thing I believed was my own previously published number.</p>
+      <h2>1. The smallest model won</h2>
 
-      <h2><span class="num">1.</span> Six of seven models ignored the instruction</h2>
+      <p>I ran the local candidates over the same translations and scored how often each agreed with the reference. The winner was the smallest model in the test, and the model it beat most clearly was the 27B from its own family: five times the size, worse agreement, and nearly twice the latency.</p>
 
-      <p>Translation has a class of spans that must survive untouched: URLs, email addresses, figures, currency. The obvious approach is to say so in the prompt. I did, explicitly, and then measured whether it held.</p>
-
-      <div class="statrow">
-        <div class="s"><b>6 / 7</b><span>models altered protected spans</span></div>
-        <div class="s"><b>1</b><span>line of prompt saying not to</span></div>
+      <div class="chart" role="img" aria-label="Agreement scores. translategemma 4B 0.788 at 3.3 GB; gemma3 12B 0.787; translategemma 12B 0.779; qwen2.5 7B 0.763; gemma4 0.741; translategemma 27B 0.734 at 17.4 GB; gemma3 1B 0.668.">
+        <div class="crow">
+          <span class="cname">translategemma:4b</span>
+          <span class="cbar"><i style="width:92%;background:var(--accent)"></i></span>
+          <span class="cval">0.788</span>
+          <span class="cnote">3.3 GB &middot; 368 ms</span>
+        </div>
+        <div class="crow">
+          <span class="cname">gemma3:12b</span>
+          <span class="cbar"><i style="width:91%"></i></span>
+          <span class="cval">0.787</span>
+          <span class="cnote">8.2 GB &middot; 582 ms</span>
+        </div>
+        <div class="crow">
+          <span class="cname">translategemma:12b</span>
+          <span class="cbar"><i style="width:86%"></i></span>
+          <span class="cval">0.779</span>
+          <span class="cnote">8.1 GB &middot; 495 ms</span>
+        </div>
+        <div class="crow">
+          <span class="cname">qwen2.5:7b</span>
+          <span class="cbar"><i style="width:75%"></i></span>
+          <span class="cval">0.763</span>
+          <span class="cnote">4.7 GB &middot; 237 ms</span>
+        </div>
+        <div class="crow">
+          <span class="cname">gemma4:latest</span>
+          <span class="cbar"><i style="width:61%"></i></span>
+          <span class="cval">0.741</span>
+          <span class="cnote">9.6 GB &middot; 398 ms</span>
+        </div>
+        <div class="crow">
+          <span class="cname">translategemma:27b</span>
+          <span class="cbar"><i style="width:56%;background:var(--accent);opacity:.45"></i></span>
+          <span class="cval">0.734</span>
+          <span class="cnote">17.4 GB &middot; 679 ms</span>
+        </div>
+        <div class="crow">
+          <span class="cname">gemma3:1b</span>
+          <span class="cbar"><i style="width:12%"></i></span>
+          <span class="cval">0.668</span>
+          <span class="cnote">0.8 GB &middot; not usable</span>
+        </div>
       </div>
 
-      <p>Every model in the roster got one sentence containing a URL, an email address and a figure, plus an instruction to leave them alone. Six of the seven mangled them anyway. Which one complied isn&rsquo;t interesting and I didn&rsquo;t record it: one pass on one sentence is a coin that landed the right way, not a compliant model. The six failures are the finding, and they are a property of the model <em>class</em> rather than of six bad models.</p>
+      <p class="cnote" style="margin:-.6rem 0 1.4rem">Bars start at 0.65 so the spread is visible. Highlighted: the 4B that won, and the 27B of the same family it beat.</p>
 
-      <p>So the instruction stopped being an instruction. Fragile spans are extracted before the call, replaced with opaque placeholders, and restored after:</p>
+      <p>The top three are within a hair of each other. What separates them is cost: the winner is a third the size of its nearest rival and a fifth the size of the 27B, and it is the one that runs comfortably on a laptop. Being built for one job beat being big at it.</p>
 
-      <pre>mask    see <i>https://a.co/x</i> for &euro;1,200
-        &darr;   deterministic, pre-flight
-        see <u>&#10214;P0&#10215;</u> for <u>&#10214;P1&#10215;</u>
-        &darr;   the model never sees the span
-unmask  see <i>https://a.co/x</i> for &euro;1,200</pre>
+      <h2>2. Six of seven models ignored an instruction</h2>
 
-      <p>The model is now handed text it <em>cannot</em> corrupt, because the corruptible parts aren&rsquo;t in it. And because masking is deterministic, it is testable once rather than sampled across runs &mdash; the test asserts the mechanism, not the wording of a prompt that the next model upgrade could quietly stop honouring.</p>
+      <p>Some things in a translation have to survive untouched. URLs, email addresses, figures, currency. The obvious move is to tell the model to leave them alone. I did, explicitly, and then checked.</p>
 
-      <div class="pull">
-        <span class="who">the rule this produced</span>
-        <p>Never enforce a model invariant by asking for it. Mask it, route it, or validate it &mdash; then test the mechanism.</p>
+      <div class="tally" role="img" aria-label="Six of seven models ignored the instruction to leave protected spans untouched">
+        <span class="pip miss"></span><span class="pip miss"></span><span class="pip miss"></span>
+        <span class="pip miss"></span><span class="pip miss"></span><span class="pip miss"></span>
+        <span class="pip hit"></span>
+        <span class="tally-note"><b>6 of 7</b> rewrote something they were told not to touch</span>
       </div>
 
-      <p>It has since paid off twice more in the same codebase. Local speech synthesis uses Piper, a VITS model rather than a language model, so it is <em>structurally incapable</em> of answering the text instead of reading it aloud &mdash; where a general TTS model needs a prompt asking it to behave, a small specialised one makes the failure unreachable. And prompt-injection defence translates embedded instructions literally rather than trusting a model to decline them.</p>
+      <p>So the spans are pulled out before the text ever reaches a model, and put back afterwards. The model never sees them and cannot damage them. The same swap doubles as the injection defence: an instruction hidden in the source gets translated literally instead of obeyed, because by the time a model sees it, it is just text.</p>
 
-      <h2><span class="num">2.</span> Thinking models are the wrong tool &mdash; for this task</h2>
-
-      <p>The qwen3 family looked like a silent failure through Ollama&rsquo;s OpenAI-compatible endpoint: <code>content</code> came back empty every time. The answer was going to a reasoning channel that endpoint doesn&rsquo;t expose. Through the native API the channels stay separate and the answer arrives &mdash; which is how I found the actual problem.</p>
-
-      <p><code>qwen3:30b</code> spent <b>8,786 characters deliberating a one-line translation and still produced no answer</b>, on top of a 2,048-token reserve. That isn&rsquo;t a budget you tune. Translation is transduction, not reasoning; there is no reserve that reliably bounds deliberation a task never needed.</p>
-
-      <p>The tempting fix is <code>think: false</code>. On a translation prompt it makes things worse &mdash; the model writes its reasoning <em>into</em> the answer. But the same flag on the same model class is exactly right for <strong>extraction</strong>, where deliberation is pure cost: with it, <code>qwen3-vl:8b</code> reads a full menu photograph, accents and currency intact, in 2.6 seconds, entirely offline.</p>
-
-      <p>Same model, same flag, opposite verdicts, decided by the shape of the job. Thinking models are kept out of the default translation roster and left selectable.</p>
-
-      <h2><span class="num">3.</span> A purpose-built 4B beat a general 27B</h2>
-
-      <div class="envs-scroll">
-        <table class="envs">
-          <caption class="sr-only">Local translation models: agreement, size and median latency</caption>
-          <thead>
-            <tr><th>Model</th><th class="n">Agreement</th><th class="n">Size</th><th class="n">p50</th><th>Verdict</th></tr>
-          </thead>
-          <tbody>
-            <tr class="win"><td>translategemma:4b</td><td class="n">0.788</td><td class="n">3.3 GB</td><td class="n">368 ms</td><td>the default</td></tr>
-            <tr><td>gemma3:12b</td><td class="n">0.787</td><td class="n">8.2 GB</td><td class="n">582 ms</td><td>best generalist</td></tr>
-            <tr><td>translategemma:12b</td><td class="n">0.779</td><td class="n">8.1 GB</td><td class="n">495 ms</td><td></td></tr>
-            <tr><td>qwen2.5:7b</td><td class="n">0.763</td><td class="n">4.7 GB</td><td class="n">237 ms</td><td>fastest usable</td></tr>
-            <tr><td>gemma4:latest</td><td class="n">0.741</td><td class="n">9.6 GB</td><td class="n">398 ms</td><td></td></tr>
-            <tr><td>translategemma:27b</td><td class="n">0.734</td><td class="n">17.4 GB</td><td class="n">679 ms</td><td>beaten by its own 4B</td></tr>
-            <tr class="dim"><td>gemma3:1b</td><td class="n">0.668</td><td class="n">0.8 GB</td><td class="n">334 ms</td><td>not usable</td></tr>
-          </tbody>
-        </table>
+      <div class="lesson">
+        <p>This is the part I would keep from the whole project. An instruction in a prompt is a request. If something must hold every time, it has to be built into the code path, not asked for.</p>
       </div>
 
-      <p>The 4B outscores the 27B from its own family at a fifth of the size and nearly twice the speed. Before spending VRAM on a bigger model, check whether someone has built a small one for your actual task.</p>
+      <h2>3. A reasoning model spent 8,786 characters saying nothing</h2>
 
-      <p>The floor is more interesting than the ceiling. <code>gemma3:1b</code> rendered &ldquo;the board pushed back on the buyback&rdquo; as <em>&ldquo;el consejo regul&oacute; la compra de acciones&rdquo;</em> &mdash; &ldquo;the council regulated the share purchase.&rdquo; That is not a rougher translation. It is a different claim, stated with identical confidence. Reaching for the tiniest model to save memory buys a confidently wrong answer, which is worse than a slow one.</p>
+      <p>The qwen3 family looked broken: empty responses, every time. The answers were going to a reasoning channel that the compatibility endpoint I was using does not expose. Through the native API the text arrived, which is how I found the real problem.</p>
 
-      <p>One caveat I&rsquo;d want applied to my own table: <em>agreement</em> means mean similarity to the other models on the same input. There is no reference translation to score against, so it rewards the mainstream reading and flags the outlier. It is triage, not a leaderboard &mdash; a model can be right and alone.</p>
+      <p>It had spent <b>8,786 characters</b> deliberating a one-line translation, then produced no translation. That is not a setting to tune. Translation is transduction, not deduction, and a model that reasons about the answer is solving a different problem than the one in front of it. Thinking models stayed selectable and came out of the default roster.</p>
 
-      <h2><span class="num">4.</span> One run is not a result</h2>
+      <h2>What I would tell you</h2>
 
-      <p>An overlay-alignment fix &mdash; painting translated text back onto a photograph in the right place &mdash; measured 17.5&nbsp;px error before and 9.2&nbsp;px after. A halving. I nearly shipped that number.</p>
+      <p>Match the model to the shape of the job before you touch anything else. The smallest model built for the task beat a general model two and a half times its size, and a model built for reasoning could not do the task at all. That decision was worth more than every prompt I wrote.</p>
 
-      <div class="envs-scroll">
-        <table class="envs">
-          <caption class="sr-only">Overlay error: one run versus the median of five</caption>
-          <thead><tr><th>Reported from</th><th class="n">Before</th><th class="n">After</th><th>What it actually says</th></tr></thead>
-          <tbody>
-            <tr class="dim"><td>a single run</td><td class="n">17.5 px</td><td class="n">9.2 px</td><td>a halving &mdash; and not reproducible</td></tr>
-            <tr class="win"><td>median of five</td><td class="n">23.5 px</td><td class="n">20.5 px</td><td>~13%, better in 4 of 5 runs</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p>The vision model&rsquo;s box predictions vary noticeably run to run, so a single before/after pair mostly measures which run you got. The fix shipped anyway &mdash; it is cheap, it degrades gracefully, it helps most of the time &mdash; but the honest headline is &ldquo;somewhat better on average,&rdquo; and one of the five runs got worse.</p>
-
-      <div class="pull">
-        <span class="who">the rule this produced</span>
-        <p>Anything whose result depends on a model&rsquo;s output gets reported as the median across at least five runs, together with how many runs improved. Deterministic changes &mdash; masking, routing, parsing &mdash; can be measured once. The distinction is whether sampling is in the loop.</p>
-      </div>
-
-      <p>The same discipline is why a shipped default in that repo carries a written note that <strong>the evidence under it doesn&rsquo;t count</strong>. Every speech measurement so far used a fixture generated by a text-to-speech model: no accent, no background noise, no clipping, no phone-mic band limiting. That is structurally the easiest possible input for a recogniser, and the gap between Whisper sizes is precisely the gap that only opens on hard audio. So the small model stays, the protocol that would settle it is written down, and the claim above it is marked unproven rather than quietly inherited.</p>
-
-      <p>A related habit, from the same instinct: a screenshot difference is not a bug report until the computed style is checked. Two &ldquo;bugs&rdquo; found during a UI pass turned out to be hover artifacts from the automation driving the browser.</p>
-
-      <h2><span class="num">5.</span> 419 passing tests, and one defect wearing four costumes</h2>
-
-      <p>An adversarial review &mdash; agents that hadn&rsquo;t written the code, driving the real app in a real browser, one per modality plus degradation and cross-user &mdash; found a cross-user data leak and three privacy overclaims. The suite was green throughout. The tests weren&rsquo;t wrong; they were <em>narrow</em>, and narrowness looks exactly like correctness until someone opens a browser.</p>
-
-      <p>The worst finding: user A&rsquo;s translation, produced on A&rsquo;s own private endpoint, served verbatim to user B and labelled as B&rsquo;s engine. The cache key was <code>(text, target, mode)</code> on one shared backend &mdash; no provider, no session. Zero outbound calls for B, so nothing looked wrong from any angle a single-session test can see.</p>
-
-      <p>It took <b>six rounds to converge</b>, and that is the part worth writing down. Not because the defects were hard, but because they were all the same defect:</p>
-
-      <div class="envs-scroll">
-        <table class="envs">
-          <caption class="sr-only">Four defects and the single shape they share</caption>
-          <thead><tr><th>Where it surfaced</th><th>The claim it made</th><th>Derived from</th></tr></thead>
-          <tbody>
-            <tr><td>cache hit</td><td>&ldquo;no model ran, nothing was sent&rdquo;</td><td>a process-wide counter every session bumps</td></tr>
-            <tr><td>response body</td><td>&ldquo;runs on this machine&rdquo;</td><td>a capability probe taken at page render</td></tr>
-            <tr><td>voice engine line</td><td>&ldquo;this machine&rdquo;</td><td>two of three steps, not the middle one</td></tr>
-            <tr class="win"><td>a failed photo</td><td>&ldquo;nothing translated yet&rdquo;</td><td>a row that was never written at all</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pull">
-        <span class="who">the shape</span>
-        <p>The app deriving a privacy claim from state read at render time, instead of recording what happened when it happened.</p>
-      </div>
-
-      <p>Six rounds is what fixing a shape one surface at a time costs. Each round closed the instance in front of it and wrote a test that passed honestly; the reviewer then found the next surface. The lesson isn&rsquo;t &ldquo;review more&rdquo; &mdash; it&rsquo;s that when the third instance of a defect arrives, the defect you are looking at is not the one to fix.</p>
-
-      <p>The last instance is my favourite, because it is the same mistake twice. Photograph a blank wall: the vision model receives the image, answers &ldquo;no text here,&rdquo; the backend raises, and the exception escapes past the bookkeeping at the end of the function. The page then reported <em>&ldquo;Nothing translated yet&rdquo;</em> about a photograph that had demonstrably been sent to a hosted model on the app&rsquo;s key.</p>
-
-      <pre>with capture_provenance() as prov:
-    result = fn(*args)
-<u># &larr; the exception escaped past everything below</u>
-record(engine=&hellip;, chars=&hellip;)</pre>
-
-      <p>A call that was <b>delivered and then failed</b> is still a disclosure &mdash; a 429, a timeout, an empty reply all happen after your text is on someone else&rsquo;s computer. A connection that <b>never opened</b> is not, and saying otherwise would tell an offline user their words had left, which is a lie told to precisely the person who chose the app for that reason. So the fix catches, books and re-raises, on the path every surface shares.</p>
-
-      <p>And then the first version of that fix reproduced the original defect one level up. It named the engine from the label the caller <em>expected</em> to use &mdash; an expectation formed before the call &mdash; and so disclosed a send for a file that validation had rejected before a single byte left. An existing test caught it, one whose docstring had already stated the rule: <em>rejected before anything leaves, and nothing is booked.</em> Provenance written at the moment of the outbound call is now the only accepted proof of departure.</p>
-
-      <h2><span class="num">6.</span> What I didn&rsquo;t build</h2>
-
-      <p>Named because they were tempting, not because they were forgotten.</p>
-
-      <ul>
-        <li><b>Accounts, billing, durable storage.</b> The auth verification is ported and tested, and deliberately unwired. A signup wall in front of a demo mostly measures who bounces at it. Abuse prevention lives where the actual risk is: a signed page token, per-IP rate limits, size caps.</li>
-        <li><b>A traces dashboard.</b> The plumbing records machine output, human edits and edit rate per engine. There are no real human edits yet, so a chart over that data would be a chart computed from nothing.</li>
-        <li><b>A third overlay heuristic.</b> Two were tried, one made it worse, a third measured no better and was reverted rather than kept for the idea&rsquo;s sake. The residual error needs real OCR line geometry, which is a dependency decision and not a tuning one. Three attempts was enough to learn <em>what kind</em> of problem it is.</li>
-        <li><b>A minimum instance on Cloud Run.</b> Two of the three config defaults that hurt a stateful WebSocket app cost nothing to change and are set. The third bills continuously, and this app has no users yet.</li>
-      </ul>
-
-      <p>The thread through all of it: the useful output of a project like this isn&rsquo;t the feature list, it&rsquo;s the set of beliefs it forced me to drop. Four of them are above, along with the evidence that killed each one.</p>
-
-      <p><a href="https://claude.ai/code/artifact/1d14890b-cb38-4fae-94fd-d1afb96394d4" rel="noopener">The full deck &mdash; twelve slides, with the routing diagrams and the negative results &rarr;</a><br />
-      <a href="https://github.com/dneish2/LanguageTranslation/blob/main/RESEARCH.md" rel="noopener">RESEARCH.md &mdash; every measurement and how it was taken &rarr;</a><br />
-      <a href="https://github.com/dneish2/LanguageTranslation/blob/main/DECISIONS.md" rel="noopener">DECISIONS.md &mdash; every open call, resolved, with the reasoning &rarr;</a></p>
+      <p>And anything that must be true every time belongs in code. Prompts are a good way to shape an answer, and a poor way to guarantee one.</p>
 
       <nav class="article-nav">
         <a href="finplatform-architecture.html">&larr; finplatform: a reference architecture</a>
