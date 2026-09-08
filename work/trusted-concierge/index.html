@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deal Lens — Concierge Prototype | David Neish</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .dn-bar {
+        background: #0E0D0B;
+        color: #EDE8DE;
+        font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+        font-size: 0.8rem;
+        padding: 0.85rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        border-bottom: 2px solid #E3A83B;
+      }
+      .dn-bar a { color: #E3A83B; text-decoration: none; font-weight: 600; }
+      .dn-bar a:hover { color: #F2C46A; }
+      .dn-bar span { color: #ACA599; letter-spacing: 0.02em; }
+    </style>
+  </head>
+  <body>
+    <div class="dn-bar">
+      <a href="../../index.html#realestate">&larr; Back to dneish2.github.io</a>
+      <span>Prototype note: this walkthrough runs on sample data (Austin, TX). The Deal Lens concept applies the same consent-first flow to St. Louis tax-sale properties.</span>
+    </div>
+    <div class="page-noise" aria-hidden="true"></div>
+
+    <header class="page-header reveal">
+      <div class="header-copy">
+        <h1>From vague chat to a tour request.</h1>
+        <p class="lede">
+          The assistant starts with an underspecified housing request, turns it into editable
+          criteria, and only contacts a realtor after the user approves what will be shared.
+        </p>
+      </div>
+    </header>
+
+    <nav class="frame-nav reveal" aria-label="Prototype frame navigation">
+      <a class="frame-nav-link active" href="#start-search">01 Start Search</a>
+      <a class="frame-nav-link" href="#edit-criteria">02 Edit Criteria</a>
+      <a class="frame-nav-link" href="#updated-results">03 Updated Results</a>
+      <a class="frame-nav-link" href="#home-detail">04 Home Detail</a>
+      <a class="frame-nav-link" href="#shortlist-confirmation">05 Shortlist</a>
+      <a class="frame-nav-link" href="#contact-consent">06 Contact Consent</a>
+      <a class="frame-nav-link" href="#schedule-showing">07 Schedule Showing</a>
+      <a class="frame-nav-link" href="#review-send">08 Review and Send</a>
+    </nav>
+
+    <main class="board">
+      <section class="frame-shell reveal" id="start-search" data-nav="start-search">
+        <div class="frame-heading">
+          <div>
+            <p class="frame-kicker">Frame 1</p>
+            <h2>Start Search</h2>
+          </div>
+          <p class="frame-note">
+            The first task starts in chat. A vague request gets turned into searchable
+            criteria and a first shortlist draft without losing the conversational feel.
+          </p>
+        </div>
+
+        <article class="artboard product-frame">
+          <div class="window-chrome">
+            <div class="window-brand">
+              <span class="brand-mark">TC</span>
+              <div>
+                <strong>Trusted Concierge</strong>
+                <p>Home Search Support</p>
+              </div>
+            </div>
+            <div class="window-status">
+              <span class="status-chip">3 starter matches</span>
+              <span class="status-chip status-chip-soft">MLS checked 11:14 AM</span>
+            </div>
+          </div>
+
+          <div class="product-layout">
+            <aside class="criteria-module">
+              <div class="criteria-top">
+                <div>
+                  <p class="section-label">Home Criteria</p>
+                  <h3>Current criteria</h3>
+                </div>
+                <div class="module-chip-row">
+                  <span class="status-pill">Austin rental</span>
+                  <span class="status-pill status-pill-soft">Walkability first</span>
+                </div>
+              </div>
+
+              <div class="criteria-stack">
+                <section class="criteria-card">
+                  <p class="card-label">Search prompt</p>
+                  <strong class="field-value">Walkable Austin rental</strong>
+                  <p class="field-note">Clarified in chat.</p>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Budget</p>
+                  <strong class="field-value" id="start-budget-value">Not set yet</strong>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Pets and move-in</p>
+                  <div class="split-metrics">
+                    <div>
+                      <span>Pets</span>
+                      <strong>Small dog</strong>
+                    </div>
+                    <div>
+                      <span>Move-in</span>
+                      <strong id="start-movein-value">6 to 8 weeks</strong>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Parking</p>
+                  <strong class="field-value" id="start-parking-value">Prefer off-street</strong>
+                  <p class="field-note">Flexible if walkability is stronger.</p>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Suggested zones</p>
+                  <div class="tag-row compact">
+                    <span>Clarksville</span>
+                    <span>Hyde Park</span>
+                    <span>South Lamar</span>
+                  </div>
+                </section>
+              </div>
+
+              <div class="module-footer">
+                <div>
+                  <span class="footer-label">Next</span>
+                  <strong>Edit the recap before the shortlist locks.</strong>
+                </div>
+                <a class="button button-primary" href="#edit-criteria">Edit recap</a>
+              </div>
+            </aside>
+
+            <section class="workspace">
+              <div class="workspace-header">
+                <div>
+                  <p class="section-label">Task A</p>
+                  <h3>The assistant mediates between open-ended chat and listing data.</h3>
+                </div>
+              </div>
+
+              <div class="search-stage">
+                <div class="property-list">
+                  <section class="panel chat-panel">
+                    <p class="section-label">Conversation</p>
+                    <h4>Walkability gets pinned down fast.</h4>
+                    <div class="chat-thread">
+                      <article class="message message-user">
+                        <span class="message-role">User</span>
+                        <p>Show me homes in Austin in a walkable area.</p>
+                      </article>
+
+                      <article class="message message-assistant">
+                        <span class="message-role">Assistant</span>
+                        <p>I can help with that. Austin has a few flavors of “walkable” so let&apos;s pin it down. Are you renting, and do you have a budget ballpark?</p>
+                      </article>
+
+                      <article class="message message-user">
+                        <span class="message-role">User</span>
+                        <p>Rental. I&apos;m not really sure on budget yet. I have a small dog.</p>
+                      </article>
+
+                      <article class="message message-assistant">
+                        <span class="message-role">Assistant</span>
+                        <p>Perfect. Dog noted. How soon are you moving, and how attached are you to off-street parking?</p>
+                      </article>
+
+                      <article class="message message-user">
+                        <span class="message-role">User</span>
+                        <p>Flexible in the next 6 to 8 weeks. Parking would be nice, but I can live without it.</p>
+                      </article>
+
+                      <article class="message message-assistant">
+                        <span class="message-role">Assistant</span>
+                        <p>Great. I&apos;ll bias toward walkable pockets and flag nearby coffee, groceries, and green space when it actually helps compare the homes.</p>
+                      </article>
+
+                      <article class="message message-user">
+                        <span class="message-role">User</span>
+                        <p>Yes, that would help. Show me the best three.</p>
+                      </article>
+
+                      <article class="message message-assistant">
+                        <span class="message-role">Assistant</span>
+                        <p>On it. I pulled three starters and added short notes so you don&apos;t have to decode listing-speak.</p>
+                      </article>
+                    </div>
+                  </section>
+
+                  <div class="toolbar">
+                    <div>
+                      <p class="toolbar-title">First shortlist draft</p>
+                      <p class="toolbar-meta">This set tightens after recap edits.</p>
+                    </div>
+                  </div>
+
+                  <div class="property-stack">
+                    <article class="property-card is-selected home-card-start" data-starter-home="westlynn" role="button" tabindex="0">
+                      <div class="property-media media-burnet"></div>
+                      <div class="property-body">
+                        <div class="property-top">
+                          <div>
+                            <h4>West Lynn Terrace</h4>
+                            <p class="property-meta">Clarksville • Austin</p>
+                          </div>
+                          <strong class="property-price">$2,180</strong>
+                        </div>
+                        <p class="property-copy">1 bd / 1 ba • Courtyard porch • Small dog pending</p>
+                  <div class="tag-row compact">
+                    <span>Walkable pocket</span>
+                    <span>Price likely fits</span>
+                    <span>Broker verified</span>
+                    <span>Coffee nearby</span>
+                  </div>
+                  <span class="property-badge">Starter pick</span>
+                  <p class="tradeoff-line">Why this match: strongest block so far, but pet policy still needs a quick check.</p>
+                  <div class="property-actions">
+                    <a class="button button-primary button-small" href="#home-detail">View home</a>
+                  </div>
+                </div>
+                    </article>
+
+                    <article class="property-card home-card-start" data-starter-home="duval" role="button" tabindex="0">
+                      <div class="property-media media-cedar"></div>
+                      <div class="property-body">
+                        <div class="property-top">
+                          <div>
+                            <h4>Duval Courtyard Flat</h4>
+                            <p class="property-meta">North University • Austin</p>
+                          </div>
+                          <strong class="property-price">$2,340</strong>
+                        </div>
+                        <p class="property-copy">1 bd / 1 ba • Off-street lot • Dog policy unclear</p>
+                        <div class="tag-row compact">
+                          <span>Walkable</span>
+                          <span>Parking easier</span>
+                          <span>Partner feed</span>
+                          <span>Grocery nearby</span>
+                        </div>
+                        <p class="tradeoff-line">Why this match: easiest parking of the three, but the pet details are thin.</p>
+                        <div class="property-actions">
+                          <a class="button button-secondary button-small" href="#home-detail">View home</a>
+                        </div>
+                      </div>
+                    </article>
+
+                    <article class="property-card home-card-start" data-starter-home="barton" role="button" tabindex="0">
+                      <div class="property-media media-parker"></div>
+                      <div class="property-body">
+                        <div class="property-top">
+                          <div>
+                            <h4>Barton View Studio</h4>
+                            <p class="property-meta">Bouldin Creek • Austin</p>
+                          </div>
+                          <strong class="property-price">$2,520</strong>
+                        </div>
+                        <p class="property-copy">1 bd / 1 ba • Patio nook • Small dog okay</p>
+                        <div class="tag-row compact">
+                          <span>Greenbelt nearby</span>
+                          <span>Patio</span>
+                          <span>Owner listed</span>
+                          <span>Price stretch</span>
+                        </div>
+                        <p class="tradeoff-line">Why this match: good amenities nearby, but this one may be a stretch once budget gets pinned down.</p>
+                        <div class="property-actions">
+                          <a class="button button-secondary button-small" href="#home-detail">View home</a>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
+                </div>
+
+                <aside class="peek-panel">
+                  <div class="detail-hero media-burnet">
+                    <div class="hero-overlay">
+                      <span class="hero-badge">MLS draft</span>
+                      <div>
+                        <p class="hero-kicker">Selected preview</p>
+                        <h4 id="starter-preview-title">West Lynn Terrace</h4>
+                        <p id="starter-preview-copy">An early Clarksville candidate. The shortlist tightens once budget and parking are edited.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="peek-copy">
+                    <div class="peek-topline">
+                      <div>
+                        <p class="section-label">Draft recap</p>
+                        <h4>What the assistant is sending into search</h4>
+                      </div>
+                      <strong class="property-price">3 homes</strong>
+                    </div>
+                    <div class="tag-row">
+                      <span>Walkable area</span>
+                      <span>Small dog</span>
+                      <span>6 to 8 weeks</span>
+                      <span>Parking flexible</span>
+                    </div>
+                    <ul class="fit-list">
+                      <li id="starter-recap-budget">Budget still needs to be pinned to a range.</li>
+                      <li>The assistant is suggesting walkable Austin neighborhoods, not one exact zone yet.</li>
+                      <li>Nearby coffee, groceries, and green space will be surfaced when they help compare homes.</li>
+                      <li>You can correct the recap before the shortlist becomes the working set.</li>
+                    </ul>
+                    <div class="action-row">
+                      <a class="button button-primary" href="#edit-criteria">Edit recap</a>
+                      <a class="button button-secondary" href="#updated-results">Skip to shortlist</a>
+                    </div>
+                  </div>
+                </aside>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="frame-shell reveal" id="edit-criteria" data-nav="edit-criteria">
+        <div class="frame-heading">
+          <div>
+            <p class="frame-kicker">Frame 2</p>
+            <h2>Edit Criteria</h2>
+          </div>
+          <p class="frame-note">
+            The recap is already in edit mode. The user changes the fields directly instead of
+            accepting a premade correction.
+          </p>
+        </div>
+
+        <article class="artboard product-frame">
+          <div class="window-chrome">
+            <div class="window-brand">
+              <span class="brand-mark">TC</span>
+              <div>
+                <strong>Trusted Concierge</strong>
+                <p>Recap correction</p>
+              </div>
+            </div>
+            <div class="window-status">
+              <span class="status-chip">Editing recap</span>
+              <span class="status-chip status-chip-soft">Shortlist updates next</span>
+            </div>
+          </div>
+
+          <div class="product-layout">
+            <aside class="criteria-module is-editing">
+              <div class="criteria-top">
+                <div>
+                  <p class="section-label">Home Criteria</p>
+                  <h3>Edit recap fields</h3>
+                </div>
+                <div class="module-chip-row">
+                  <span class="status-pill status-pill-warm" id="edit-budget-chip">Budget edited</span>
+                  <span class="status-pill status-pill-warm" id="edit-parking-chip">Parking edited</span>
+                </div>
+              </div>
+
+              <div class="criteria-stack" data-select-scope>
+                <section class="criteria-card is-edited">
+                  <p class="card-label">Budget range</p>
+                  <div class="choice-pills">
+                    <button class="choice-chip selectable" type="button" data-select-group="budget-range" data-state-key="budgetRange" data-state-value="1800-2200" aria-pressed="false">
+                      $1,800 to $2,200
+                    </button>
+                    <button class="choice-chip selectable is-selected" type="button" data-select-group="budget-range" data-state-key="budgetRange" data-state-value="2200-2600" aria-pressed="true">
+                      $2,200 to $2,600
+                    </button>
+                    <button class="choice-chip selectable" type="button" data-select-group="budget-range" data-state-key="budgetRange" data-state-value="2600-plus" aria-pressed="false">
+                      $2,600 plus
+                    </button>
+                  </div>
+                  <p class="field-note">Pick a range and refresh the shortlist.</p>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Pets</p>
+                  <strong class="field-value">Small dog</strong>
+                </section>
+
+                <section class="criteria-card is-edited">
+                  <p class="card-label">Move-in window</p>
+                  <div class="mini-input-row">
+                    <div class="mini-input" id="move-in-start-input" contenteditable="true" role="textbox" aria-label="Move-in start week">
+                      6
+                    </div>
+                    <span class="range-dash">to</span>
+                    <div class="mini-input" id="move-in-end-input" contenteditable="true" role="textbox" aria-label="Move-in end week">
+                      8
+                    </div>
+                    <span class="range-suffix">weeks</span>
+                  </div>
+                  <p class="field-note">Adjust the timing here if needed.</p>
+                </section>
+
+                <section class="criteria-card is-edited">
+                  <p class="card-label">Parking</p>
+                  <div class="choice-pills">
+                    <button class="choice-chip selectable" type="button" data-select-group="parking-priority" data-state-key="parkingPriority" data-state-value="required" aria-pressed="false">
+                      Required
+                    </button>
+                    <button class="choice-chip selectable is-selected" type="button" data-select-group="parking-priority" data-state-key="parkingPriority" data-state-value="preferred" aria-pressed="true">
+                      Preferred
+                    </button>
+                    <button class="choice-chip selectable" type="button" data-select-group="parking-priority" data-state-key="parkingPriority" data-state-value="not-important" aria-pressed="false">
+                      Not important
+                    </button>
+                  </div>
+                  <p class="field-note">Parking can be tightened or relaxed here.</p>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Neighborhood focus</p>
+                  <div class="tag-row compact">
+                    <span>Clarksville</span>
+                    <span>Hyde Park</span>
+                    <span>South Lamar</span>
+                  </div>
+                </section>
+              </div>
+
+              <div class="module-footer">
+                <div>
+                  <span class="footer-label">Edit in progress</span>
+                  <strong>Save these edits to refresh the shortlist.</strong>
+                </div>
+                <a class="button button-primary" href="#updated-results">Update shortlist</a>
+              </div>
+            </aside>
+
+            <section class="workspace">
+              <div class="workspace-header">
+                <div>
+                  <p class="section-label">Task A Repair</p>
+                  <h3>The assistant stays in the loop, but the user edits the recap directly.</h3>
+                </div>
+              </div>
+
+              <div class="edit-stage">
+                <section class="panel chat-panel">
+                  <p class="section-label">Chat context</p>
+                  <h4>The recap is editable, not frozen.</h4>
+                  <div class="chat-thread">
+                    <article class="message message-assistant">
+                      <span class="message-role">Assistant</span>
+                      <p>
+                        Here&apos;s my recap: walkable Austin, budget around $2,200 to $2,600,
+                        small dog, move in 6 to 8 weeks, and off-street parking required.
+                      </p>
+                    </article>
+
+                    <article class="message message-user">
+                      <span class="message-role">User</span>
+                      <p>Parking isn&apos;t required, and I&apos;d probably look around $2,200 to $2,600.</p>
+                    </article>
+
+                    <article class="message message-assistant">
+                      <span class="message-role">Assistant</span>
+                      <p>Perfect. Edit either field directly and I&apos;ll refresh the shortlist from there.</p>
+                    </article>
+                  </div>
+                </section>
+
+                <section class="panel">
+                  <p class="section-label">Still in scope</p>
+                  <h4>Walkability and pet fit stay in scope.</h4>
+                  <ul class="fit-list">
+                    <li>Walkable Austin neighborhoods remain in scope.</li>
+                    <li>Small dog and the move-in window stay in scope.</li>
+                    <li>Parking strictness is what changes the shortlist most.</li>
+                  </ul>
+                </section>
+              </div>
+
+              <section class="loading-band tradeoff-band">
+                <span class="status-pill status-pill-warm" id="tradeoff-pill">Balanced</span>
+                <div>
+                  <p class="section-label">Tradeoff snapshot</p>
+                  <h4 id="tradeoff-title">This is the strongest middle ground.</h4>
+                  <p class="subtle-copy" id="tradeoff-copy">The shortlist keeps the balcony option while still surfacing easier-parking alternatives to compare.</p>
+                </div>
+              </section>
+
+              <div class="action-row">
+                <a class="button button-primary" href="#updated-results">See shortlist</a>
+                <a class="button button-secondary" href="#start-search">Back to chat</a>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="frame-shell reveal" id="updated-results" data-nav="updated-results">
+        <div class="frame-heading">
+          <div>
+            <p class="frame-kicker">Frame 3</p>
+            <h2>Updated Results</h2>
+          </div>
+          <p class="frame-note">
+            The repaired recap produces a tighter shortlist. A small refinement request keeps
+            the CUI visible while the matches become more concrete.
+          </p>
+        </div>
+
+        <article class="artboard product-frame">
+          <div class="window-chrome">
+            <div class="window-brand">
+              <span class="brand-mark">TC</span>
+              <div>
+                <strong>Trusted Concierge</strong>
+                <p>Updated shortlist</p>
+              </div>
+            </div>
+            <div class="window-status">
+              <span class="status-chip">3 shortlist candidates</span>
+              <span class="status-chip status-chip-soft">Balcony refinement applied</span>
+            </div>
+          </div>
+
+          <div class="product-layout">
+            <aside class="criteria-module">
+              <div class="criteria-top">
+                <div>
+                  <p class="section-label">Home Criteria</p>
+                  <h3>Shortlist-ready</h3>
+                </div>
+                <div class="module-chip-row">
+                  <span class="status-pill">Walkability first</span>
+                  <span class="status-pill status-pill-soft" id="results-parking-pill">Parking flexible</span>
+                </div>
+              </div>
+
+              <div class="criteria-stack">
+                <section class="criteria-card is-confirmed">
+                  <p class="card-label">Budget</p>
+                  <strong class="field-value" id="results-budget">$2,200 to $2,600</strong>
+                  <div class="meter"><span class="meter-fill meter-fill-updated"></span></div>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Pets</p>
+                  <strong class="field-value">Small dog</strong>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Move-in</p>
+                  <strong class="field-value" id="results-movein">6 to 8 weeks</strong>
+                </section>
+
+                <section class="criteria-card is-confirmed">
+                  <p class="card-label">Parking</p>
+                  <strong class="field-value" id="results-parking">Preferred, not required</strong>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Neighborhoods</p>
+                  <div class="tag-row compact">
+                    <span>Clarksville</span>
+                    <span>Hyde Park</span>
+                    <span>South Lamar</span>
+                  </div>
+                </section>
+              </div>
+
+              <div class="module-footer">
+                <div>
+                  <span class="footer-label">Next</span>
+                  <strong>Open the balcony listing or save the shortlist.</strong>
+                </div>
+                <div class="action-row">
+                  <a class="button button-primary" href="#home-detail">Open home</a>
+                  <a class="button button-secondary" href="#edit-criteria">Refine recap</a>
+                </div>
+              </div>
+            </aside>
+
+            <section class="workspace">
+              <div class="workspace-header">
+                <div>
+                  <p class="section-label">Refinement</p>
+                  <h3>The user asks for balcony or better light, and the shortlist responds.</h3>
+                </div>
+              </div>
+
+              <section class="panel chat-panel">
+                <div class="chat-thread">
+                  <article class="message message-user">
+                    <span class="message-role">User</span>
+                    <p>Show me the ones with a balcony or better light.</p>
+                  </article>
+
+                  <article class="message message-assistant">
+                    <span class="message-role">Assistant</span>
+                    <p>These three are strongest after loosening parking. Maple &amp; Burnet is the only one with a balcony.</p>
+                  </article>
+                </div>
+              </section>
+
+              <div class="results-board">
+                <article class="property-card vertical is-selected home-card-results" data-home-id="maple" role="button" tabindex="0">
+                  <div class="property-media media-maple"></div>
+                  <div class="property-body">
+                    <div class="property-top">
+                      <div>
+                        <h4>Maple &amp; Burnet House</h4>
+                        <p class="property-meta">Clarksville • Austin</p>
+                      </div>
+                      <strong class="property-price">$2,320</strong>
+                    </div>
+                    <p class="property-copy">1 bd / 1 ba • Balcony • Small dog okay</p>
+                    <div class="tag-row compact">
+                      <span>Walkable block</span>
+                      <span>MLS verified</span>
+                      <span>Street permit parking</span>
+                      <span>Coffee + grocery nearby</span>
+                    </div>
+                    <span class="property-badge">Lead pick</span>
+                    <p class="tradeoff-line">Why this match: the only balcony option, but parking is the compromise.</p>
+                    <div class="property-actions">
+                      <a class="button button-primary button-small" href="#home-detail" data-home-id="maple">View home</a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="property-card vertical home-card-results" data-home-id="juniper" role="button" tabindex="0">
+                  <div class="property-media media-juniper"></div>
+                  <div class="property-body">
+                    <div class="property-top">
+                      <div>
+                        <h4>Juniper Walk Apartments</h4>
+                        <p class="property-meta">Hyde Park • Austin</p>
+                      </div>
+                      <strong class="property-price">$2,280</strong>
+                    </div>
+                    <p class="property-copy">1 bd / 1 ba • Courtyard light • Small dog okay</p>
+                    <div class="tag-row compact">
+                      <span>Off-street lot</span>
+                      <span>Broker verified</span>
+                      <span>Quiet street</span>
+                      <span>Park + coffee nearby</span>
+                    </div>
+                    <p class="tradeoff-line">Why this match: easiest parking, but no balcony.</p>
+                    <div class="property-actions">
+                      <a class="button button-secondary button-small" href="#home-detail" data-home-id="juniper">View home</a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="property-card vertical home-card-results" data-home-id="southlamar" role="button" tabindex="0">
+                  <div class="property-media media-arbor"></div>
+                  <div class="property-body">
+                    <div class="property-top">
+                      <div>
+                        <h4>South Lamar Yard</h4>
+                        <p class="property-meta">South Lamar • Austin</p>
+                      </div>
+                      <strong class="property-price">$2,485</strong>
+                    </div>
+                    <p class="property-copy">1 bd / 1 ba • Big windows • Small dog okay</p>
+                    <div class="tag-row compact">
+                      <span>Garage add-on</span>
+                      <span>Partner feed</span>
+                      <span>Newer finish</span>
+                      <span>Groceries nearby</span>
+                    </div>
+                    <p class="tradeoff-line">Why this match: strongest light, slightly less walkable.</p>
+                    <div class="property-actions">
+                      <a class="button button-secondary button-small" href="#home-detail" data-home-id="southlamar">View home</a>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="frame-shell reveal" id="home-detail" data-nav="home-detail">
+        <div class="frame-heading">
+          <div>
+            <p class="frame-kicker">Frame 4</p>
+            <h2>Home Detail</h2>
+          </div>
+          <p class="frame-note">
+            The clicked-home view makes one shortlist item feel inspectable before the user
+            saves it or requests a tour.
+          </p>
+        </div>
+
+        <article class="artboard product-frame">
+          <div class="window-chrome">
+            <div class="window-brand">
+              <span class="brand-mark">TC</span>
+              <div>
+                <strong>Trusted Concierge</strong>
+                <p>Home view</p>
+              </div>
+            </div>
+            <div class="window-status">
+              <span class="status-chip">Selected from shortlist</span>
+              <span class="status-chip status-chip-soft">Verified listing</span>
+            </div>
+          </div>
+
+          <div class="product-layout">
+            <aside class="criteria-module">
+              <div class="criteria-top">
+                <div>
+                  <p class="section-label">Search Snapshot</p>
+                  <h3>Still grounded in chat</h3>
+                </div>
+                <div class="module-chip-row">
+                  <span class="status-pill">3 candidates</span>
+                </div>
+              </div>
+
+              <div class="criteria-stack">
+                <section class="criteria-card">
+                  <p class="card-label">Current filters</p>
+                  <div class="tag-row compact">
+                    <span id="detail-filter-budget">$2,200 to $2,600</span>
+                    <span>Small dog</span>
+                    <span id="detail-filter-movein">6 to 8 weeks</span>
+                    <span id="detail-filter-parking">Parking flexible</span>
+                  </div>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Selected home</p>
+                  <strong class="field-value" id="detail-selected-home">Maple &amp; Burnet House</strong>
+                  <p class="field-note" id="detail-selected-note">The only shortlist option with a balcony.</p>
+                </section>
+
+                <section class="criteria-card">
+                  <p class="card-label">Handoff state</p>
+                  <strong class="field-value">Not shared yet</strong>
+                </section>
+              </div>
+
+              <div class="module-footer">
+                <div>
+                  <span class="footer-label">Action</span>
+                  <strong>Add this home to the shortlist.</strong>
+                </div>
+                <div class="action-row">
+                  <a class="button button-primary" href="#shortlist-confirmation">Create shortlist</a>
+                  <a class="button button-secondary" href="#edit-criteria">Adjust criteria</a>
+                </div>
+              </div>
+            </aside>
+
+            <section class="workspace detail-workspace">
+              <div class="detail-hero detail-hero-large media-maple" id="detail-hero">
+                <div class="hero-overlay">
+                  <div class="hero-badge-row">
+                    <span class="hero-badge" id="detail-hero-badge">Balcony listing</span>
+                    <span class="hero-badge hero-badge-soft">Verified</span>
+                  </div>
+                  <div>
+                    <p class="hero-kicker">Home View</p>
+                    <h3 id="detail-hero-title">Maple &amp; Burnet House</h3>
+                    <p id="detail-hero-subtitle">Clarksville • Austin, TX</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-topline">
+                <div>
+                  <p class="section-label">Selected home</p>
+                  <h3 id="detail-headline">Balcony plus walkability makes this the standout pick.</h3>
+                </div>
+                <div class="action-row">
+                  <a class="button button-primary" href="#shortlist-confirmation">Add to shortlist</a>
+                  <a class="button button-secondary" href="#updated-results">Back to shortlist</a>
+                </div>
+              </div>
+
+              <div class="fact-grid">
+                <div class="fact-card">
+                  <span>Rent</span>
+                  <strong id="detail-rent">$2,320/mo</strong>
+                </div>
+                <div class="fact-card">
+                  <span>Walk score</span>
+                  <strong id="detail-walk-score">92 / 100</strong>
+                </div>
+                <div class="fact-card">
+                  <span>Pet policy</span>
+                  <strong id="detail-pet-policy">Small dog okay</strong>
+                </div>
+                <div class="fact-card">
+                  <span>Parking</span>
+                  <strong id="detail-parking-value">Street permit</strong>
+                </div>
+              </div>
+
+              <div class="detail-columns">
+                <section class="panel">
+                  <p class="section-label">Why it fits</p>
+                  <h4>The trade-off is visible, not hidden.</h4>
+                  <ul class="fit-list" id="detail-fit-list">
+                    <li>Most walkable block in the shortlist and the only balcony option.</li>
+                    <li>Dog policy is already verified for the current listing.</li>
+                    <li>Coffee, a corner grocery, and a small park are all within a short walk.</li>
+                    <li>Street permit parking is the main compromise the user is making.</li>
+                  </ul>
+                </section>
+
+                <section class="panel">
+                  <p class="section-label">Source notes</p>
+                  <h4>Confidence stays inside the product.</h4>
+                  <div class="source-list">
+                    <div class="source-item">
+                      <span>Pricing</span>
+                      <strong>MLS refreshed today at 11:14 AM</strong>
+                    </div>
+                    <div class="source-item">
+                      <span>Pets</span>
+                      <strong>Small dog policy confirmed this week</strong>
+                    </div>
+                    <div class="source-item">
+                      <span>Parking</span>
+                      <strong id="detail-source-parking">Street permit note pulled from the listing remarks</strong>
+                    </div>
+                    <div class="source-item">
+                      <span>Nearby</span>
+                      <strong id="detail-source-nearby">Coffee, grocery, and green space highlighted from local amenity notes</strong>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="frame-shell reveal" id="shortlist-confirmation" data-nav="shortlist-confirmation">
+        <div class="frame-heading">
+          <div>
+            <p class="frame-kicker">Frame 5</p>
+            <h2>Shortlist Confirmation</h2>
+          </div>
+          <p class="frame-note">
+            Task A ends with a concrete shortlist, not a loose transcript. That working set is
+            what makes the later balcony reference understandable.
+          </p>
+        </div>
+
+        <article class="artboard product-frame">
+          <div class="window-chrome">
+            <div class="window-brand">
+              <span class="brand-mark">TC</span>
+              <div>
+                <strong>Trusted Concierge</strong>
+                <p>Shortlist saved</p>
+              </div>
+            </div>
+            <div class="window-status">
+              <span class="status-chip">3 homes saved</span>
+              <span class="status-chip status-chip-soft">Nothing shared yet</span>
+            </div>
+          </div>
+
+          <div class="product-layout">
+            <aside class="context-panel">
+              <div class="context-top">
+                <div>
+                  <p class="section-label">Named shortlist</p>
+                  <h3>Walkable Austin picks</h3>
+                </div>
+                <span class="status-pill">3 homes</span>
+              </div>
+
+              <section class="context-card">
+                <p class="card-label">Saved search snapshot</p>
+                <div class="tag-row compact">
+                    <span id="shortlist-budget">$2,200 to $2,600</span>
+                  <span>Small dog</span>
+                    <span id="shortlist-movein">6 to 8 weeks</span>
+                    <span id="shortlist-parking">Parking flexible</span>
+                </div>
+              </section>
+
+              <section class="context-card">
+                <p class="card-label">Current contents</p>
+                <div class="stack-list" id="shortlist-current-contents">
+                  <div class="mini-home">
+                    <strong>Maple &amp; Burnet House</strong>
+                    <span>Balcony</span>
+                  </div>
+                  <div class="mini-home">
+                    <strong>Juniper Walk Apartments</strong>
+                    <span>Better parking</span>
+                  </div>
+                  <div class="mini-home">
+                    <strong>South Lamar Yard</strong>
+                    <span>Best natural light</span>
+                  </div>
+                </div>
+              </section>
+
+              <div class="module-footer">
+                <div>
+                  <span class="footer-label">Next</span>
+                  <strong>Request a tour through the assistant.</strong>
+                </div>
+                <div class="action-row">
+                  <a class="button button-secondary" href="#contact-consent">Contact Realtor</a>
+                  <a class="button button-secondary" href="#edit-criteria">Edit criteria</a>
+                </div>
+              </div>
+            </aside>
+
+            <section class="workspace">
+              <div class="workspace-header">
+                <div>
+                  <p class="section-label">Shortlist</p>
+                  <h3>The assistant now has a stable set of homes to reference.</h3>
+                </div>
+              </div>
+
+              <div class="shortlist-stage">
+                <section class="shortlist-card highlight-card">
+                  <p class="section-label">Saved homes</p>
+                  <h4>Walkable Austin picks</h4>
+                  <p class="subtle-copy">The balcony listing leads, but two alternatives remain visible for comparison.</p>
+                  <div class="shortlist-bay">
+                    <div class="bay-label">Lead match</div>
+                    <article class="property-card property-card-inline is-selected home-card-shortlist" data-home-id="maple" role="button" tabindex="0" id="shortlist-lead-card">
+                      <div class="property-media media-maple" id="shortlist-lead-media"></div>
+                      <div class="property-body">
+                        <span class="property-badge" id="shortlist-lead-badge">Lead pick</span>
+                        <div class="property-top">
+                          <div>
+                            <h4 id="shortlist-lead-name">Maple &amp; Burnet House</h4>
+                            <p class="property-meta" id="shortlist-lead-meta">Clarksville • Balcony</p>
+                          </div>
+                          <strong class="property-price" id="shortlist-lead-price">$2,320</strong>
+                        </div>
+                        <div class="tag-row compact" id="shortlist-lead-tags">
+                          <span>Walkable</span>
+                          <span>Balcony</span>
+                          <span>Dog okay</span>
+                        </div>
+                      </div>
+                    </article>
+
+                    <div class="stack-list" id="shortlist-alt-list">
+                      <div class="mini-home home-card-shortlist" data-home-id="juniper" role="button" tabindex="0">
+                        <strong>Juniper Walk Apartments</strong>
+                        <span>Parking is easier here</span>
+                      </div>
+                      <div class="mini-home home-card-shortlist" data-home-id="southlamar" role="button" tabindex="0">
+                        <strong>South Lamar Yard</strong>
+                        <span>Best light, less walkable</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="panel">
+                  <p class="section-label">Next step</p>
+                  <h4>Now the user can say, “Request a tour for the one with the balcony.”</h4>
+                  <div class="kpi-row">
+                    <div class="kpi-card">
+                      <span>Homes saved</span>
+                      <strong>3</strong>
+                    </div>
+                    <div class="kpi-card">
+                      <span>Balcony target</span>
+                      <strong>1</strong>
+                    </div>
+                    <div class="kpi-card">
+                      <span>Shared yet</span>
+                      <strong>No</strong>
+                    </div>
+                  </div>
+                  <div class="action-row">
+                    <a class="button button-primary" href="#contact-consent">Request tour</a>
+                    <a class="button button-secondary" href="#updated-results">Back to results</a>
+                  </div>
+                </section>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="frame-shell reveal" id="contact-consent" data-nav="contact-consent">
+        <div class="frame-heading">
+          <div>
+            <p class="frame-kicker">Frame 6</p>
+            <h2>Contact Consent</h2>
+          </div>
+          <p class="frame-note">
+            Task B starts in chat again: the user references “the one with the balcony,” the
+            assistant resolves it, and nothing is sent until the user explicitly approves the preview.
+          </p>
+        </div>
+
+        <article class="artboard product-frame">
+          <div class="window-chrome">
+            <div class="window-brand">
+              <span class="brand-mark">TC</span>
+              <div>
+                <strong>Trusted Concierge</strong>
+                <p>Contact preview</p>
+              </div>
+            </div>
+            <div class="window-status">
+              <span class="status-chip">Preview ready</span>
+              <span class="status-chip status-chip-soft">Not sent</span>
+            </div>
+          </div>
+
+          <div class="product-layout">
+            <aside class="context-panel">
+              <div class="context-top">
+                <div>
+                  <p class="section-label">Assigned Realtor</p>
+                  <h3>Maya Brooks</h3>
+                </div>
+                <span class="status-pill">Verified partner</span>
+              </div>
+
+              <section class="context-card identity-card">
+                <div class="identity-row">
+                  <div class="avatar">MB</div>
+                  <div>
+                    <strong>Maya Brooks</strong>
+                    <p class="subtle-copy">Compass Austin • TX 718422</p>
+                  </div>
+                </div>
+                <p class="subtle-copy">Nothing reaches Maya until the user approves the preview.</p>
+              </section>
+
+              <section class="context-card">
+                <p class="card-label">Resolved listing</p>
+                <div class="mini-home">
+                  <strong id="resolved-listing-name">Maple &amp; Burnet House</strong>
+                  <span id="resolved-listing-note">Resolved from “the one with the balcony”</span>
+                </div>
+              </section>
+            </aside>
+
+            <section class="workspace">
+              <div class="workspace-header">
+                <div>
+                  <p class="section-label">Task B</p>
+                  <h3>Reference resolution happens in chat before anything is shared.</h3>
+                </div>
+              </div>
+
+              <section class="panel chat-panel">
+                <div class="chat-thread">
+                  <article class="message message-user">
+                    <span class="message-role">User</span>
+                    <p>Now request a tour for the one with the balcony.</p>
+                  </article>
+
+                  <article class="message message-assistant">
+                    <span class="message-role">Assistant</span>
+                    <p id="consent-assistant-resolution">That should be Maple &amp; Burnet House. It&apos;s the only shortlist home with a balcony.</p>
+                  </article>
+
+                  <article class="message message-assistant">
+                    <span class="message-role">Assistant</span>
+                    <p>I can draft the request, but I won&apos;t contact Maya until you approve exactly what gets shared.</p>
+                  </article>
+                </div>
+              </section>
+
+              <div class="choice-grid" data-select-scope>
+                <button class="choice-card selectable" type="button" data-select-group="consent-channel" data-state-key="consentChannel" data-state-value="email" aria-pressed="false">
+                  <span class="choice-title">Email</span>
+                  <span class="choice-copy">Share name, email, and the selected home.</span>
+                </button>
+                <button class="choice-card selectable is-selected" type="button" data-select-group="consent-channel" data-state-key="consentChannel" data-state-value="phone" aria-pressed="true">
+                  <span class="choice-title">Phone</span>
+                  <span class="choice-copy">Share name, phone, and the tour request.</span>
+                </button>
+                <button class="choice-card selectable" type="button" data-select-group="consent-channel" data-state-key="consentChannel" data-state-value="both" aria-pressed="false">
+                  <span class="choice-title">Both</span>
+                  <span class="choice-copy">Share email and phone for follow-up.</span>
+                </button>
+              </div>
+
+              <section class="share-preview">
+                <div class="panel">
+                  <p class="section-label">Will be shared</p>
+                  <h4 id="share-heading">Phone</h4>
+                  <ul class="fit-list">
+                    <li id="share-item-1">Name and phone number.</li>
+                    <li id="share-item-2">Maple &amp; Burnet House as the requested listing.</li>
+                    <li id="share-item-3">Preferred afternoon showing times.</li>
+                  </ul>
+                </div>
+
+                <div class="panel">
+                  <p class="section-label">Still private</p>
+                  <h4>Not included</h4>
+                  <ul class="fit-list">
+                    <li>The other shortlist homes.</li>
+                    <li>The full chat transcript.</li>
+                    <li>Anything not shown in this preview.</li>
+                  </ul>
+                </div>
+              </section>
+
+              <section class="panel">
+                <p class="section-label">Editable request note</p>
+                <h4>The user stays in the loop before contact happens.</h4>
+                <div class="message-box message-box-editable" id="consent-note-draft" contenteditable="true" role="textbox" aria-label="Editable request note">
+                  Hi Maya, I&apos;m interested in Maple &amp; Burnet House. Afternoons are best for me,
+                  and phone is the easiest way to reach me.
+                </div>
+                <p class="subtle-copy">Edit the note if needed before sending.</p>
+              </section>
+
+              <div class="action-row">
+                <a class="button button-primary" href="#schedule-showing">Approve preview</a>
+                <a class="button button-secondary" href="#shortlist-confirmation">Back to shortlist</a>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="frame-shell reveal" id="schedule-showing" data-nav="schedule-showing">
+        <div class="frame-heading">
+          <div>
+            <p class="frame-kicker">Frame 7</p>
+            <h2>Schedule Showing</h2>
+          </div>
+          <p class="frame-note">
+            Bounded afternoon slots keep the handoff narrow, easy to scan, and easy to confirm.
+          </p>
+        </div>
+
+        <article class="artboard product-frame">
+          <div class="window-chrome">
+            <div class="window-brand">
+              <span class="brand-mark">TC</span>
+              <div>
+                <strong>Trusted Concierge</strong>
+                <p>Schedule showing</p>
+              </div>
+            </div>
+            <div class="window-status">
+              <span class="status-chip">Afternoon slots</span>
+              <span class="status-chip status-chip-soft">Still not sent</span>
+            </div>
+          </div>
+
+          <div class="product-layout">
+            <aside class="context-panel">
+              <div class="context-top">
+                <div>
+                  <p class="section-label">Showing context</p>
+                  <h3 id="schedule-home-title">Maple &amp; Burnet House</h3>
+                </div>
+                <span class="status-pill" id="schedule-home-chip">Balcony home</span>
+              </div>
+
+              <section class="context-card">
+                <p class="card-label">Assigned Realtor</p>
+                <div class="identity-row">
+                  <div class="avatar">MB</div>
+                  <div>
+                    <strong>Maya Brooks</strong>
+                    <p class="subtle-copy">Compass Austin • Verified partner</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="context-card">
+                <p class="card-label">Contact method</p>
+                <strong class="field-value" id="schedule-contact-method">Name + phone</strong>
+              </section>
+            </aside>
+
+            <section class="workspace">
+              <div class="workspace-header">
+                <div>
+                  <p class="section-label">Schedule</p>
+                  <h3>Choose one afternoon slot for Maya Brooks.</h3>
+                </div>
+              </div>
+
+              <div class="schedule-shell" data-select-scope>
+                <div class="day-strip">
+                  <button class="choice-chip selectable is-selected" type="button" data-select-group="showing-day" data-state-key="showingDay" data-state-value="wed" aria-pressed="true">
+                    Wed Jun 5
+                  </button>
+                  <button class="choice-chip selectable" type="button" data-select-group="showing-day" data-state-key="showingDay" data-state-value="thu" aria-pressed="false">
+                    Thu Jun 6
+                  </button>
+                </div>
+
+                <div class="slot-grid">
+                  <button class="slot-button selectable" type="button" data-select-group="showing-slot" data-state-key="showingSlot" data-state-value="1:30 PM" aria-pressed="false">
+                    <span class="slot-time">1:30 PM</span>
+                    <span class="slot-note">Earliest afternoon slot</span>
+                  </button>
+                  <button class="slot-button selectable is-selected" type="button" data-select-group="showing-slot" data-state-key="showingSlot" data-state-value="3:00 PM" aria-pressed="true">
+                    <span class="slot-time">3:00 PM</span>
+                    <span class="slot-note">Best overlap for Maya</span>
+                  </button>
+                  <button class="slot-button selectable" type="button" data-select-group="showing-slot" data-state-key="showingSlot" data-state-value="4:30 PM" aria-pressed="false">
+                    <span class="slot-time">4:30 PM</span>
+                    <span class="slot-note">Late afternoon</span>
+                  </button>
+                  <button class="slot-button selectable" type="button" data-select-group="showing-slot" data-state-key="showingSlot" data-state-value="5:30 PM" aria-pressed="false">
+                    <span class="slot-time">5:30 PM</span>
+                    <span class="slot-note">Last slot today</span>
+                  </button>
+                </div>
+
+                <section class="panel">
+                  <p class="section-label">Selected slot</p>
+                  <h4 id="schedule-selected-slot">Wednesday, June 5 at 3:00 PM</h4>
+                  <p class="subtle-copy">One time only. Maya can confirm it or offer the nearest alternative.</p>
+                </section>
+              </div>
+
+              <div class="action-row">
+                <a class="button button-primary" href="#review-send">Review request</a>
+                <a class="button button-secondary" href="#contact-consent">Back to preview</a>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="frame-shell reveal" id="review-send" data-nav="review-send">
+        <div class="frame-heading">
+          <div>
+            <p class="frame-kicker">Frame 8</p>
+            <h2>Review and Send</h2>
+          </div>
+          <p class="frame-note">
+            The final frame keeps the send step cautious and legible without overexplaining it.
+          </p>
+        </div>
+
+        <article class="artboard product-frame">
+          <div class="window-chrome">
+            <div class="window-brand">
+              <span class="brand-mark">TC</span>
+              <div>
+                <strong>Trusted Concierge</strong>
+                <p>Review and send</p>
+              </div>
+            </div>
+            <div class="window-status">
+              <span class="status-chip" id="review-status-chip">Ready to send</span>
+              <span class="status-chip status-chip-soft" id="review-status-meta">Verified agent</span>
+            </div>
+          </div>
+
+          <div class="product-layout">
+            <aside class="context-panel">
+              <div class="context-top">
+                <div>
+                  <p class="section-label">Request status</p>
+                  <h3>Final check</h3>
+                </div>
+              </div>
+
+              <div class="summary-steps">
+                <div class="step-pill">
+                  <span>Search</span>
+                  <strong>Done</strong>
+                </div>
+                <div class="step-pill">
+                  <span>Shortlist</span>
+                  <strong>3 homes</strong>
+                </div>
+                <div class="step-pill">
+                  <span>Consent</span>
+                  <strong id="review-consent-step">Phone</strong>
+                </div>
+                <div class="step-pill is-current">
+                  <span>Tour time</span>
+                  <strong id="review-time-step">Wed Jun 5 • 3:00 PM</strong>
+                </div>
+              </div>
+            </aside>
+
+            <section class="workspace">
+              <div class="workspace-header">
+                <div>
+                  <p class="section-label">Review</p>
+                  <h3>Final check before the request goes out to Maya Brooks.</h3>
+                </div>
+              </div>
+
+              <section class="review-sheet">
+                <div class="review-banner">
+                  <div>
+                    <p class="section-label">Outbound request</p>
+                    <h4 id="review-headline">Tour request for Maple &amp; Burnet House</h4>
+                  </div>
+                  <p class="subtle-copy" id="review-status-note">Editable until the request is sent.</p>
+                </div>
+
+                <div id="review-draft-content">
+                  <div class="review-grid">
+                    <section class="review-block">
+                      <p class="card-label">Property</p>
+                      <strong id="review-property-name">Maple &amp; Burnet House</strong>
+                      <p class="subtle-copy" id="review-property-meta">Clarksville • Balcony • $2,320/mo</p>
+                    </section>
+
+                    <section class="review-block">
+                      <p class="card-label">Realtor</p>
+                      <strong>Maya Brooks</strong>
+                      <p class="subtle-copy">Compass Austin • TX 718422</p>
+                    </section>
+
+                    <section class="review-block">
+                      <p class="card-label">Contact channel</p>
+                      <strong id="review-contact-channel">Phone</strong>
+                      <p class="subtle-copy" id="review-contact-copy">Name and phone number only.</p>
+                    </section>
+
+                    <section class="review-block">
+                      <p class="card-label">Selected time</p>
+                      <strong id="review-selected-time">Wednesday, June 5 at 3:00 PM</strong>
+                      <p class="subtle-copy">Single requested slot.</p>
+                    </section>
+
+                    <section class="review-block review-block-wide">
+                      <p class="card-label">Shared details</p>
+                      <ul class="fit-list">
+                        <li id="review-shared-1">Name and phone number.</li>
+                        <li id="review-shared-2">Maple &amp; Burnet House as the selected listing.</li>
+                        <li id="review-shared-3">Preferred afternoon slot and the current move-in window.</li>
+                      </ul>
+                    </section>
+
+                    <section class="review-block review-block-wide">
+                      <p class="card-label">Message preview</p>
+                      <div class="message-box message-box-editable" id="review-message-draft" contenteditable="true" role="textbox" aria-label="Editable message preview">
+                        Hi Maya, I&apos;d like to request a tour for Maple &amp; Burnet House on
+                        Wednesday, June 5 at 3:00 PM. I&apos;m the renter who shortlisted the balcony
+                        listing through Trusted Concierge.
+                      </div>
+                    </section>
+                  </div>
+
+                  <div class="action-row action-row-end">
+                    <button class="button button-primary" type="button" id="review-send-button">Send to Maya</button>
+                    <a class="button button-secondary button-secondary-quiet" href="#schedule-showing">Cancel</a>
+                  </div>
+                </div>
+
+                <section class="review-confirmation is-hidden" id="review-sent-content" aria-live="polite">
+                  <p class="section-label">Request sent</p>
+                  <h4 id="review-sent-heading">Maya Brooks now has the tour request.</h4>
+                  <p class="subtle-copy" id="review-sent-copy">
+                    The selected home, contact method, and time were shared exactly as previewed.
+                  </p>
+                  <div class="review-confirmation-grid">
+                    <div class="mini-home is-selected">
+                      <strong id="review-sent-home">Maple &amp; Burnet House</strong>
+                      <span id="review-sent-time">Wednesday, June 5 at 3:00 PM</span>
+                    </div>
+                    <div class="mini-home is-selected">
+                      <strong id="review-sent-channel">Phone</strong>
+                      <span id="review-sent-summary">Name and phone number only.</span>
+                    </div>
+                  </div>
+                  <div class="action-row action-row-end">
+                    <button class="button button-secondary" type="button" id="review-back-button">Back to review</button>
+                    <a class="button button-primary" href="#schedule-showing">Back to schedule</a>
+                  </div>
+                </section>
+              </section>
+            </section>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -1,1399 +1,1061 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Deal Lens — Concierge Prototype | David Neish</title>
-    <link rel="stylesheet" href="./styles.css" />
-    <style>
-      .dn-bar {
-        background: #0E0D0B;
-        color: #EDE8DE;
-        font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
-        font-size: 0.8rem;
-        padding: 0.85rem 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        flex-wrap: wrap;
-        border-bottom: 2px solid #E3A83B;
-      }
-      .dn-bar a { color: #E3A83B; text-decoration: none; font-weight: 600; }
-      .dn-bar a:hover { color: #F2C46A; }
-      .dn-bar span { color: #ACA599; letter-spacing: 0.02em; }
-    </style>
-  </head>
-  <body>
-    <div class="dn-bar">
-      <a href="../../index.html#realestate">&larr; Back to dneish2.github.io</a>
-      <span>Prototype note: this walkthrough runs on sample data (Austin, TX). The Deal Lens concept applies the same consent-first flow to St. Louis tax-sale properties.</span>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal Lens — St. Louis Sale 237</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    /* surfaces — intentional warm light */
+    --canvas:#F7F3EC; --surface:#FFFFFF; --surface-2:#FBF8F2; --inset:#F1EBE0;
+    --ink:#211E18; --ink-soft:#6C665B; --ink-faint:#9A9384;
+    --line:#E7E0D3; --line-2:#D8CFBE;
+    /* brand + wayfinding */
+    --brand:#BE7C16; --brand-deep:#9C6610; --brand-tint:#F6ECD5;
+    /* semantic system: green = good, amber = attention/your-number, orange = caution, clay = risk */
+    --good:#2E8460; --good-tint:#E1EFE8;
+    --caution:#C46A26; --caution-tint:#F7E8D7;
+    --risk:#B4453A; --risk-tint:#F6E1DC;
+    --info:#3F7AA6; --info-tint:#E2EDF4;
+    --shadow:0 1px 2px rgba(40,33,20,.04),0 4px 16px rgba(40,33,20,.05);
+    --shadow-lift:0 2px 6px rgba(40,33,20,.06),0 12px 34px rgba(40,33,20,.10);
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif; --serif:'Fraunces',Georgia,serif;
+    --r:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--canvas);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
+  ::selection{background:var(--brand-tint)}
+  .wrap{max-width:1340px;margin:0 auto;padding:0 26px}
+
+  /* ---------- top nav ---------- */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0 16px;gap:16px;flex-wrap:wrap}
+  .brand{font-family:var(--serif);font-weight:600;font-size:23px;letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
+  .brand .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(145deg,var(--brand),var(--brand-deep));display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;box-shadow:var(--shadow)}
+  .brand .sub{font-family:var(--sans);font-weight:500;font-size:11px;color:var(--ink-faint);letter-spacing:.3px}
+  .nav-right{display:flex;align-items:center;gap:10px}
+  .crumbs{font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:8px}
+  .crumbs a{color:var(--brand-deep);cursor:pointer;font-weight:500;text-decoration:none}
+  .crumbs a:hover{text-decoration:underline}
+  .btn{font-family:var(--sans);font-weight:500;font-size:13px;padding:9px 15px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{border-color:var(--brand);box-shadow:var(--shadow)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.primary:hover{background:var(--brand-deep)}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--ink-soft)}
+  .btn.ghost:hover{background:var(--inset);border-color:transparent}
+
+  .divider{height:1px;background:var(--line);margin-bottom:22px}
+
+  /* ---------- list view ---------- */
+  .pagehead{margin-bottom:20px}
+  .pagehead h1{font-family:var(--serif);font-weight:600;font-size:30px;letter-spacing:-.4px;margin-bottom:5px}
+  .pagehead p{color:var(--ink-soft);font-size:14.5px;max-width:680px}
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  @media(max-width:880px){.summary{grid-template-columns:1fr 1fr}}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
+  .stat .k{font-size:12px;color:var(--ink-soft);font-weight:500;margin-bottom:7px}
+  .stat .v{font-family:var(--serif);font-size:27px;font-weight:600;line-height:1}
+  .stat .n{font-size:11.5px;color:var(--ink-faint);margin-top:6px}
+  .stat .v.good{color:var(--good)} .stat .v.brand{color:var(--brand-deep)}
+
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .seg{display:inline-flex;background:var(--inset);border-radius:10px;padding:3px}
+  .seg button{font-family:var(--sans);font-size:12.5px;font-weight:500;padding:7px 13px;border:none;background:transparent;color:var(--ink-soft);border-radius:8px;cursor:pointer;transition:.14s}
+  .seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+  .filterbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+  .chip{font-family:var(--sans);font-size:12.5px;font-weight:500;padding:7px 13px;border-radius:99px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-soft);cursor:pointer;transition:.14s;display:inline-flex;align-items:center;gap:7px}
+  .chip:hover{border-color:var(--ink-faint)}
+  .chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+  .chip .swt{width:8px;height:8px;border-radius:2px;display:inline-block}
+  .search{font-family:var(--sans);font-size:13px;padding:8px 13px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);width:210px;outline:none}
+  .search:focus{border-color:var(--brand)}
+
+  #listmap{height:300px;border-radius:var(--r);border:1px solid var(--line);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow);background:var(--inset)}
+  .map-fallback{display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--sans);font-size:13px;color:var(--ink-faint);padding:24px;line-height:1.6;height:100%}
+
+  .listwrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse}
+  thead th{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--ink-faint);text-align:left;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface-2);cursor:pointer;user-select:none;white-space:nowrap}
+  thead th.num{text-align:right}
+  thead th:hover{color:var(--ink-soft)}
+  tbody tr{border-bottom:1px solid var(--line);cursor:pointer;transition:.1s}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:hover{background:var(--surface-2)}
+  tbody td{padding:13px 16px;font-size:13.5px;vertical-align:middle}
+  td.num{text-align:right;font-family:var(--mono);font-weight:500}
+  .addr-cell .a{font-weight:600;font-size:14px}
+  .addr-cell .o{font-size:11.5px;color:var(--ink-faint);margin-top:2px}
+  .pill{font-family:var(--sans);font-size:11px;font-weight:600;padding:4px 9px;border-radius:99px;white-space:nowrap;display:inline-block}
+  .pill.land{background:var(--info-tint);color:var(--info)}
+  .pill.flip{background:var(--caution-tint);color:var(--caution)}
+  .pill.hold{background:var(--good-tint);color:var(--good)}
+  .pill.resale{background:var(--brand-tint);color:var(--brand-deep)}
+  .pill.unrated{background:var(--inset);color:var(--ink-faint)}
+  .pill.risk{background:var(--risk-tint);color:var(--risk)}
+  .pill.info{background:var(--info-tint);color:var(--info)}
+  .tierdot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle}
+  .roi-cell{font-family:var(--mono);font-weight:600;font-size:14px}
+  .roi-cell.pos{color:var(--good)} .roi-cell.neg{color:var(--risk)} .roi-cell.na{color:var(--ink-faint);font-weight:500}
+  .zone-tag{font-size:11.5px;color:var(--ink-soft)}
+
+  /* ---------- deal view ---------- */
+  .deal{display:grid;grid-template-columns:340px 1.35fr 1fr;gap:18px;align-items:start}
+  @media(max-width:1180px){.deal{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  .card .ch{padding:15px 18px 0;display:flex;align-items:center;justify-content:space-between}
+  .card .ch h3{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--ink-faint)}
+  .card .ch .note{font-size:11px;color:var(--ink-faint)}
+  .card .cb{padding:16px 18px 18px}
+
+  .tierband{display:flex;align-items:center;gap:9px;padding:10px 18px;border-radius:var(--r) var(--r) 0 0;font-size:12.5px;font-weight:600}
+  .tierband.A{background:var(--good-tint);color:var(--good)}
+  .tierband.B{background:var(--caution-tint);color:var(--caution)}
+  .tierband.U{background:var(--inset);color:var(--ink-faint)}
+
+  .dealhead h2{font-family:var(--serif);font-weight:600;font-size:24px;letter-spacing:-.3px;margin-bottom:3px}
+  .dealhead .loc{font-size:13px;color:var(--ink-soft);margin-bottom:14px}
+  .strat-line{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:16px}
+  .strat-main{font-family:var(--sans);font-size:13px;font-weight:600;padding:7px 13px;border-radius:9px}
+  .strat-or{font-size:12.5px;color:var(--ink-soft)}
+
+  .factgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .fcell{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+  .fcell .k{font-size:11px;color:var(--ink-faint);font-weight:500;margin-bottom:4px}
+  .fcell .v{font-size:15px;font-weight:600}
+  .fcell .v.mono{font-family:var(--mono)}
+
+  .readout{font-size:13.5px;line-height:1.6;color:var(--ink);background:var(--brand-tint);border-radius:11px;padding:13px 15px;margin-bottom:14px}
+  .reason{font-size:13px;line-height:1.6;color:var(--ink-soft)}
+  .reason .lead{font-weight:600;color:var(--ink);display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+
+  .riskline{margin-top:16px}
+  .risk-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+  .risk-row .rk{font-size:13px;color:var(--ink-soft)}
+  .risk-row .rk small{display:block;color:var(--ink-faint);font-size:11px}
+  .meter{display:flex;gap:3px;align-items:center}
+  .mlabel{font-size:11.5px;font-weight:600;margin-right:9px}
+  .mlabel.good{color:var(--good)} .mlabel.mid{color:var(--caution)} .mlabel.bad{color:var(--risk)}
+  .pip{width:18px;height:6px;border-radius:3px;background:var(--inset)}
+  .pip.on.good{background:var(--good)} .pip.on.mid{background:var(--caution)} .pip.on.bad{background:var(--risk)}
+
+  /* map + comps */
+  #dealmap{height:300px;border-radius:11px;border:1px solid var(--line);overflow:hidden;background:var(--inset)}
+  .maptools{display:flex;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap;gap:10px}
+  .layers{display:flex;gap:8px;flex-wrap:wrap}
+  .layer{font-size:12px;font-weight:500;padding:6px 11px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-soft);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.14s}
+  .layer:hover{border-color:var(--ink-faint)}
+  .layer.on{background:var(--inset);border-color:var(--ink-faint);color:var(--ink)}
+  .layer .ld{width:8px;height:8px;border-radius:50%}
+  .maplegend{display:flex;gap:13px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-soft)}
+  .maplegend div{display:flex;align-items:center;gap:6px}
+  .ldot{width:10px;height:10px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line-2)}
+
+  .complist{margin-top:6px}
+  .comp{border:1px solid var(--line);border-radius:11px;padding:0;margin-bottom:9px;cursor:pointer;transition:.14s;overflow:hidden;background:var(--surface)}
+  .comp:hover{border-color:var(--line-2);box-shadow:var(--shadow)}
+  .comp.sel{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
+  .comp-top{display:flex;align-items:center;gap:11px;padding:11px 13px}
+  .comp-photo{width:46px;height:46px;border-radius:8px;background:var(--inset);flex:none;display:flex;align-items:center;justify-content:center;color:var(--ink-faint);font-size:10px;text-align:center;line-height:1.2;overflow:hidden}
+  .comp-photo img{width:100%;height:100%;object-fit:cover}
+  .comp-mid{flex:1;min-width:0}
+  .comp-label{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .comp-note{font-size:11.5px;color:var(--ink-soft);margin-top:1px}
+  .comp-val{font-family:var(--mono);font-size:15px;font-weight:600;white-space:nowrap;flex:none}
+  .comp-meta{display:flex;gap:7px;flex-wrap:wrap;padding:0 13px 11px;align-items:center}
+  .tag{font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .tag.src-mls{background:var(--good-tint);color:var(--good)}
+  .tag.src-listing{background:var(--brand-tint);color:var(--brand-deep)}
+  .tag.src-assessor{background:var(--info-tint);color:var(--info)}
+  .tag.src-estimate{background:var(--inset);color:var(--ink-soft)}
+  .tag.src-web{background:var(--caution-tint);color:var(--caution)}
+  .metabit{font-size:11.5px;color:var(--ink-soft);font-family:var(--mono)}
+  .metabit b{color:var(--ink);font-weight:600}
+  .sourcelink{font-size:11.5px;color:var(--brand-deep);font-weight:500;margin-left:auto}
+  .sourcelink.disabled{color:var(--ink-faint);font-weight:400}
+  .simbar{height:5px;border-radius:3px;background:var(--inset);overflow:hidden;flex:1;min-width:40px;max-width:80px}
+  .simbar i{display:block;height:100%;background:var(--good)}
+
+  /* underwriting */
+  .uw-toggle{display:inline-flex;background:var(--inset);border-radius:9px;padding:3px;margin-bottom:14px}
+  .uw-toggle button{font-size:12px;font-weight:500;padding:6px 12px;border:none;background:transparent;color:var(--ink-soft);border-radius:7px;cursor:pointer}
+  .uw-toggle button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+  .walk{border:1px solid var(--brand);background:linear-gradient(160deg,var(--brand-tint),#fff);border-radius:12px;padding:15px 16px;margin-bottom:15px}
+  .walk .wk{font-size:12px;font-weight:600;color:var(--brand-deep);margin-bottom:3px}
+  .walk .wv{font-family:var(--serif);font-size:33px;font-weight:600;color:var(--brand-deep);line-height:1}
+  .walk .ws{font-size:12.5px;color:var(--ink-soft);margin-top:7px;line-height:1.5}
+  .walk .ws b{color:var(--ink);font-weight:600}
+  .walk.over{border-color:var(--risk);background:linear-gradient(160deg,var(--risk-tint),#fff)}
+  .walk.over .wk,.walk.over .wv{color:var(--risk)}
+
+  .outs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:15px}
+  .ocell{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px;text-align:center}
+  .ocell .k{font-size:10.5px;color:var(--ink-faint);font-weight:500;margin-bottom:5px}
+  .ocell .v{font-family:var(--mono);font-size:16px;font-weight:600}
+  .ocell .v.pos{color:var(--good)} .ocell .v.neg{color:var(--risk)}
+
+  .chainwrap{margin-bottom:8px}
+  .chain-cap{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft);margin-bottom:5px}
+  .track{height:24px;background:var(--inset);border-radius:7px;overflow:hidden;display:flex}
+  .seg2{height:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;transition:width .4s ease}
+  .seg2 span{font-family:var(--mono);font-size:9.5px;font-weight:600;color:#fff;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.15)}
+  .chain-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:11px;color:var(--ink-soft)}
+  .chain-legend div{display:flex;align-items:center;gap:5px}
+  .csw{width:9px;height:9px;border-radius:2px}
+
+  .ctrl{margin-bottom:13px}
+  .ctrl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .ctrl-top label{font-size:12.5px;color:var(--ink-soft);font-weight:500}
+  .ctrl-top .val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--brand-deep)}
+  input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:4px;background:var(--line-2);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--brand);cursor:pointer;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--brand);cursor:pointer;border:2px solid #fff}
+  .advanced{border-top:1px solid var(--line);margin-top:6px;padding-top:13px}
+  .adv-toggle{font-size:12.5px;font-weight:500;color:var(--brand-deep);cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none}
+  .adv-body{margin-top:13px;display:none}
+  .adv-body.open{display:block}
+  .reset{width:100%;margin-top:8px;background:transparent;border:1px solid var(--line-2);color:var(--ink-soft);font-family:var(--sans);font-size:12.5px;font-weight:500;padding:10px;border-radius:9px;cursor:pointer}
+  .reset:hover{border-color:var(--brand);color:var(--brand-deep)}
+
+  /* compare mode */
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cmp-col{border:1px solid var(--line);border-radius:11px;padding:13px;background:var(--surface-2)}
+  .cmp-col h4{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+  .cmp-col h4 .badge{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+  .cmp-walk{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--brand-deep);margin-bottom:4px}
+  .cmp-line{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-top:1px solid var(--line)}
+  .cmp-line .l{color:var(--ink-soft)} .cmp-line .r{font-family:var(--mono);font-weight:600}
+  .delta{text-align:center;font-size:12.5px;color:var(--ink-soft);margin-top:12px;padding:10px;background:var(--inset);border-radius:9px}
+  .delta b{font-family:var(--mono)}
+  .mini-ctrl{margin-bottom:9px}
+  .mini-ctrl .ctrl-top label{font-size:11.5px}
+  .mini-ctrl .ctrl-top .val{font-size:12px}
+
+  /* chat */
+  .chatfab{position:fixed;right:24px;bottom:24px;z-index:900;background:var(--brand);color:#fff;border:none;border-radius:99px;padding:13px 19px;font-family:var(--sans);font-weight:600;font-size:14px;cursor:pointer;box-shadow:var(--shadow-lift);display:flex;align-items:center;gap:9px}
+  .chatfab:hover{background:var(--brand-deep)}
+  .chatpanel{position:fixed;right:24px;bottom:24px;width:380px;max-width:calc(100vw - 48px);height:560px;max-height:calc(100vh - 48px);background:var(--surface);border:1px solid var(--line-2);border-radius:18px;box-shadow:var(--shadow-lift);z-index:950;display:none;flex-direction:column;overflow:hidden}
+  .chatpanel.open{display:flex}
+  .chat-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface-2)}
+  .chat-head .t{font-family:var(--serif);font-weight:600;font-size:16px;display:flex;align-items:center;gap:9px}
+  .chat-head .t .mark{width:24px;height:24px;border-radius:7px;background:linear-gradient(145deg,var(--brand),var(--brand-deep));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px}
+  .chat-x{border:none;background:transparent;color:var(--ink-faint);font-size:20px;cursor:pointer;line-height:1}
+  .chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:84%;font-size:13.5px;line-height:1.55;padding:11px 14px;border-radius:14px}
+  .msg.bot{background:var(--surface-2);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:5px;color:var(--ink)}
+  .msg.user{background:var(--brand);color:#fff;align-self:flex-end;border-bottom-right-radius:5px}
+  .msg.bot b{color:var(--brand-deep)}
+  .chat-suggest{padding:12px 16px;border-top:1px solid var(--line);background:var(--surface-2)}
+  .chat-suggest .lbl{font-size:11px;color:var(--ink-faint);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:9px}
+  .sugg{display:flex;flex-direction:column;gap:7px}
+  .sugg button{text-align:left;font-family:var(--sans);font-size:12.5px;padding:9px 12px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);cursor:pointer;transition:.14s}
+  .sugg button:hover{border-color:var(--brand);background:var(--brand-tint)}
+
+  .footnote{margin:26px 0 0;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-faint);line-height:1.7}
+  .footnote b{color:var(--ink-soft)}
+  .hidden{display:none!important}
+  .leaflet-container{background:#EDE7DB;font-family:var(--sans)}
+  .leaflet-popup-content-wrapper{border-radius:10px;box-shadow:var(--shadow-lift)}
+  .leaflet-popup-content{font-family:var(--sans);font-size:12.5px;margin:11px 13px;line-height:1.5}
+  .leaflet-popup-content b{font-weight:600}
+  .pop-link{color:var(--brand-deep);font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div style="background:#1C1A17;color:#EDE8DE;font:500 13px/1.4 Inter,system-ui,sans-serif;padding:9px 18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+  <a href="../index.html" style="color:#E3A83B;text-decoration:none">&larr; David Neish &middot; case studies</a>
+  <span style="opacity:.75">Deal Lens runs on the published St. Louis Land Tax Sale 237 listing.</span>
+  <a href="https://www.stlouis-mo.gov/government/departments/sheriff/land-tax/" rel="noopener" style="color:#E3A83B;text-decoration:none;margin-left:auto">Sheriff&rsquo;s land tax sale &rarr;</a>
+</div>
+
+<div class="wrap">
+  <div class="nav">
+    <div class="brand"><span class="mark">◆</span><div>Deal Lens<div class="sub">St. Louis Land Tax Sale 237</div></div></div>
+    <div class="nav-right">
+      <div class="crumbs" id="crumbs"></div>
     </div>
-    <div class="page-noise" aria-hidden="true"></div>
+  </div>
+  <div class="divider"></div>
+  <div id="view-list"></div>
+  <div id="view-deal" class="hidden"></div>
+  <div class="footnote" id="footnote"></div>
+</div>
 
-    <header class="page-header reveal">
-      <div class="header-copy">
-        <h1>From vague chat to a tour request.</h1>
-        <p class="lede">
-          The assistant starts with an underspecified housing request, turns it into editable
-          criteria, and only contacts a realtor after the user approves what will be shared.
-        </p>
+<button class="chatfab" id="chatfab">Ask Deal Lens</button>
+<div class="chatpanel" id="chatpanel">
+  <div class="chat-head">
+    <div class="t"><span class="mark">◆</span>Deal Lens Assistant</div>
+    <button class="chat-x" id="chatx">×</button>
+  </div>
+  <div class="chat-body" id="chatbody"></div>
+  <div class="chat-suggest">
+    <div class="lbl">Try asking</div>
+    <div class="sugg" id="sugg"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA LAYER
+   Shape mirrors the eventual CSV / MLS import. Fields marked
+   researched:true carry full deep data; the rest are imported
+   rows awaiting analysis (honest empty states).
+   ============================================================ */
+const ZONES = {
+  lafsq:    {name:"Lafayette Square", lat:38.6150, lng:-90.2180},
+  north:    {name:"North City",       lat:38.6580, lng:-90.2200},
+  dutchtown:{name:"Dutchtown / Gravois", lat:38.5870, lng:-90.2410},
+  carondelet:{name:"Carondelet / Patch", lat:38.5610, lng:-90.2500}
+};
+function zoneFor(addr){
+  const s=addr.toUpperCase();
+  if(/HICKORY|PARK AV/.test(s)) return "lafsq";
+  if(/HELEN|MONROE|SULLIVAN|25TH|N 23RD|ANGELICA|NEWHOUSE|GLASGOW|PECK|N 20TH|N FLORISSANT|N 21ST|19TH|PENROSE|BLAIR|FERRY|GREER|ST LOUIS AV|LINCOLN|COTTAGE|COTE BRILLIANTE|PAGE|COOK|THEODOSIA|MARTIN LUTHER KING|ARLINGTON|WELLS|UNION|N 22ND|POTOMAC/.test(s)) return "north";
+  if(/S BROADWAY|MICHIGAN|HOLLY HILLS|BATES|S GRAND|VERMONT|WATER|REILLY|CATALAN|EICHELBERGER|STEINS|IDAHO|KOELN|ROSWELL|6115 VIRGINIA|6818 VIRGINIA|7353 VIRGINIA/.test(s)) return "carondelet";
+  return "dutchtown";
+}
+/* deterministic jitter so pins are stable across renders (approximate placeholders) */
+function jitter(seed){let x=Math.sin(seed*99.7)*10000;return (x-Math.floor(x)-0.5);}
+
+/* raw import: id, owner, address, floor bid (the sale "Total") */
+const RAW = [
+["237-002","Glynn, Robert F","2350 Hickory St",23334],["237-005","2007 Park Avenue LLC","2003 Park Ave",4020],
+["237-009","Cooley, Fitzgerald","1620 Helen St",6832],["237-010","LCRA c/o Sara Winbush","1510 Monroe St",1362],
+["237-011","Superior Home Health Serv LLC","1500 Monroe St",43713],["237-020","Garth, Rodney Jr","3721 Sullivan Ave",9348],
+["237-022","Rice, Carnell & Mary L","4025 25th St",737],["237-023","KAQ LLC","4007 25th St",6344],
+["237-025","Pernal, Shakmia","4020 N 23rd St",802],["237-027","Robinson, Samuel","2022 Angelica St",6585],
+["237-029","Ladies of Peace Unlimited","1516 Newhouse Ave",707],["237-030","Drake, Angela","1418 Newhouse Ave",5424],
+["237-032","Haughton, Verneta","1121 Newhouse Ave",5230],["237-036","Craig, Darryl L","4140 Glasgow Ave",3427],
+["237-037","Topstone Inv STL 1 LLC","4149 Peck St",737],["237-038","Topstone Inv STL 1 LLC","4145 Peck St",833],
+["237-039","Topstone Inv STL 1 LLC","4143 Peck St",7270],["237-041","Jordon, Mollie J","4244 Peck St",3070],
+["237-043","Patagiopepe LLC","4329 N 20th St",3710],["237-044","KKE Investments LLC","4302 N Florissant Ave",4131],
+["237-048","Johnson, Patrick & Karen Chestnut","4229 N Florissant Ave",1858],["237-050","Haywood, Richard","4259 N 21st St",7313],
+["237-051","Conners, Michael W","4236 N 21st St",2330],["237-052","Back2Front4Me LLC","1921 Penrose St",9374],
+["237-053","Billingsley, Jimmie C & Laura M","4238 19th St",777],["237-055","Conners, Michael W","4254 Blair Ave",1630],
+["237-056","Young, Aga K","1417 Penrose St",9053],["237-058","Croft, Erle","1127 Ferry St",4120],
+["237-061","3144 Potomac LLC","4320 N 20th St",941],["237-062","Gordon, Jonathan K Sr","4423 19th St",1224],
+["237-072","DeClue Investments LLC","2926 Keokuk St",15555],["237-075","Hunley, Sherwin A","2730 Osage St",7954],
+["237-077","Carter, Clint S","4137 Ohio Ave",2669],["237-079","PE Property LLC","4131 Pennsylvania Ave",3414],
+["237-082","Luepker, Martin","4215 Dewey Ave",11655],["237-083","Pantano, Joseph R","4254 California Ave",11347],
+["237-084","Veatch, Richard M","4347 California Ave",16034],["237-086","JM Realty Investments LLC","4334 Nebraska Ave",3701],
+["237-087","Twelve34 LLC","4306 Nebraska Ave",9830],["237-089","Goetchius, John M","4436 Louisiana Ave",24634],
+["237-096","Alexander, Larry O Jr","4443 Pennsylvania Ave",9510],["237-097","Etienne, Patrick","4458 Pennsylvania Ave",6302],
+["237-098","Carter, Clint S","4439 Nebraska Ave",5170],["237-099","Hughes, Karl","3205 Taft Ave",7346],
+["237-100","4429 Louisiana LLC","4429 Louisiana Ave",4939],["237-101","4501 Louisiana Trust","4501 Louisiana Ave",2883],
+["237-103","Hopkins, Raymond F","4610 Louisiana Ave",13661],["237-104","XGen Homes LLC","4619 Alaska Ave",1525],
+["237-105","Rausch, Betty J & Daniel J","3233 Pulaski St",4881],["237-106","Warren, Everette","4646 Virginia Ave",27286],
+["237-110","Sparks Investments Group LLC","4722 Nebraska Ave",13995],["237-111","Postawko, Roxanne","4733 S Broadway St",15235],
+["237-112","Davis, David Warren","4821 S Broadway St",6556],["237-113","Washington, Tineasha D","4737 Nebraska Ave",5628],
+["237-114","Roller, Shelia Rose","3216 Liberty St",8750],["237-116","Manning, Dorothy J & Willard I","4747 Tennessee Ave",10729],
+["237-117","Guzman, Gervin","4752 Louisiana Ave",4350],["237-118","Rogers, Rosetta","4809 Minnesota Ave",10568],
+["237-120","Hendrix, Lindsay","5053 Tennessee Ave",9704],["237-121","Amanullah, Nadiyah & Diana","463 Eichelberger St",29816],
+["237-125","Love Best LLC","920 Bates St",10712],["237-127","JM Realty Investments LLC","816 Wilmington Ave",10134],
+["237-131","Price, Tracey Lynn","6115 Virginia Ave",4178],["237-136","Paisley Partners LLC","714 Holly Hills Ave",3854],
+["237-148","Pruitt, J Geoffrey & Karen McFerran","6818 Virginia Ave",9246],["237-149","Robtoy, Keith","7009 S Broadway St",8789],
+["237-150","Dakota Note LLC","7009 Michigan Ave",1570],["237-156","Alisef Blue Development LLC","7353 Virginia Ave",3335],
+["237-158","Jung, Richard R","7500 S Grand Blvd",12064],["237-159","Lee, Alan L Jr & Mary Ann Mueller","7526 Tennessee Ave",1048],
+["237-160","Lee, Alan L Jr & Mary Ann Mueller","7524 Tennessee Ave",7785],["237-162","Willard, Gary D","223 W Steins St",1565],
+["237-165","Webb, Donald","7723 Vermont Ave",8311],["237-169","Rusu, Pavel & Mihaela","7815 S Broadway St",6075],
+["237-171","Nishiyama, Jeanette A","7810 Michigan Ave",8962],["237-172","Dennis, Nichole","7808 Michigan Ave",8719],
+["237-173","Weimar, Jaclyn Martha","7914 Minnesota Ave",4660],["237-174","Boyd, Velma J & Esther L","7917 Water St",11334],
+["237-175","Stewart, Susan M","8115 Water St",6174],["237-176","McMurtry, Adam","8219 Reilly Ave",7485],
+["237-178","Vazquez, Nickolas A","8225 Pennsylvania Ave",6369],["237-185","Grimm, Robert J","120 E Catalan St",41727],
+["237-187","Calhoun, Theodore Jr","7425 S Grand Blvd",9421],["237-287","Palmore, Dedra D","3864 Greer Ave",6751],
+["237-289","James, Nancy Christine","3856 St Louis Ave",737],["237-291","Bland, Roy M","3817 Lincoln Ave",7487],
+["237-292","Bland, Roy M","3819 Lincoln Ave",5965],["237-293","Jones, Princella","3841 Cottage Ave",5978],
+["237-294","Cook, Dorothy J","3846 Cottage Ave",763],["237-297","New Beginnings M B Church","3830 Cote Brilliante Ave",10210],
+["237-369","Bennifield, Robert Lee Jr","3732 Page Blvd",5190],["237-370","Grand Preservation & Development LLC","3730 Cook Ave",1807],
+["237-371","New Solutions Development LLC","3718 Cook Ave",115815],["237-446","Young, Willie & Gloria","5378 Theodosia Ave",737],
+["237-447","Wren, Lashonda","5344 Martin Luther King Dr",4845],["237-451","Topstone Inv STL 1 LLC","1460 Arlington Ave",3339],
+["237-452","Tyse, David C & Jackie M","5350 Wells Ave",2234],["237-453","Harris, Keith D","1417 Union Blvd",6126],
+["237-455","Lancashire Investments LLC","1373 Union Blvd",4120],["237-232-002","Phoenix I LP","1831 N 20th St",9340],
+["237-232-003","Phoenix I LP","1829 N 20th St",6917],["237-232-004","Phoenix I LP","1827 N 20th St",9795],
+["237-232-005","Phoenix I LP","1825 N 20th St",9866],["237-232-006","Phoenix I LP","1821 N 20th St",4830],
+["237-232-007","Phoenix I LP","1819 N 20th St",7664],["237-232-008","Pruitt-Igoe Dev / Phoenix I LP","1637 Helen St",2120],
+["237-232-009","Pruitt-Igoe Dev / Phoenix I LP","1633 Helen St",2897],["237-232-010","Pruitt-Igoe Dev / Phoenix I LP","1631 Helen St",4986],
+["237-232-013","Pittman, Kevin L","1640 Helen St",7042],["237-232-025","Kelley, Deandre","4028 N 22nd St",9333],
+["237-232-109","Wright, Matthew D","2102 Osage St",7216],["237-232-148","Bannerman-Menson, Edwin","5212 S Compton Ave",5757],
+["237-232-178","Esser, Catherine J","6638 Idaho Ave",4616],["237-232-196","Horner, Edward J","127 Koeln Ave",3461],
+["237-232-218","Rivera, Fernando & Carol Ann","3668 Roswell Ave",484],["237-232-549","Bass, Amber","5346 Wells Ave",2842],
+["237-227-158","Fisher, Bryan & Jeanette Bolin","8516 Water St",7537],["237-207-235","Langenberg, William F","4630 Michigan Ave",32132],
+["237-207-332","Ross, Ramon & Taron Smith","4302 Oregon Ave",20154],["237-207-350","Smith, Taron","4300 Oregon Ave",25814]
+];
+
+/* deep research data for the analyzed parcels, keyed by id. Voice is plain and human. */
+const DEEP = {
+ "237-005":{tier:"A",strat:"land",strat2:null,type:"Vacant lot",size:"2,983 sq ft lot",
+  readout:"This is an empty lot in one of the strongest infill markets in the city. Because there is no building, there is nothing to inspect, nothing to evict, and no stale assessor record that can fool you. It is also the simplest kind of property to clear title on. Even if the bidding pushes you up to fifteen or twenty thousand dollars, you would still be holding a Lafayette Square lot worth far more.",
+  reason:"The strongest signal here is the depth of the surrounding market rather than a single matching sale. There is no recorded sale on this exact lot, so treat the value as directional until you confirm it is a genuinely buildable parcel and not a narrow side yard.",
+  d:{bid:12000,title:4500,rehab:0,months:7,arv:90000,holdPerMo:300,sellPct:7},
+  max:{bid:40000,title:9000,rehab:20000,months:18,arv:160000},risk:{data:"good",redemption:"mid",title:"good"},
+  comps:[
+   {label:"Redfin lot estimate",val:"$152,000",valNum:152000,src:"estimate",note:"Automated estimate, directional only",dist:0,date:"current",ppsf:null,sim:62,photo:null,url:null},
+   {label:"Nearby lot sales, this area",val:"$220k–$739k",valNum:300000,src:"mls",note:"Range of recorded sales nearby",dist:0.3,date:"2023–2025",ppsf:null,sim:55,photo:null,url:null,area:true},
+   {label:"Zip 63104 median sale",val:"$290,000",valNum:290000,src:"web",note:"Neighborhood-level figure",dist:0,date:"2025",ppsf:null,sim:40,photo:null,url:null,area:true}]},
+ "237-125":{tier:"A",strat:"hold",strat2:"flip",type:"Two-family, built 1927",size:"about 2,400 sq ft",
+  readout:"This one already produces income, which is rare in a sale like this. There is a tenant paying roughly eight hundred and fifty dollars a month, and the identical building next door sold recently for a hundred and fifteen thousand. Carondelet is a stable neighborhood, so that comparable sale is one you can lean on with confidence.",
+  reason:"The value is anchored on a recorded sale of the adjacent twin building, which is the strongest kind of comparable you can get. The rent figure comes from an older listing, so treat the income number as soft until you verify the current lease.",
+  d:{bid:32000,title:5000,rehab:15000,months:9,arv:115000,holdPerMo:300,sellPct:7},
+  max:{bid:70000,title:9000,rehab:45000,months:18,arv:160000},risk:{data:"mid",redemption:"good",title:"mid"},
+  comps:[
+   {label:"924 Bates, the twin next door",val:"$115,000",valNum:115000,src:"mls",note:"Recorded sale, directly adjacent",dist:0.02,date:"2024",ppsf:48,sim:96,photo:null,url:null,lat:38.5663,lng:-90.2524},
+   {label:"In-place monthly rent",val:"$850/mo",valNum:850,src:"listing",note:"From a prior listing, verify the lease",dist:0,date:"prior",ppsf:null,sim:70,photo:null,url:null},
+   {label:"Carondelet stability read",val:"High",src:"web",note:"Neighborhood-level assessment",dist:0,date:"2025",ppsf:null,sim:50,photo:null,url:null,area:true}]},
+ "237-156":{tier:"A",strat:"flip",strat2:null,type:"Single-family needing work, built 1893",size:"1,147 sq ft",
+  readout:"This is the best proof of value in the entire sale, because the house itself is listed for sale right now at just under ninety thousand dollars, and the two houses beside it sold for between a hundred and thirty and a hundred and forty three thousand. You are not guessing at the value here. The market is telling you out loud.",
+  reason:"The evidence is unusually strong because the subject property is a live listing and two adjacent recorded sales bracket it. The real risk is not the comparables but the Patch micro-market, which swings hard, so lean on the immediate block rather than the neighborhood average. Because it is actively listed, the most likely outcome is the owner sells or pays off the taxes before the auction.",
+  d:{bid:20000,title:5000,rehab:25000,months:9,arv:133000,holdPerMo:300,sellPct:7},
+  max:{bid:55000,title:9000,rehab:60000,months:18,arv:175000},risk:{data:"mid",redemption:"bad",title:"mid"},
+  comps:[
+   {label:"7353 Virginia, listed now as-is",val:"$89,999",valNum:89999,src:"listing",note:"Active asking price, this is the subject",dist:0,date:"current",ppsf:78,sim:100,photo:null,url:null},
+   {label:"7351 Virginia",val:"$143,000",valNum:143000,src:"mls",note:"Recorded sale on the same block",dist:0.01,date:"2024",ppsf:120,sim:88,photo:null,url:null,lat:38.5534,lng:-90.2470},
+   {label:"7349 Virginia",val:"$133,000",valNum:133000,src:"mls",note:"Recorded sale on the same block",dist:0.02,date:"2024",ppsf:110,sim:85,photo:null,url:null,lat:38.5535,lng:-90.2470}]},
+ "237-136":{tier:"A",strat:"hold",strat2:"flip",type:"Small single-family, occupied, built 1912",size:"1,012 sq ft",
+  readout:"This is a small occupied rental near Carondelet. The fact that someone is living in it is a useful signal, because it tells you the house is not a burned-out shell. Your most natural buyer is a landlord who cares about the income rather than the cosmetics. The ceiling is modest, but the opportunity is real.",
+  reason:"The value leans on an automated estimate and the zip-code median rather than a matching recorded sale, so confidence is only moderate. Before bidding aggressively, confirm the number against a real sale on the block. Note this is the lower seven-hundred block of Holly Hills, which is the Carondelet end, not the prestigious Holly Hills neighborhood further west.",
+  d:{bid:18000,title:5000,rehab:12000,months:10,arv:96000,holdPerMo:300,sellPct:7},
+  max:{bid:50000,title:9000,rehab:40000,months:18,arv:140000},risk:{data:"mid",redemption:"mid",title:"mid"},
+  comps:[
+   {label:"Automated value estimate",val:"$95,900",valNum:95900,src:"estimate",note:"Automated model estimate",dist:0,date:"current",ppsf:95,sim:60,photo:null,url:null},
+   {label:"Estimated monthly rent",val:"$1,110/mo",valNum:1110,src:"estimate",note:"Automated rent estimate",dist:0,date:"current",ppsf:null,sim:55,photo:null,url:null},
+   {label:"Zip 63111 median sale",val:"$114,000",valNum:114000,src:"web",note:"Neighborhood-level figure",dist:0,date:"2025",ppsf:null,sim:45,photo:null,url:null,area:true}]},
+ "237-002":{tier:"A",strat:"resale",strat2:null,type:"Renovated single-family, built 1896",size:"1,562 sq ft",
+  readout:"On paper this looks like the best deal in the sale, a roughly three-hundred-thousand-dollar home opening at twenty three thousand. The catch is that it is already listed for sale at three hundred thousand, so the owner is very likely to sell or pay off the taxes before the auction. And if it does reach the auction, a home like this gets bid into the six figures fast. Keep it on your radar as a long shot, not a plan.",
+  reason:"The comparables are excellent, with a live listing and two recorded sales above three hundred and thirty thousand. The low confidence is not about the value at all. It is about whether you can actually win it at a price that still works, which is unlikely.",
+  d:{bid:165000,title:5000,rehab:8000,months:8,arv:300000,holdPerMo:300,sellPct:7},
+  max:{bid:300000,title:9000,rehab:40000,months:18,arv:360000},risk:{data:"good",redemption:"bad",title:"mid"},
+  comps:[
+   {label:"2350 Hickory, listed now",val:"$300,000",valNum:300000,src:"listing",note:"Active asking price, this is the subject",dist:0,date:"current",ppsf:192,sim:100,photo:null,url:null},
+   {label:"2344 Hickory",val:"$335,000",valNum:335000,src:"mls",note:"Recorded sale on the same block",dist:0.01,date:"2024",ppsf:210,sim:90,photo:null,url:null,lat:38.6157,lng:-90.2188},
+   {label:"2716 Hickory",val:"$330,000",valNum:330000,src:"mls",note:"Recorded sale nearby",dist:0.3,date:"2024",ppsf:205,sim:82,photo:null,url:null,lat:38.6148,lng:-90.2240}]},
+ "237-131":{tier:"B",strat:"hold",strat2:"flip",type:"Multi-family, built 1905",size:"about 2,050 sq ft",
+  readout:"This could be an income play, but the value has not been re-verified and this stretch of Virginia is genuinely uneven from block to block. Drive past it before you trust any number on the page.",
+  reason:"This rests on a single automated estimate with no matching recorded sale. It is flagged as needing verification on purpose, because a nearby unit estimates near nine thousand dollars, which is exactly why neighborhood averages mislead here.",
+  d:{bid:22000,title:5000,rehab:30000,months:10,arv:130000,holdPerMo:300,sellPct:7},
+  max:{bid:55000,title:9000,rehab:60000,months:18,arv:170000},risk:{data:"bad",redemption:"mid",title:"mid"},
+  comps:[
+   {label:"Automated estimate, unverified",val:"$130,000",valNum:130000,src:"estimate",note:"Not re-checked this round, drive by",dist:0,date:"current",ppsf:63,sim:40,photo:null,url:null},
+   {label:"Virginia Ave block-to-block spread",val:"Wide",src:"web",note:"A nearby unit estimates near $9k",dist:0.2,date:"2025",ppsf:null,sim:25,photo:null,url:null,area:true}]},
+ "237-072":{tier:"B",strat:"flip",strat2:null,type:"Structure, owned by an investor",size:"To verify",
+  readout:"The owner here is an investment company that let the property fall into the sale. That can mean one of two things, either a known problem they walked away from, or a portfolio they are shedding. The floor bid is on the higher side, so confirm the condition in person before you do anything else.",
+  reason:"There is no verified matching sale yet, only an area-level flip estimate and the ownership flag. The fact that a professional investor let it go is itself worth understanding before you bid.",
+  d:{bid:28000,title:5000,rehab:35000,months:11,arv:120000,holdPerMo:300,sellPct:7},
+  max:{bid:60000,title:9000,rehab:70000,months:18,arv:160000},risk:{data:"bad",redemption:"mid",title:"mid"},
+  comps:[
+   {label:"Marine Villa flips, area read",val:"$120,000",valNum:120000,src:"web",note:"Area estimate, needs verification",dist:0.4,date:"2025",ppsf:null,sim:35,photo:null,url:null,area:true},
+   {label:"Owner is an investment company",val:"Flag",src:"assessor",note:"Worth asking why they let it go",dist:0,date:"current",ppsf:null,sim:30,photo:null,url:null}]},
+ "237-207-350":{tier:"B",strat:"flip",strat2:"land",type:"Structure plus an adjacent parcel",size:"To verify",
+  readout:"The interesting thing here is that this parcel and the one next door at 4302 Oregon are both in the sale. Together they could form a small package, which is worth more than either piece alone. This carries the highest entry cost on the watchlist, so it is only worth pursuing if you can secure both.",
+  reason:"The value is an area estimate only, paired with a note that the two parcels adjoin. The package idea is the whole thesis here, and neither value has been confirmed against a specific sale.",
+  d:{bid:40000,title:6000,rehab:40000,months:12,arv:150000,holdPerMo:350,sellPct:7},
+  max:{bid:90000,title:12000,rehab:80000,months:18,arv:220000},risk:{data:"bad",redemption:"mid",title:"bad"},
+  comps:[
+   {label:"Dutchtown single-family, area read",val:"$150,000+",valNum:150000,src:"web",note:"Area estimate, needs verification",dist:0.3,date:"2025",ppsf:null,sim:35,photo:null,url:null,area:true},
+   {label:"4300 plus 4302 as a package",val:"Two parcels",src:"assessor",note:"Adjacent, possible assemblage",dist:0.01,date:"current",ppsf:null,sim:40,photo:null,url:null}]},
+ "237-116":{tier:"B",strat:"flip",strat2:null,type:"Structure",size:"To verify",
+  readout:"A solid Dutchtown block with a mid-range floor bid. It is a plausible flip, but the value here is a neighborhood read rather than a comparable we pulled, so treat it as a lead to chase rather than a confirmed deal.",
+  reason:"This is a pure area estimate for now. No live listing or recorded sale has been pulled, which is exactly why it sits in the verify-then-bid tier.",
+  d:{bid:24000,title:5000,rehab:28000,months:10,arv:110000,holdPerMo:300,sellPct:7},
+  max:{bid:55000,title:9000,rehab:60000,months:18,arv:150000},risk:{data:"bad",redemption:"mid",title:"mid"},
+  comps:[{label:"Dutchtown block, area read",val:"$110,000",valNum:110000,src:"web",note:"Area estimate, needs verification",dist:0.3,date:"2025",ppsf:null,sim:35,photo:null,url:null,area:true}]},
+ "237-103":{tier:"B",strat:"flip",strat2:null,type:"Structure",size:"To verify",
+  readout:"A flip candidate in the Gravois and Dutchtown area. It carries the same caveat as the rest of the watchlist, the value is an area estimate and both the condition and the price still need to be confirmed in person.",
+  reason:"An area estimate only, with no matching sale pulled. It is on the list to give you a fuller pipeline to work through, not because it has been confirmed.",
+  d:{bid:28000,title:5000,rehab:30000,months:11,arv:120000,holdPerMo:300,sellPct:7},
+  max:{bid:60000,title:9000,rehab:65000,months:18,arv:160000},risk:{data:"bad",redemption:"mid",title:"mid"},
+  comps:[{label:"Gravois and Dutchtown, area read",val:"$120,000",valNum:120000,src:"web",note:"Area estimate, needs verification",dist:0.3,date:"2025",ppsf:null,sim:35,photo:null,url:null,area:true}]},
+ "237-111":{tier:"B",strat:"flip",strat2:null,type:"Single-family, built 1897, needs major work",size:"about 1,935 to 2,435 sq ft",
+  readout:"This is a real fix and flip in a Carondelet market that sells quickly, with a renovated house two doors down asking two hundred twenty thousand. The honest catch is condition. The last time this house was on the market it was a short sale flagged for electrical, plumbing, roof, and structural settling work. That is a heavier rehab than your budget likes, so treat it as a deal only if you can buy it low enough to absorb real construction.",
+  reason:"The value evidence is unusually good for a sale like this. There is an automated estimate near a hundred and twelve thousand, a recorded short-sale listing on the property itself, and a renovated comparable on the same block at two hundred twenty thousand. The risk is not the value, it is the depth of the work, which the prior listing described in plain terms.",
+  d:{bid:14000,title:5000,rehab:55000,months:11,arv:140000,holdPerMo:325,sellPct:7},
+  max:{bid:45000,title:9000,rehab:95000,months:18,arv:200000},risk:{data:"good",redemption:"mid",title:"mid"},
+  comps:[
+   {label:"4733 S Broadway, the subject, prior short sale",val:"$19,900",valNum:19900,src:"listing",note:"Old as-is listing, flagged heavy systems work",dist:0,date:"2021",ppsf:null,sim:100,photo:null,url:null},
+   {label:"Automated value estimate",val:"$112,403",valNum:112403,src:"estimate",note:"Redfin model estimate, current",dist:0,date:"current",ppsf:58,sim:65,photo:null,url:null},
+   {label:"4745 S Broadway, renovated",val:"$220,000",valNum:220000,src:"listing",note:"Renovated comp on the same block",dist:0.02,date:"recent",ppsf:61,sim:80,photo:null,url:null,lat:38.5532,lng:-90.2535}]},
+ "237-106":{tier:"B",strat:"hold",strat2:"flip",type:"Multi-family, two to four units, built early 1900s",size:"3,174 sq ft on a small lot",
+  readout:"This is a large multi-family building on the Carondelet and Dutchtown edge, the kind of thing that becomes an income property if you can get through the rehab. It last changed hands in two thousand nine for twenty six thousand, and an automated model now puts it near a hundred and forty thousand. The floor bid is high, which usually means years of unpaid taxes, so expect a building that has been neglected.",
+  reason:"The value rests on an automated estimate near a hundred and forty thousand and a twin across the street that sold around forty nine thousand in twenty eighteen. The square footage is large, so the rehab number will swing the outcome more than the purchase price. Confirm how many units are truly usable before you trust the income story.",
+  d:{bid:28000,title:5000,rehab:50000,months:12,arv:141000,holdPerMo:350,sellPct:7},
+  max:{bid:65000,title:9000,rehab:100000,months:18,arv:185000},risk:{data:"mid",redemption:"mid",title:"mid"},
+  comps:[
+   {label:"Automated value estimate",val:"$141,644",valNum:141644,src:"estimate",note:"Redfin model estimate, current",dist:0,date:"current",ppsf:45,sim:62,photo:null,url:null},
+   {label:"4646 Virginia, last recorded sale",val:"$26,000",valNum:26000,src:"mls",note:"Recorded sale, but back in 2009",dist:0,date:"2009",ppsf:8,sim:70,photo:null,url:null},
+   {label:"4647 Virginia, the twin across the street",val:"$49,500",valNum:49500,src:"mls",note:"Recorded sale, smaller townhouse unit",dist:0.01,date:"2018",ppsf:33,sim:72,photo:null,url:null,lat:38.5712,lng:-90.2470}]},
+ "237-121":{tier:"B",strat:"flip",strat2:null,type:"Records conflict, possibly a cleared lot",size:"about 2,426 sq ft if the building stands",
+  readout:"This one needs eyes on it before anything else. The public record is contradictory, listing a building from eighteen ninety seven and a vacant-land flag in the same breath, which usually means the structure came down and the data never caught up. The block itself is a solid Carondelet multi-family street with values from roughly a hundred thousand to three hundred thousand, so if a sound building is actually standing this is interesting. The high floor bid makes a drive-by essential.",
+  reason:"The block comparables are strong, but the subject record contradicts itself on whether a building even exists. That single unresolved fact is why this cannot be trusted yet, and it is exactly the kind of stale-record trap that the cheap parcels in this sale tend to hide.",
+  d:{bid:18000,title:5500,rehab:45000,months:12,arv:160000,holdPerMo:350,sellPct:7},
+  max:{bid:60000,title:10000,rehab:90000,months:18,arv:280000},risk:{data:"bad",redemption:"mid",title:"mid"},
+  comps:[
+   {label:"448 Eichelberger, multi-family nearby",val:"$297,595",valNum:297595,src:"estimate",note:"Model estimate, larger four-bath building",dist:0.04,date:"current",ppsf:100,sim:55,photo:null,url:null,lat:38.5588,lng:-90.2545},
+   {label:"427 to 444 Eichelberger range",val:"$100k–$124k",valNum:115000,src:"estimate",note:"Block estimates for smaller units",dist:0.03,date:"current",ppsf:null,sim:50,photo:null,url:null,area:true},
+   {label:"Record contradiction on the subject",val:"Verify",src:"assessor",note:"Lists 1897 building and vacant land together",dist:0,date:"current",ppsf:null,sim:30,photo:null,url:null}]},
+ "237-158":{tier:"B",strat:"hold",strat2:null,type:"Multi-family, two to four units",size:"2,450 sq ft on a corner",
+  readout:"This is a two to four unit building on the South Grand corridor in Carondelet, sitting on a corner where the street carries some commercial life. It reads as an income play rather than a quick flip. The automated models do not have enough data to price it, which is common for mixed corridors, so the value here leans on what similar buildings on Grand have done.",
+  reason:"There is no automated estimate for this exact building, so confidence is low and the value comes from comparable multi-family buildings on the same boulevard. The corner position and the Grand corridor zoning could be an advantage or a complication, which is worth checking before you bid.",
+  d:{bid:22000,title:5000,rehab:35000,months:11,arv:150000,holdPerMo:325,sellPct:7},
+  max:{bid:55000,title:9000,rehab:75000,months:18,arv:200000},risk:{data:"bad",redemption:"mid",title:"mid"},
+  comps:[
+   {label:"5201 S Grand, larger multi-family",val:"Comparable corridor unit",src:"mls",note:"5,175 sq ft multi-family on Grand",dist:0.4,date:"recent",ppsf:null,sim:48,photo:null,url:null,area:true},
+   {label:"South Grand multi-family range",val:"$120k–$180k",valNum:150000,src:"web",note:"Corridor estimate, needs a direct pull",dist:0.2,date:"2025",ppsf:null,sim:40,photo:null,url:null,area:true}]},
+ "237-118":{tier:"B",strat:"hold",strat2:"flip",type:"Structure on an active Carondelet block",size:"To verify",
+  readout:"The encouraging thing here is the company this property keeps. The four thousand block of Minnesota saw renovated four-family buildings sell near three hundred thousand in twenty twenty five, so the ceiling on this street is real. The work now is to pull the exact building and confirm what you would actually be buying, because the floor bid is reasonable and the neighborhood momentum is on your side.",
+  reason:"The value is drawn from recent recorded multi-family sales on the same block rather than from the subject itself, so treat it as a strong lead that still needs its own confirmation. The block evidence is genuinely good, which is why this sits at the top of the verify-first group.",
+  d:{bid:20000,title:5000,rehab:30000,months:10,arv:135000,holdPerMo:300,sellPct:7},
+  max:{bid:55000,title:9000,rehab:70000,months:18,arv:300000},risk:{data:"mid",redemption:"mid",title:"mid"},
+  comps:[
+   {label:"6311 Minnesota, four-family",val:"$295,000",valNum:295000,src:"mls",note:"Recorded 2025 sale, renovated four-family",dist:0.5,date:"2025",ppsf:75,sim:55,photo:null,url:null,lat:38.5610,lng:-90.2560},
+   {label:"4400 Minnesota, four-family",val:"$300,000",valNum:300000,src:"mls",note:"Recorded 2025 sale, investment building",dist:0.2,date:"2025",ppsf:73,sim:58,photo:null,url:null,lat:38.5712,lng:-90.2520},
+   {label:"6824 Minnesota, remodeled single",val:"$132,500",valNum:132500,src:"mls",note:"Recorded sale, smaller remodeled home",dist:0.4,date:"2022",ppsf:115,sim:52,photo:null,url:null,lat:38.5588,lng:-90.2555}]}
+};
+
+const STRAT={land:{cls:"land",t:"Land flip"},hold:{cls:"hold",t:"Buy and hold"},flip:{cls:"flip",t:"Fix and flip"},resale:{cls:"resale",t:"Resale"},unrated:{cls:"unrated",t:"Not yet analyzed"}};
+const TIERMETA={A:{color:"#2E8460",label:"Verified deal",band:"This property has been researched and the value is backed by real comparable evidence."},
+  B:{color:"#C46A26",label:"Verify before bidding",band:"This property looks promising but the value still rests on area estimates. Confirm it in person before you bid."},
+  U:{color:"#9A9384",label:"Imported, not yet analyzed",band:"This row came straight from the sale list. It has not been researched yet."}};
+const SRCMETA={mls:{cls:"src-mls",t:"Recorded sale"},listing:{cls:"src-listing",t:"Live listing"},assessor:{cls:"src-assessor",t:"Assessor"},estimate:{cls:"src-estimate",t:"Automated estimate"},web:{cls:"src-web",t:"Web research"}};
+const PINCOLOR={subject:"#BE7C16",mls:"#2E8460",listing:"#BE7C16",assessor:"#3F7AA6",estimate:"#9A9384",web:"#C46A26",amenity:"#6C665B"};
+
+/* ------------------------------------------------------------
+   Honest auto-classification for parcels not yet hand-researched.
+   This is NOT a valuation. It sorts the remaining list into plain
+   buckets with a stated reason, so nothing is left blank and the
+   passes are clearly separated from the leads worth field work.
+   ------------------------------------------------------------ */
+const CATMETA={
+  eminent:{color:"#B4453A",label:"Avoid, redevelopment trap",chip:"risk",
+    why:"This parcel sits in the Pruitt-Igoe and Phoenix I LP group that is tied up in eminent-domain condemnation. You could win it and still lose it. Pass."},
+  north:{color:"#9A9384",label:"North City, likely a pass",chip:"unrated",
+    why:"This is in the North City area most affected by the 2025 tornado and the demolition pipeline. Most parcels here are now shells or empty lots in a soft market. Treat as land-bank only unless you have a specific reason."},
+  commercial:{color:"#9A9384",label:"Large or commercial, likely over budget",chip:"unrated",
+    why:"The size of the unpaid balance points to a large or commercial building. It is likely well above a thirty thousand dollar budget, so it is here for awareness rather than as a target."},
+  lot:{color:"#9A9384",label:"Likely a low-value lot",chip:"unrated",
+    why:"The very small balance owed usually means a vacant lot or a minor parcel in a weak market. Low cost, but also low resale unless it adjoins something you own."},
+  investor:{color:"#C46A26",label:"Investor owned, worth understanding",chip:"flip",
+    why:"The owner is a company rather than a person, which means a professional let it fall into the sale. That is either a known problem they walked away from or a portfolio they are shedding. Worth a look once you know which."},
+  south:{color:"#3F7AA6",label:"South City, worth field work",chip:"info",
+    why:"This is a South City residential parcel in a neighborhood with a real resale market. It has not been individually pulled yet, but it is the kind of property worth a drive-by and a comparable check."}
+};
+function isInvestorOwner(o){return /LLC|L\.L\.C|TRUST|INVESTMENT|REALTY|DEVELOPMENT|PROPERT|PARTNERS|GROUP|HOMES|CHURCH|UNLIMITED|NOTE|PRESERVATION|SOLUTIONS|CO$/i.test(o);}
+function classify(id,owner,addr,floor,zone){
+  if(/Phoenix I LP|Pruitt-Igoe|LCRA/i.test(owner)) return "eminent";
+  if(zone==="north") return "north";
+  if(floor>=31000) return "commercial";
+  if(floor<1500) return "lot";
+  if(isInvestorOwner(owner)) return "investor";
+  return "south";
+}
+
+/* build the full property objects */
+const PROPS = RAW.map((r,i)=>{
+  const [id,owner,addr,floor]=r;
+  const zone=zoneFor(addr);
+  const z=ZONES[zone];
+  const deep=DEEP[id]||null;
+  const lat = deep&&deep.lat ? deep.lat : z.lat + jitter(i+1)*0.022;
+  const lng = deep&&deep.lng ? deep.lng : z.lng + jitter(i+7)*0.030;
+  let strat = deep?deep.strat:"unrated";
+  let tier = deep?deep.tier:"U";
+  let cat = deep?null:classify(id,owner,addr,floor,zone);
+  return {id,owner,addr,floor,zone,zoneName:z.name,lat,lng,researched:!!deep,strat,tier,cat,
+    type:deep?deep.type:null,size:deep?deep.size:null,readout:deep?deep.readout:null,reason:deep?deep.reason:null,
+    d:deep?deep.d:null,max:deep?deep.max:null,risk:deep?deep.risk:null,comps:deep?deep.comps:[],strat2:deep?deep.strat2:null};
+});
+</script>
+
+<script>
+/* ============================================================
+   STATE — single source of truth. View, map, and chat all read
+   and write here, then call render(). This is the shared spine.
+   ============================================================ */
+const APP = {
+  view:"list",
+  selectedId:"237-005",
+  filter:"all",        // all | A | B | land | flip | hold | resale
+  sort:{key:"opportunity",dir:-1},
+  search:"",
+  target:30,
+  uwMode:"single",     // single | compare
+  advOpen:false,
+  scenarios:{},        // per-property: {A:{...}, B:{...}}
+  chatOpen:false
+};
+
+const $ = s=>document.querySelector(s);
+const M = n => "$"+Math.round(n).toLocaleString();
+const Mk = n => { const a=Math.abs(n); if(a>=1000){ let v=a/1000; let s=(a>=100000?v.toFixed(0):v.toFixed(1)).replace(/\.0$/,""); return (n<0?"-$":"$")+s+"k"; } return (n<0?"-$":"$")+Math.round(a); };
+function prop(id){return PROPS.find(p=>p.id===(id||APP.selectedId));}
+
+function scenarioFor(id,key){
+  if(!APP.scenarios[id]) APP.scenarios[id]={};
+  if(!APP.scenarios[id][key]){
+    const base=prop(id).d || {bid:20000,title:5000,rehab:25000,months:9,arv:120000,holdPerMo:300,sellPct:7};
+    APP.scenarios[id][key]=Object.assign({},base);
+  }
+  return APP.scenarios[id][key];
+}
+function calc(s,target){
+  const sellCost=s.arv*(s.sellPct/100), holding=s.months*s.holdPerMo, fixed=s.title+s.rehab+holding;
+  const cashIn=s.bid+fixed, totalCost=cashIn+sellCost, net=s.arv-totalCost;
+  const roi=cashIn>0?net/cashIn*100:0, ann=roi/(s.months/12);
+  const tf=target/100, K=s.arv-sellCost-fixed, walk=(K-tf*fixed)/(1+tf);
+  return {sellCost,holding,fixed,cashIn,totalCost,net,roi,ann,walk};
+}
+/* opportunity score for sorting unresearched-aware list */
+function opp(p){
+  if(!p.researched) return -1;
+  const s=scenarioFor(p.id,"A"); return calc(s,APP.target).roi;
+}
+
+/* ============================================================
+   MAPS
+   ============================================================ */
+let listMap,listLayer,listOK=false;
+let dealMap,dealLayer,dealMarkers=[],dealOK=false,dealLayers={comps:true,amenities:false,tornado:false};
+function pin(color,size,ring){size=size||14;return L.divIcon({className:"",iconSize:[size,size],iconAnchor:[size/2,size/2],
+  html:'<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+color+';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25)'+(ring?',0 0 0 3px '+color+'44':'')+'"></div>'});}
+function tile(map){L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',subdomains:'abcd',maxZoom:19}).addTo(map);}
+
+function initListMap(){
+  try{
+    if(typeof L==="undefined")throw 0;
+    listMap=L.map("listmap",{zoomControl:true,scrollWheelZoom:false}).setView([38.61,-90.235],12);
+    tile(listMap); listLayer=L.layerGroup().addTo(listMap); listOK=true; drawListMap();
+  }catch(e){ $("#listmap").innerHTML='<div class="map-fallback">The city map renders here when opened with a live connection. It plots every parcel in the sale and you can click any pin to open that property.</div>'; }
+}
+function drawListMap(){
+  if(!listOK)return; listLayer.clearLayers();
+  visibleProps().forEach(p=>{
+    const col = p.researched ? TIERMETA[p.tier].color : "#C9C0B0";
+    const mk=L.marker([p.lat,p.lng],{icon:pin(col,p.researched?13:9)}).addTo(listLayer);
+    mk.bindPopup('<b>'+p.addr+'</b><br>'+p.zoneName+'<br>Floor bid '+M(p.floor)+'<br><span class="pop-link" onclick="openDeal(\''+p.id+'\')">Open this property</span>');
+    mk.on("click",()=>mk.openPopup());
+  });
+}
+function initDealMap(){
+  try{
+    if(typeof L==="undefined")throw 0;
+    const p=prop();
+    dealMap=L.map("dealmap",{zoomControl:true,scrollWheelZoom:false}).setView([p.lat,p.lng],15);
+    tile(dealMap); dealLayer=L.layerGroup().addTo(dealMap); dealOK=true; drawDealMap();
+  }catch(e){ const el=$("#dealmap"); if(el) el.innerHTML='<div class="map-fallback">The neighborhood map renders here with a live connection, showing the subject property and its comparable sales. Click a comparable below to highlight it.</div>'; }
+}
+function drawDealMap(){
+  if(!dealOK)return; dealLayer.clearLayers(); dealMarkers=[];
+  const p=prop();
+  L.marker([p.lat,p.lng],{icon:pin(PINCOLOR.subject,18,true)}).addTo(dealLayer)
+    .bindPopup('<b>'+p.addr+'</b><br>The property you are evaluating<br>Floor bid '+M(p.floor));
+  if(dealLayers.comps){
+    p.comps.forEach((c,i)=>{ if(c.lat){
+      const col=PINCOLOR[c.src]||PINCOLOR.assessor;
+      const mk=L.marker([c.lat,c.lng],{icon:pin(col,13)}).addTo(dealLayer)
+        .bindPopup('<b>'+c.label+'</b><br>'+c.val+'<br>'+SRCMETA[c.src].t);
+      mk.on("click",()=>{selComp=i;renderComps();});
+      dealMarkers[i]=mk;
+    }});
+  }
+  if(dealLayers.amenities){
+    const a=[[p.lat+0.004,p.lng+0.003,"Coffee and cafe"],[p.lat-0.003,p.lng+0.005,"Park"],[p.lat+0.002,p.lng-0.004,"Grocery"]];
+    a.forEach(x=>L.marker([x[0],x[1]],{icon:pin(PINCOLOR.amenity,9)}).addTo(dealLayer)
+      .bindPopup('<b>'+x[2]+'</b><br>Illustrative until the places data source is connected'));
+  }
+  if(dealLayers.tornado && p.zone==="north"){
+    L.circle([p.lat,p.lng],{radius:600,color:"#B4453A",fillColor:"#B4453A",fillOpacity:.08,weight:1}).addTo(dealLayer)
+      .bindPopup("Approximate 2025 tornado damage context. This area saw heavy structural damage that reshaped local value.");
+  }
+  dealMap.flyTo([p.lat,p.lng],15,{duration:.5});
+}
+
+/* ============================================================
+   LIST VIEW
+   ============================================================ */
+function visibleProps(){
+  let list=PROPS.slice();
+  const f=APP.filter;
+  if(f==="A"||f==="B") list=list.filter(p=>p.tier===f);
+  else if(f==="leads") list=list.filter(p=>p.researched||p.cat==="south"||p.cat==="investor");
+  else if(f==="south") list=list.filter(p=>!p.researched&&p.cat==="south");
+  else if(["land","flip","hold","resale"].includes(f)) list=list.filter(p=>p.researched&&p.strat===f);
+  if(APP.search.trim()){
+    const q=APP.search.toLowerCase();
+    list=list.filter(p=>p.addr.toLowerCase().includes(q)||p.owner.toLowerCase().includes(q)||p.id.includes(q)||p.zoneName.toLowerCase().includes(q));
+  }
+  const k=APP.sort.key,dir=APP.sort.dir;
+  list.sort((a,b)=>{
+    let va,vb;
+    if(k==="opportunity"){va=opp(a);vb=opp(b);}
+    else if(k==="floor"){va=a.floor;vb=b.floor;}
+    else if(k==="addr"){va=a.addr;vb=b.addr;return dir*va.localeCompare(vb);}
+    else if(k==="zone"){va=a.zoneName;vb=b.zoneName;return dir*va.localeCompare(vb);}
+    else {va=a.floor;vb=b.floor;}
+    return dir*(va-vb);
+  });
+  return list;
+}
+/* shared row helpers so the full render and the search re-render stay identical */
+function dotColor(p){ return p.researched ? TIERMETA[p.tier].color : CATMETA[p.cat].color; }
+function pillFor(p){
+  if(p.researched) return '<span class="pill '+STRAT[p.strat].cls+'">'+STRAT[p.strat].t+'</span>';
+  const c=CATMETA[p.cat]; return '<span class="pill '+c.chip+'">'+c.label+'</span>';
+}
+function rowHtml(p){
+  const r=p.researched?calc(scenarioFor(p.id,"A"),APP.target):null;
+  const roiCell=p.researched
+    ? '<span class="roi-cell '+(r.roi>=0?"pos":"neg")+'">'+(r.roi>=0?"+":"")+r.roi.toFixed(0)+'%</span>'
+    : '<span class="roi-cell na">Not analyzed</span>';
+  const tierDot='<span class="tierdot" style="background:'+dotColor(p)+'"></span>';
+  return '<tr onclick="openDeal(\''+p.id+'\')">'+
+    '<td><div class="addr-cell"><div class="a">'+tierDot+p.addr+'</div><div class="o">'+p.owner+' · '+p.id+'</div></div></td>'+
+    '<td><span class="zone-tag">'+p.zoneName+'</span></td>'+
+    '<td>'+pillFor(p)+'</td>'+
+    '<td class="num">'+M(p.floor)+'</td>'+
+    '<td class="num">'+roiCell+'</td>'+
+  '</tr>';
+}
+function renderList(){
+  const researched=PROPS.filter(p=>p.researched);
+  const verified=PROPS.filter(p=>p.tier==="A");
+  const leads=PROPS.filter(p=>!p.researched&&(p.cat==="south"||p.cat==="investor")).length;
+  const bestRoi=Math.max(...researched.map(p=>calc(scenarioFor(p.id,"A"),APP.target).roi));
+  const north=PROPS.filter(p=>p.zone==="north").length;
+  const south=PROPS.length-north;
+
+  let filterChips="";
+  [["all","All properties",null],["leads","Worth a look",null],["A","Verified",TIERMETA.A.color],["B","Verify first",TIERMETA.B.color],
+   ["south","South leads",CATMETA.south.color],["flip","Fix and flip",null],["hold","Buy and hold",null]].forEach(([k,label,sw])=>{
+    filterChips+='<button class="chip'+(APP.filter===k?" on":"")+'" onclick="setFilter(\''+k+'\')">'+(sw?'<span class="swt" style="background:'+sw+'"></span>':"")+label+'</button>';
+  });
+
+  const vis=visibleProps();
+  const rows=vis.map(rowHtml).join("");
+
+  $("#view-list").innerHTML=`
+    <div class="pagehead">
+      <h1>The sale at a glance</h1>
+      <p>Every parcel in St. Louis Land Tax Sale 237, imported from the official list. ${researched.length} are researched in depth and carry a full valuation. Every other parcel is sorted into an honest category with a stated reason, so the deals worth your time are separated from the ones to pass on. Sort by return to bring the strongest to the top, filter to Worth a look to hide the passes, or open any property to study it.</p>
+    </div>
+    <div class="summary">
+      <div class="stat"><div class="k">Parcels in this sale</div><div class="v">${PROPS.length}</div><div class="n">${researched.length} researched, the rest categorized</div></div>
+      <div class="stat"><div class="k">Verified deals</div><div class="v good">${verified.length}</div><div class="n">Value backed by real comparables</div></div>
+      <div class="stat"><div class="k">Leads to chase</div><div class="v brand">${leads}</div><div class="n">South City parcels worth field work</div></div>
+      <div class="stat"><div class="k">Best return found</div><div class="v brand">+${bestRoi.toFixed(0)}%</div><div class="n">At your ${APP.target}% target, on the strongest pick</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="filterbar">${filterChips}</div>
+      <input class="search" id="searchbox" placeholder="Search address, owner, or area" value="${APP.search}">
+    </div>
+    <div id="listmap"></div>
+    <div class="listwrap">
+      <table>
+        <thead><tr>
+          <th onclick="setSort('addr')">Property</th>
+          <th onclick="setSort('zone')">Area</th>
+          <th>Read</th>
+          <th class="num" onclick="setSort('floor')">Floor bid</th>
+          <th class="num" onclick="setSort('opportunity')">Return</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  $("#searchbox").addEventListener("input",e=>{APP.search=e.target.value; renderListRowsOnly();});
+  initListMap();
+}
+function renderListRowsOnly(){
+  const tbody=$("#view-list tbody"); if(!tbody)return;
+  tbody.innerHTML=visibleProps().map(rowHtml).join("");
+  drawListMap();
+}
+function setFilter(f){APP.filter=f;renderList();}
+function setSort(k){ if(APP.sort.key===k)APP.sort.dir*=-1; else {APP.sort.key=k;APP.sort.dir=(k==="addr"||k==="zone")?1:-1;} renderList(); }
+
+/* ============================================================
+   DEAL VIEW
+   ============================================================ */
+let selComp=-1;
+function openDeal(id){ APP.selectedId=id; APP.view="deal"; APP.uwMode="single"; selComp=-1; render(); }
+function backToList(){ APP.view="list"; render(); }
+
+function renderDeal(){
+  const p=prop();
+  if(!p.researched){
+    const c=CATMETA[p.cat];
+    $("#view-deal").innerHTML=`
+      <div class="card"><div class="tierband U" style="background:${c.color}1a;color:${c.color}">◌ ${c.label}</div>
+      <div class="cb">
+        <div class="dealhead"><h2>${p.addr}</h2><div class="loc">${p.zoneName} · Owner of record ${p.owner} · Parcel ${p.id}</div></div>
+        <div class="factgrid">
+          <div class="fcell"><div class="k">Floor bid</div><div class="v mono">${M(p.floor)}</div></div>
+          <div class="fcell"><div class="k">Category</div><div class="v" style="font-size:13px;color:${c.color}">${c.label}</div></div>
+        </div>
+        <div class="readout">${c.why}</div>
+        <div class="reason"><span class="lead">What turns this into a full analysis</span>This parcel has not been individually researched yet. The next step is to pull a comparable sale or a current listing for the block, confirm the property type and condition, and check the redevelopment and tornado overlays. Once that data is attached it gets a verified or verify-first rating, a map of nearby comparables, and the live underwriting model on the right.</div>
+        <div style="margin-top:16px"><button class="btn primary" onclick="backToList()">Back to the sale list</button></div>
+      </div></div>`;
+    return;
+  }
+  const sA=scenarioFor(p.id,"A");
+  const tm=TIERMETA[p.tier];
+  const strat='<span class="strat-main pill '+STRAT[p.strat].cls+'">'+STRAT[p.strat].t+'</span>'+(p.strat2?'<span class="strat-or">or possibly '+STRAT[p.strat2].t.toLowerCase()+'</span>':"");
+
+  // risk rows
+  const riskMeta={data:{label:"How confident the value is",sub:"Based on the quality of the comparables"},
+    redemption:{label:"Chance the owner pays off first",sub:"Higher means more likely to vanish before sale day"},
+    title:{label:"How clean the title looks",sub:"Affects how fast you can resell"}};
+  const lvlMap={good:{n:1,cls:"good",t:"Low"},mid:{n:2,cls:"mid",t:"Medium"},bad:{n:3,cls:"bad",t:"High"}};
+  let riskRows="";
+  ["data","redemption","title"].forEach(k=>{
+    const lvl=p.risk[k],m=lvlMap[lvl];
+    // for "data" and "title", good = low risk = green; for redemption, good=low chance=green
+    let pips="";for(let i=0;i<3;i++)pips+='<span class="pip'+(i<m.n?" on "+m.cls:"")+'"></span>';
+    riskRows+='<div class="risk-row"><div class="rk">'+riskMeta[k].label+'<small>'+riskMeta[k].sub+'</small></div><div class="meter"><span class="mlabel '+m.cls+'">'+m.t+'</span>'+pips+'</div></div>';
+  });
+
+  // LEFT
+  const left=`
+    <div class="card">
+      <div class="tierband ${p.tier}">${p.tier==="A"?"✓":"!"} ${tm.label}</div>
+      <div class="cb">
+        <div class="dealhead">
+          <h2>${p.addr}</h2>
+          <div class="loc">${p.zoneName} · Owner of record ${p.owner} · Parcel ${p.id}</div>
+        </div>
+        <div class="strat-line">${strat}</div>
+        <div class="factgrid">
+          <div class="fcell"><div class="k">Property type</div><div class="v" style="font-size:13.5px">${p.type}</div></div>
+          <div class="fcell"><div class="k">Size</div><div class="v" style="font-size:13.5px">${p.size}</div></div>
+          <div class="fcell"><div class="k">Floor bid</div><div class="v mono">${M(p.floor)}</div></div>
+          <div class="fcell"><div class="k">Estimated value</div><div class="v mono">${M(sA.arv)}</div></div>
+        </div>
+        <div class="readout">${p.readout}</div>
+        <div class="reason"><span class="lead">Why we are confident, and where we are not</span>${p.reason}</div>
+        <div class="riskline">${riskRows}</div>
       </div>
-    </header>
+    </div>`;
 
-    <nav class="frame-nav reveal" aria-label="Prototype frame navigation">
-      <a class="frame-nav-link active" href="#start-search">01 Start Search</a>
-      <a class="frame-nav-link" href="#edit-criteria">02 Edit Criteria</a>
-      <a class="frame-nav-link" href="#updated-results">03 Updated Results</a>
-      <a class="frame-nav-link" href="#home-detail">04 Home Detail</a>
-      <a class="frame-nav-link" href="#shortlist-confirmation">05 Shortlist</a>
-      <a class="frame-nav-link" href="#contact-consent">06 Contact Consent</a>
-      <a class="frame-nav-link" href="#schedule-showing">07 Schedule Showing</a>
-      <a class="frame-nav-link" href="#review-send">08 Review and Send</a>
-    </nav>
-
-    <main class="board">
-      <section class="frame-shell reveal" id="start-search" data-nav="start-search">
-        <div class="frame-heading">
-          <div>
-            <p class="frame-kicker">Frame 1</p>
-            <h2>Start Search</h2>
-          </div>
-          <p class="frame-note">
-            The first task starts in chat. A vague request gets turned into searchable
-            criteria and a first shortlist draft without losing the conversational feel.
-          </p>
+  // CENTER (map + comps)
+  let layers='';
+  [["comps","Comparable sales","#2E8460"],["amenities","Nearby places","#6C665B"],["tornado","Tornado context","#B4453A"]].forEach(([k,label,c])=>{
+    layers+='<button class="layer'+(dealLayers[k]?" on":"")+'" onclick="toggleLayer(\''+k+'\')"><span class="ld" style="background:'+c+'"></span>'+label+'</button>';
+  });
+  const center=`
+    <div class="card">
+      <div class="ch"><h3>The neighborhood</h3><span class="note">Pins are approximate in this prototype</span></div>
+      <div class="cb">
+        <div id="dealmap"></div>
+        <div class="maptools">
+          <div class="layers">${layers}</div>
         </div>
-
-        <article class="artboard product-frame">
-          <div class="window-chrome">
-            <div class="window-brand">
-              <span class="brand-mark">TC</span>
-              <div>
-                <strong>Trusted Concierge</strong>
-                <p>Home Search Support</p>
-              </div>
-            </div>
-            <div class="window-status">
-              <span class="status-chip">3 starter matches</span>
-              <span class="status-chip status-chip-soft">MLS checked 11:14 AM</span>
-            </div>
-          </div>
-
-          <div class="product-layout">
-            <aside class="criteria-module">
-              <div class="criteria-top">
-                <div>
-                  <p class="section-label">Home Criteria</p>
-                  <h3>Current criteria</h3>
-                </div>
-                <div class="module-chip-row">
-                  <span class="status-pill">Austin rental</span>
-                  <span class="status-pill status-pill-soft">Walkability first</span>
-                </div>
-              </div>
-
-              <div class="criteria-stack">
-                <section class="criteria-card">
-                  <p class="card-label">Search prompt</p>
-                  <strong class="field-value">Walkable Austin rental</strong>
-                  <p class="field-note">Clarified in chat.</p>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Budget</p>
-                  <strong class="field-value" id="start-budget-value">Not set yet</strong>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Pets and move-in</p>
-                  <div class="split-metrics">
-                    <div>
-                      <span>Pets</span>
-                      <strong>Small dog</strong>
-                    </div>
-                    <div>
-                      <span>Move-in</span>
-                      <strong id="start-movein-value">6 to 8 weeks</strong>
-                    </div>
-                  </div>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Parking</p>
-                  <strong class="field-value" id="start-parking-value">Prefer off-street</strong>
-                  <p class="field-note">Flexible if walkability is stronger.</p>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Suggested zones</p>
-                  <div class="tag-row compact">
-                    <span>Clarksville</span>
-                    <span>Hyde Park</span>
-                    <span>South Lamar</span>
-                  </div>
-                </section>
-              </div>
-
-              <div class="module-footer">
-                <div>
-                  <span class="footer-label">Next</span>
-                  <strong>Edit the recap before the shortlist locks.</strong>
-                </div>
-                <a class="button button-primary" href="#edit-criteria">Edit recap</a>
-              </div>
-            </aside>
-
-            <section class="workspace">
-              <div class="workspace-header">
-                <div>
-                  <p class="section-label">Task A</p>
-                  <h3>The assistant mediates between open-ended chat and listing data.</h3>
-                </div>
-              </div>
-
-              <div class="search-stage">
-                <div class="property-list">
-                  <section class="panel chat-panel">
-                    <p class="section-label">Conversation</p>
-                    <h4>Walkability gets pinned down fast.</h4>
-                    <div class="chat-thread">
-                      <article class="message message-user">
-                        <span class="message-role">User</span>
-                        <p>Show me homes in Austin in a walkable area.</p>
-                      </article>
-
-                      <article class="message message-assistant">
-                        <span class="message-role">Assistant</span>
-                        <p>I can help with that. Austin has a few flavors of “walkable” so let&apos;s pin it down. Are you renting, and do you have a budget ballpark?</p>
-                      </article>
-
-                      <article class="message message-user">
-                        <span class="message-role">User</span>
-                        <p>Rental. I&apos;m not really sure on budget yet. I have a small dog.</p>
-                      </article>
-
-                      <article class="message message-assistant">
-                        <span class="message-role">Assistant</span>
-                        <p>Perfect. Dog noted. How soon are you moving, and how attached are you to off-street parking?</p>
-                      </article>
-
-                      <article class="message message-user">
-                        <span class="message-role">User</span>
-                        <p>Flexible in the next 6 to 8 weeks. Parking would be nice, but I can live without it.</p>
-                      </article>
-
-                      <article class="message message-assistant">
-                        <span class="message-role">Assistant</span>
-                        <p>Great. I&apos;ll bias toward walkable pockets and flag nearby coffee, groceries, and green space when it actually helps compare the homes.</p>
-                      </article>
-
-                      <article class="message message-user">
-                        <span class="message-role">User</span>
-                        <p>Yes, that would help. Show me the best three.</p>
-                      </article>
-
-                      <article class="message message-assistant">
-                        <span class="message-role">Assistant</span>
-                        <p>On it. I pulled three starters and added short notes so you don&apos;t have to decode listing-speak.</p>
-                      </article>
-                    </div>
-                  </section>
-
-                  <div class="toolbar">
-                    <div>
-                      <p class="toolbar-title">First shortlist draft</p>
-                      <p class="toolbar-meta">This set tightens after recap edits.</p>
-                    </div>
-                  </div>
-
-                  <div class="property-stack">
-                    <article class="property-card is-selected home-card-start" data-starter-home="westlynn" role="button" tabindex="0">
-                      <div class="property-media media-burnet"></div>
-                      <div class="property-body">
-                        <div class="property-top">
-                          <div>
-                            <h4>West Lynn Terrace</h4>
-                            <p class="property-meta">Clarksville • Austin</p>
-                          </div>
-                          <strong class="property-price">$2,180</strong>
-                        </div>
-                        <p class="property-copy">1 bd / 1 ba • Courtyard porch • Small dog pending</p>
-                  <div class="tag-row compact">
-                    <span>Walkable pocket</span>
-                    <span>Price likely fits</span>
-                    <span>Broker verified</span>
-                    <span>Coffee nearby</span>
-                  </div>
-                  <span class="property-badge">Starter pick</span>
-                  <p class="tradeoff-line">Why this match: strongest block so far, but pet policy still needs a quick check.</p>
-                  <div class="property-actions">
-                    <a class="button button-primary button-small" href="#home-detail">View home</a>
-                  </div>
-                </div>
-                    </article>
-
-                    <article class="property-card home-card-start" data-starter-home="duval" role="button" tabindex="0">
-                      <div class="property-media media-cedar"></div>
-                      <div class="property-body">
-                        <div class="property-top">
-                          <div>
-                            <h4>Duval Courtyard Flat</h4>
-                            <p class="property-meta">North University • Austin</p>
-                          </div>
-                          <strong class="property-price">$2,340</strong>
-                        </div>
-                        <p class="property-copy">1 bd / 1 ba • Off-street lot • Dog policy unclear</p>
-                        <div class="tag-row compact">
-                          <span>Walkable</span>
-                          <span>Parking easier</span>
-                          <span>Partner feed</span>
-                          <span>Grocery nearby</span>
-                        </div>
-                        <p class="tradeoff-line">Why this match: easiest parking of the three, but the pet details are thin.</p>
-                        <div class="property-actions">
-                          <a class="button button-secondary button-small" href="#home-detail">View home</a>
-                        </div>
-                      </div>
-                    </article>
-
-                    <article class="property-card home-card-start" data-starter-home="barton" role="button" tabindex="0">
-                      <div class="property-media media-parker"></div>
-                      <div class="property-body">
-                        <div class="property-top">
-                          <div>
-                            <h4>Barton View Studio</h4>
-                            <p class="property-meta">Bouldin Creek • Austin</p>
-                          </div>
-                          <strong class="property-price">$2,520</strong>
-                        </div>
-                        <p class="property-copy">1 bd / 1 ba • Patio nook • Small dog okay</p>
-                        <div class="tag-row compact">
-                          <span>Greenbelt nearby</span>
-                          <span>Patio</span>
-                          <span>Owner listed</span>
-                          <span>Price stretch</span>
-                        </div>
-                        <p class="tradeoff-line">Why this match: good amenities nearby, but this one may be a stretch once budget gets pinned down.</p>
-                        <div class="property-actions">
-                          <a class="button button-secondary button-small" href="#home-detail">View home</a>
-                        </div>
-                      </div>
-                    </article>
-                  </div>
-                </div>
-
-                <aside class="peek-panel">
-                  <div class="detail-hero media-burnet">
-                    <div class="hero-overlay">
-                      <span class="hero-badge">MLS draft</span>
-                      <div>
-                        <p class="hero-kicker">Selected preview</p>
-                        <h4 id="starter-preview-title">West Lynn Terrace</h4>
-                        <p id="starter-preview-copy">An early Clarksville candidate. The shortlist tightens once budget and parking are edited.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="peek-copy">
-                    <div class="peek-topline">
-                      <div>
-                        <p class="section-label">Draft recap</p>
-                        <h4>What the assistant is sending into search</h4>
-                      </div>
-                      <strong class="property-price">3 homes</strong>
-                    </div>
-                    <div class="tag-row">
-                      <span>Walkable area</span>
-                      <span>Small dog</span>
-                      <span>6 to 8 weeks</span>
-                      <span>Parking flexible</span>
-                    </div>
-                    <ul class="fit-list">
-                      <li id="starter-recap-budget">Budget still needs to be pinned to a range.</li>
-                      <li>The assistant is suggesting walkable Austin neighborhoods, not one exact zone yet.</li>
-                      <li>Nearby coffee, groceries, and green space will be surfaced when they help compare homes.</li>
-                      <li>You can correct the recap before the shortlist becomes the working set.</li>
-                    </ul>
-                    <div class="action-row">
-                      <a class="button button-primary" href="#edit-criteria">Edit recap</a>
-                      <a class="button button-secondary" href="#updated-results">Skip to shortlist</a>
-                    </div>
-                  </div>
-                </aside>
-              </div>
-            </section>
-          </div>
-        </article>
-      </section>
-
-      <section class="frame-shell reveal" id="edit-criteria" data-nav="edit-criteria">
-        <div class="frame-heading">
-          <div>
-            <p class="frame-kicker">Frame 2</p>
-            <h2>Edit Criteria</h2>
-          </div>
-          <p class="frame-note">
-            The recap is already in edit mode. The user changes the fields directly instead of
-            accepting a premade correction.
-          </p>
+        <div class="maplegend" style="margin-top:11px">
+          <div><span class="ldot" style="background:#BE7C16"></span>This property</div>
+          <div><span class="ldot" style="background:#2E8460"></span>Recorded sale</div>
+          <div><span class="ldot" style="background:#3F7AA6"></span>Assessor or other</div>
         </div>
+        <div class="ch" style="padding:18px 0 0"><h3>Comparable values and where they came from</h3></div>
+        <div class="complist" id="comps"></div>
+      </div>
+    </div>`;
 
-        <article class="artboard product-frame">
-          <div class="window-chrome">
-            <div class="window-brand">
-              <span class="brand-mark">TC</span>
-              <div>
-                <strong>Trusted Concierge</strong>
-                <p>Recap correction</p>
-              </div>
-            </div>
-            <div class="window-status">
-              <span class="status-chip">Editing recap</span>
-              <span class="status-chip status-chip-soft">Shortlist updates next</span>
-            </div>
-          </div>
-
-          <div class="product-layout">
-            <aside class="criteria-module is-editing">
-              <div class="criteria-top">
-                <div>
-                  <p class="section-label">Home Criteria</p>
-                  <h3>Edit recap fields</h3>
-                </div>
-                <div class="module-chip-row">
-                  <span class="status-pill status-pill-warm" id="edit-budget-chip">Budget edited</span>
-                  <span class="status-pill status-pill-warm" id="edit-parking-chip">Parking edited</span>
-                </div>
-              </div>
-
-              <div class="criteria-stack" data-select-scope>
-                <section class="criteria-card is-edited">
-                  <p class="card-label">Budget range</p>
-                  <div class="choice-pills">
-                    <button class="choice-chip selectable" type="button" data-select-group="budget-range" data-state-key="budgetRange" data-state-value="1800-2200" aria-pressed="false">
-                      $1,800 to $2,200
-                    </button>
-                    <button class="choice-chip selectable is-selected" type="button" data-select-group="budget-range" data-state-key="budgetRange" data-state-value="2200-2600" aria-pressed="true">
-                      $2,200 to $2,600
-                    </button>
-                    <button class="choice-chip selectable" type="button" data-select-group="budget-range" data-state-key="budgetRange" data-state-value="2600-plus" aria-pressed="false">
-                      $2,600 plus
-                    </button>
-                  </div>
-                  <p class="field-note">Pick a range and refresh the shortlist.</p>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Pets</p>
-                  <strong class="field-value">Small dog</strong>
-                </section>
-
-                <section class="criteria-card is-edited">
-                  <p class="card-label">Move-in window</p>
-                  <div class="mini-input-row">
-                    <div class="mini-input" id="move-in-start-input" contenteditable="true" role="textbox" aria-label="Move-in start week">
-                      6
-                    </div>
-                    <span class="range-dash">to</span>
-                    <div class="mini-input" id="move-in-end-input" contenteditable="true" role="textbox" aria-label="Move-in end week">
-                      8
-                    </div>
-                    <span class="range-suffix">weeks</span>
-                  </div>
-                  <p class="field-note">Adjust the timing here if needed.</p>
-                </section>
-
-                <section class="criteria-card is-edited">
-                  <p class="card-label">Parking</p>
-                  <div class="choice-pills">
-                    <button class="choice-chip selectable" type="button" data-select-group="parking-priority" data-state-key="parkingPriority" data-state-value="required" aria-pressed="false">
-                      Required
-                    </button>
-                    <button class="choice-chip selectable is-selected" type="button" data-select-group="parking-priority" data-state-key="parkingPriority" data-state-value="preferred" aria-pressed="true">
-                      Preferred
-                    </button>
-                    <button class="choice-chip selectable" type="button" data-select-group="parking-priority" data-state-key="parkingPriority" data-state-value="not-important" aria-pressed="false">
-                      Not important
-                    </button>
-                  </div>
-                  <p class="field-note">Parking can be tightened or relaxed here.</p>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Neighborhood focus</p>
-                  <div class="tag-row compact">
-                    <span>Clarksville</span>
-                    <span>Hyde Park</span>
-                    <span>South Lamar</span>
-                  </div>
-                </section>
-              </div>
-
-              <div class="module-footer">
-                <div>
-                  <span class="footer-label">Edit in progress</span>
-                  <strong>Save these edits to refresh the shortlist.</strong>
-                </div>
-                <a class="button button-primary" href="#updated-results">Update shortlist</a>
-              </div>
-            </aside>
-
-            <section class="workspace">
-              <div class="workspace-header">
-                <div>
-                  <p class="section-label">Task A Repair</p>
-                  <h3>The assistant stays in the loop, but the user edits the recap directly.</h3>
-                </div>
-              </div>
-
-              <div class="edit-stage">
-                <section class="panel chat-panel">
-                  <p class="section-label">Chat context</p>
-                  <h4>The recap is editable, not frozen.</h4>
-                  <div class="chat-thread">
-                    <article class="message message-assistant">
-                      <span class="message-role">Assistant</span>
-                      <p>
-                        Here&apos;s my recap: walkable Austin, budget around $2,200 to $2,600,
-                        small dog, move in 6 to 8 weeks, and off-street parking required.
-                      </p>
-                    </article>
-
-                    <article class="message message-user">
-                      <span class="message-role">User</span>
-                      <p>Parking isn&apos;t required, and I&apos;d probably look around $2,200 to $2,600.</p>
-                    </article>
-
-                    <article class="message message-assistant">
-                      <span class="message-role">Assistant</span>
-                      <p>Perfect. Edit either field directly and I&apos;ll refresh the shortlist from there.</p>
-                    </article>
-                  </div>
-                </section>
-
-                <section class="panel">
-                  <p class="section-label">Still in scope</p>
-                  <h4>Walkability and pet fit stay in scope.</h4>
-                  <ul class="fit-list">
-                    <li>Walkable Austin neighborhoods remain in scope.</li>
-                    <li>Small dog and the move-in window stay in scope.</li>
-                    <li>Parking strictness is what changes the shortlist most.</li>
-                  </ul>
-                </section>
-              </div>
-
-              <section class="loading-band tradeoff-band">
-                <span class="status-pill status-pill-warm" id="tradeoff-pill">Balanced</span>
-                <div>
-                  <p class="section-label">Tradeoff snapshot</p>
-                  <h4 id="tradeoff-title">This is the strongest middle ground.</h4>
-                  <p class="subtle-copy" id="tradeoff-copy">The shortlist keeps the balcony option while still surfacing easier-parking alternatives to compare.</p>
-                </div>
-              </section>
-
-              <div class="action-row">
-                <a class="button button-primary" href="#updated-results">See shortlist</a>
-                <a class="button button-secondary" href="#start-search">Back to chat</a>
-              </div>
-            </section>
-          </div>
-        </article>
-      </section>
-
-      <section class="frame-shell reveal" id="updated-results" data-nav="updated-results">
-        <div class="frame-heading">
-          <div>
-            <p class="frame-kicker">Frame 3</p>
-            <h2>Updated Results</h2>
-          </div>
-          <p class="frame-note">
-            The repaired recap produces a tighter shortlist. A small refinement request keeps
-            the CUI visible while the matches become more concrete.
-          </p>
+  // RIGHT (underwriting)
+  const right=`
+    <div class="card">
+      <div class="ch"><h3>The numbers</h3></div>
+      <div class="cb">
+        <div class="uw-toggle">
+          <button class="${APP.uwMode==='single'?'on':''}" onclick="setUw('single')">One scenario</button>
+          <button class="${APP.uwMode==='compare'?'on':''}" onclick="setUw('compare')">Compare two</button>
         </div>
-
-        <article class="artboard product-frame">
-          <div class="window-chrome">
-            <div class="window-brand">
-              <span class="brand-mark">TC</span>
-              <div>
-                <strong>Trusted Concierge</strong>
-                <p>Updated shortlist</p>
-              </div>
-            </div>
-            <div class="window-status">
-              <span class="status-chip">3 shortlist candidates</span>
-              <span class="status-chip status-chip-soft">Balcony refinement applied</span>
-            </div>
-          </div>
-
-          <div class="product-layout">
-            <aside class="criteria-module">
-              <div class="criteria-top">
-                <div>
-                  <p class="section-label">Home Criteria</p>
-                  <h3>Shortlist-ready</h3>
-                </div>
-                <div class="module-chip-row">
-                  <span class="status-pill">Walkability first</span>
-                  <span class="status-pill status-pill-soft" id="results-parking-pill">Parking flexible</span>
-                </div>
-              </div>
-
-              <div class="criteria-stack">
-                <section class="criteria-card is-confirmed">
-                  <p class="card-label">Budget</p>
-                  <strong class="field-value" id="results-budget">$2,200 to $2,600</strong>
-                  <div class="meter"><span class="meter-fill meter-fill-updated"></span></div>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Pets</p>
-                  <strong class="field-value">Small dog</strong>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Move-in</p>
-                  <strong class="field-value" id="results-movein">6 to 8 weeks</strong>
-                </section>
-
-                <section class="criteria-card is-confirmed">
-                  <p class="card-label">Parking</p>
-                  <strong class="field-value" id="results-parking">Preferred, not required</strong>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Neighborhoods</p>
-                  <div class="tag-row compact">
-                    <span>Clarksville</span>
-                    <span>Hyde Park</span>
-                    <span>South Lamar</span>
-                  </div>
-                </section>
-              </div>
-
-              <div class="module-footer">
-                <div>
-                  <span class="footer-label">Next</span>
-                  <strong>Open the balcony listing or save the shortlist.</strong>
-                </div>
-                <div class="action-row">
-                  <a class="button button-primary" href="#home-detail">Open home</a>
-                  <a class="button button-secondary" href="#edit-criteria">Refine recap</a>
-                </div>
-              </div>
-            </aside>
-
-            <section class="workspace">
-              <div class="workspace-header">
-                <div>
-                  <p class="section-label">Refinement</p>
-                  <h3>The user asks for balcony or better light, and the shortlist responds.</h3>
-                </div>
-              </div>
-
-              <section class="panel chat-panel">
-                <div class="chat-thread">
-                  <article class="message message-user">
-                    <span class="message-role">User</span>
-                    <p>Show me the ones with a balcony or better light.</p>
-                  </article>
-
-                  <article class="message message-assistant">
-                    <span class="message-role">Assistant</span>
-                    <p>These three are strongest after loosening parking. Maple &amp; Burnet is the only one with a balcony.</p>
-                  </article>
-                </div>
-              </section>
-
-              <div class="results-board">
-                <article class="property-card vertical is-selected home-card-results" data-home-id="maple" role="button" tabindex="0">
-                  <div class="property-media media-maple"></div>
-                  <div class="property-body">
-                    <div class="property-top">
-                      <div>
-                        <h4>Maple &amp; Burnet House</h4>
-                        <p class="property-meta">Clarksville • Austin</p>
-                      </div>
-                      <strong class="property-price">$2,320</strong>
-                    </div>
-                    <p class="property-copy">1 bd / 1 ba • Balcony • Small dog okay</p>
-                    <div class="tag-row compact">
-                      <span>Walkable block</span>
-                      <span>MLS verified</span>
-                      <span>Street permit parking</span>
-                      <span>Coffee + grocery nearby</span>
-                    </div>
-                    <span class="property-badge">Lead pick</span>
-                    <p class="tradeoff-line">Why this match: the only balcony option, but parking is the compromise.</p>
-                    <div class="property-actions">
-                      <a class="button button-primary button-small" href="#home-detail" data-home-id="maple">View home</a>
-                    </div>
-                  </div>
-                </article>
-
-                <article class="property-card vertical home-card-results" data-home-id="juniper" role="button" tabindex="0">
-                  <div class="property-media media-juniper"></div>
-                  <div class="property-body">
-                    <div class="property-top">
-                      <div>
-                        <h4>Juniper Walk Apartments</h4>
-                        <p class="property-meta">Hyde Park • Austin</p>
-                      </div>
-                      <strong class="property-price">$2,280</strong>
-                    </div>
-                    <p class="property-copy">1 bd / 1 ba • Courtyard light • Small dog okay</p>
-                    <div class="tag-row compact">
-                      <span>Off-street lot</span>
-                      <span>Broker verified</span>
-                      <span>Quiet street</span>
-                      <span>Park + coffee nearby</span>
-                    </div>
-                    <p class="tradeoff-line">Why this match: easiest parking, but no balcony.</p>
-                    <div class="property-actions">
-                      <a class="button button-secondary button-small" href="#home-detail" data-home-id="juniper">View home</a>
-                    </div>
-                  </div>
-                </article>
-
-                <article class="property-card vertical home-card-results" data-home-id="southlamar" role="button" tabindex="0">
-                  <div class="property-media media-arbor"></div>
-                  <div class="property-body">
-                    <div class="property-top">
-                      <div>
-                        <h4>South Lamar Yard</h4>
-                        <p class="property-meta">South Lamar • Austin</p>
-                      </div>
-                      <strong class="property-price">$2,485</strong>
-                    </div>
-                    <p class="property-copy">1 bd / 1 ba • Big windows • Small dog okay</p>
-                    <div class="tag-row compact">
-                      <span>Garage add-on</span>
-                      <span>Partner feed</span>
-                      <span>Newer finish</span>
-                      <span>Groceries nearby</span>
-                    </div>
-                    <p class="tradeoff-line">Why this match: strongest light, slightly less walkable.</p>
-                    <div class="property-actions">
-                      <a class="button button-secondary button-small" href="#home-detail" data-home-id="southlamar">View home</a>
-                    </div>
-                  </div>
-                </article>
-              </div>
-            </section>
-          </div>
-        </article>
-      </section>
-
-      <section class="frame-shell reveal" id="home-detail" data-nav="home-detail">
-        <div class="frame-heading">
-          <div>
-            <p class="frame-kicker">Frame 4</p>
-            <h2>Home Detail</h2>
-          </div>
-          <p class="frame-note">
-            The clicked-home view makes one shortlist item feel inspectable before the user
-            saves it or requests a tour.
-          </p>
-        </div>
-
-        <article class="artboard product-frame">
-          <div class="window-chrome">
-            <div class="window-brand">
-              <span class="brand-mark">TC</span>
-              <div>
-                <strong>Trusted Concierge</strong>
-                <p>Home view</p>
-              </div>
-            </div>
-            <div class="window-status">
-              <span class="status-chip">Selected from shortlist</span>
-              <span class="status-chip status-chip-soft">Verified listing</span>
-            </div>
-          </div>
-
-          <div class="product-layout">
-            <aside class="criteria-module">
-              <div class="criteria-top">
-                <div>
-                  <p class="section-label">Search Snapshot</p>
-                  <h3>Still grounded in chat</h3>
-                </div>
-                <div class="module-chip-row">
-                  <span class="status-pill">3 candidates</span>
-                </div>
-              </div>
-
-              <div class="criteria-stack">
-                <section class="criteria-card">
-                  <p class="card-label">Current filters</p>
-                  <div class="tag-row compact">
-                    <span id="detail-filter-budget">$2,200 to $2,600</span>
-                    <span>Small dog</span>
-                    <span id="detail-filter-movein">6 to 8 weeks</span>
-                    <span id="detail-filter-parking">Parking flexible</span>
-                  </div>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Selected home</p>
-                  <strong class="field-value" id="detail-selected-home">Maple &amp; Burnet House</strong>
-                  <p class="field-note" id="detail-selected-note">The only shortlist option with a balcony.</p>
-                </section>
-
-                <section class="criteria-card">
-                  <p class="card-label">Handoff state</p>
-                  <strong class="field-value">Not shared yet</strong>
-                </section>
-              </div>
-
-              <div class="module-footer">
-                <div>
-                  <span class="footer-label">Action</span>
-                  <strong>Add this home to the shortlist.</strong>
-                </div>
-                <div class="action-row">
-                  <a class="button button-primary" href="#shortlist-confirmation">Create shortlist</a>
-                  <a class="button button-secondary" href="#edit-criteria">Adjust criteria</a>
-                </div>
-              </div>
-            </aside>
-
-            <section class="workspace detail-workspace">
-              <div class="detail-hero detail-hero-large media-maple" id="detail-hero">
-                <div class="hero-overlay">
-                  <div class="hero-badge-row">
-                    <span class="hero-badge" id="detail-hero-badge">Balcony listing</span>
-                    <span class="hero-badge hero-badge-soft">Verified</span>
-                  </div>
-                  <div>
-                    <p class="hero-kicker">Home View</p>
-                    <h3 id="detail-hero-title">Maple &amp; Burnet House</h3>
-                    <p id="detail-hero-subtitle">Clarksville • Austin, TX</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="detail-topline">
-                <div>
-                  <p class="section-label">Selected home</p>
-                  <h3 id="detail-headline">Balcony plus walkability makes this the standout pick.</h3>
-                </div>
-                <div class="action-row">
-                  <a class="button button-primary" href="#shortlist-confirmation">Add to shortlist</a>
-                  <a class="button button-secondary" href="#updated-results">Back to shortlist</a>
-                </div>
-              </div>
-
-              <div class="fact-grid">
-                <div class="fact-card">
-                  <span>Rent</span>
-                  <strong id="detail-rent">$2,320/mo</strong>
-                </div>
-                <div class="fact-card">
-                  <span>Walk score</span>
-                  <strong id="detail-walk-score">92 / 100</strong>
-                </div>
-                <div class="fact-card">
-                  <span>Pet policy</span>
-                  <strong id="detail-pet-policy">Small dog okay</strong>
-                </div>
-                <div class="fact-card">
-                  <span>Parking</span>
-                  <strong id="detail-parking-value">Street permit</strong>
-                </div>
-              </div>
-
-              <div class="detail-columns">
-                <section class="panel">
-                  <p class="section-label">Why it fits</p>
-                  <h4>The trade-off is visible, not hidden.</h4>
-                  <ul class="fit-list" id="detail-fit-list">
-                    <li>Most walkable block in the shortlist and the only balcony option.</li>
-                    <li>Dog policy is already verified for the current listing.</li>
-                    <li>Coffee, a corner grocery, and a small park are all within a short walk.</li>
-                    <li>Street permit parking is the main compromise the user is making.</li>
-                  </ul>
-                </section>
-
-                <section class="panel">
-                  <p class="section-label">Source notes</p>
-                  <h4>Confidence stays inside the product.</h4>
-                  <div class="source-list">
-                    <div class="source-item">
-                      <span>Pricing</span>
-                      <strong>MLS refreshed today at 11:14 AM</strong>
-                    </div>
-                    <div class="source-item">
-                      <span>Pets</span>
-                      <strong>Small dog policy confirmed this week</strong>
-                    </div>
-                    <div class="source-item">
-                      <span>Parking</span>
-                      <strong id="detail-source-parking">Street permit note pulled from the listing remarks</strong>
-                    </div>
-                    <div class="source-item">
-                      <span>Nearby</span>
-                      <strong id="detail-source-nearby">Coffee, grocery, and green space highlighted from local amenity notes</strong>
-                    </div>
-                  </div>
-                </section>
-              </div>
-            </section>
-          </div>
-        </article>
-      </section>
-
-      <section class="frame-shell reveal" id="shortlist-confirmation" data-nav="shortlist-confirmation">
-        <div class="frame-heading">
-          <div>
-            <p class="frame-kicker">Frame 5</p>
-            <h2>Shortlist Confirmation</h2>
-          </div>
-          <p class="frame-note">
-            Task A ends with a concrete shortlist, not a loose transcript. That working set is
-            what makes the later balcony reference understandable.
-          </p>
-        </div>
-
-        <article class="artboard product-frame">
-          <div class="window-chrome">
-            <div class="window-brand">
-              <span class="brand-mark">TC</span>
-              <div>
-                <strong>Trusted Concierge</strong>
-                <p>Shortlist saved</p>
-              </div>
-            </div>
-            <div class="window-status">
-              <span class="status-chip">3 homes saved</span>
-              <span class="status-chip status-chip-soft">Nothing shared yet</span>
-            </div>
-          </div>
-
-          <div class="product-layout">
-            <aside class="context-panel">
-              <div class="context-top">
-                <div>
-                  <p class="section-label">Named shortlist</p>
-                  <h3>Walkable Austin picks</h3>
-                </div>
-                <span class="status-pill">3 homes</span>
-              </div>
-
-              <section class="context-card">
-                <p class="card-label">Saved search snapshot</p>
-                <div class="tag-row compact">
-                    <span id="shortlist-budget">$2,200 to $2,600</span>
-                  <span>Small dog</span>
-                    <span id="shortlist-movein">6 to 8 weeks</span>
-                    <span id="shortlist-parking">Parking flexible</span>
-                </div>
-              </section>
-
-              <section class="context-card">
-                <p class="card-label">Current contents</p>
-                <div class="stack-list" id="shortlist-current-contents">
-                  <div class="mini-home">
-                    <strong>Maple &amp; Burnet House</strong>
-                    <span>Balcony</span>
-                  </div>
-                  <div class="mini-home">
-                    <strong>Juniper Walk Apartments</strong>
-                    <span>Better parking</span>
-                  </div>
-                  <div class="mini-home">
-                    <strong>South Lamar Yard</strong>
-                    <span>Best natural light</span>
-                  </div>
-                </div>
-              </section>
-
-              <div class="module-footer">
-                <div>
-                  <span class="footer-label">Next</span>
-                  <strong>Request a tour through the assistant.</strong>
-                </div>
-                <div class="action-row">
-                  <a class="button button-secondary" href="#contact-consent">Contact Realtor</a>
-                  <a class="button button-secondary" href="#edit-criteria">Edit criteria</a>
-                </div>
-              </div>
-            </aside>
-
-            <section class="workspace">
-              <div class="workspace-header">
-                <div>
-                  <p class="section-label">Shortlist</p>
-                  <h3>The assistant now has a stable set of homes to reference.</h3>
-                </div>
-              </div>
-
-              <div class="shortlist-stage">
-                <section class="shortlist-card highlight-card">
-                  <p class="section-label">Saved homes</p>
-                  <h4>Walkable Austin picks</h4>
-                  <p class="subtle-copy">The balcony listing leads, but two alternatives remain visible for comparison.</p>
-                  <div class="shortlist-bay">
-                    <div class="bay-label">Lead match</div>
-                    <article class="property-card property-card-inline is-selected home-card-shortlist" data-home-id="maple" role="button" tabindex="0" id="shortlist-lead-card">
-                      <div class="property-media media-maple" id="shortlist-lead-media"></div>
-                      <div class="property-body">
-                        <span class="property-badge" id="shortlist-lead-badge">Lead pick</span>
-                        <div class="property-top">
-                          <div>
-                            <h4 id="shortlist-lead-name">Maple &amp; Burnet House</h4>
-                            <p class="property-meta" id="shortlist-lead-meta">Clarksville • Balcony</p>
-                          </div>
-                          <strong class="property-price" id="shortlist-lead-price">$2,320</strong>
-                        </div>
-                        <div class="tag-row compact" id="shortlist-lead-tags">
-                          <span>Walkable</span>
-                          <span>Balcony</span>
-                          <span>Dog okay</span>
-                        </div>
-                      </div>
-                    </article>
-
-                    <div class="stack-list" id="shortlist-alt-list">
-                      <div class="mini-home home-card-shortlist" data-home-id="juniper" role="button" tabindex="0">
-                        <strong>Juniper Walk Apartments</strong>
-                        <span>Parking is easier here</span>
-                      </div>
-                      <div class="mini-home home-card-shortlist" data-home-id="southlamar" role="button" tabindex="0">
-                        <strong>South Lamar Yard</strong>
-                        <span>Best light, less walkable</span>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <section class="panel">
-                  <p class="section-label">Next step</p>
-                  <h4>Now the user can say, “Request a tour for the one with the balcony.”</h4>
-                  <div class="kpi-row">
-                    <div class="kpi-card">
-                      <span>Homes saved</span>
-                      <strong>3</strong>
-                    </div>
-                    <div class="kpi-card">
-                      <span>Balcony target</span>
-                      <strong>1</strong>
-                    </div>
-                    <div class="kpi-card">
-                      <span>Shared yet</span>
-                      <strong>No</strong>
-                    </div>
-                  </div>
-                  <div class="action-row">
-                    <a class="button button-primary" href="#contact-consent">Request tour</a>
-                    <a class="button button-secondary" href="#updated-results">Back to results</a>
-                  </div>
-                </section>
-              </div>
-            </section>
-          </div>
-        </article>
-      </section>
-
-      <section class="frame-shell reveal" id="contact-consent" data-nav="contact-consent">
-        <div class="frame-heading">
-          <div>
-            <p class="frame-kicker">Frame 6</p>
-            <h2>Contact Consent</h2>
-          </div>
-          <p class="frame-note">
-            Task B starts in chat again: the user references “the one with the balcony,” the
-            assistant resolves it, and nothing is sent until the user explicitly approves the preview.
-          </p>
-        </div>
-
-        <article class="artboard product-frame">
-          <div class="window-chrome">
-            <div class="window-brand">
-              <span class="brand-mark">TC</span>
-              <div>
-                <strong>Trusted Concierge</strong>
-                <p>Contact preview</p>
-              </div>
-            </div>
-            <div class="window-status">
-              <span class="status-chip">Preview ready</span>
-              <span class="status-chip status-chip-soft">Not sent</span>
-            </div>
-          </div>
-
-          <div class="product-layout">
-            <aside class="context-panel">
-              <div class="context-top">
-                <div>
-                  <p class="section-label">Assigned Realtor</p>
-                  <h3>Maya Brooks</h3>
-                </div>
-                <span class="status-pill">Verified partner</span>
-              </div>
-
-              <section class="context-card identity-card">
-                <div class="identity-row">
-                  <div class="avatar">MB</div>
-                  <div>
-                    <strong>Maya Brooks</strong>
-                    <p class="subtle-copy">Compass Austin • TX 718422</p>
-                  </div>
-                </div>
-                <p class="subtle-copy">Nothing reaches Maya until the user approves the preview.</p>
-              </section>
-
-              <section class="context-card">
-                <p class="card-label">Resolved listing</p>
-                <div class="mini-home">
-                  <strong id="resolved-listing-name">Maple &amp; Burnet House</strong>
-                  <span id="resolved-listing-note">Resolved from “the one with the balcony”</span>
-                </div>
-              </section>
-            </aside>
-
-            <section class="workspace">
-              <div class="workspace-header">
-                <div>
-                  <p class="section-label">Task B</p>
-                  <h3>Reference resolution happens in chat before anything is shared.</h3>
-                </div>
-              </div>
-
-              <section class="panel chat-panel">
-                <div class="chat-thread">
-                  <article class="message message-user">
-                    <span class="message-role">User</span>
-                    <p>Now request a tour for the one with the balcony.</p>
-                  </article>
-
-                  <article class="message message-assistant">
-                    <span class="message-role">Assistant</span>
-                    <p id="consent-assistant-resolution">That should be Maple &amp; Burnet House. It&apos;s the only shortlist home with a balcony.</p>
-                  </article>
-
-                  <article class="message message-assistant">
-                    <span class="message-role">Assistant</span>
-                    <p>I can draft the request, but I won&apos;t contact Maya until you approve exactly what gets shared.</p>
-                  </article>
-                </div>
-              </section>
-
-              <div class="choice-grid" data-select-scope>
-                <button class="choice-card selectable" type="button" data-select-group="consent-channel" data-state-key="consentChannel" data-state-value="email" aria-pressed="false">
-                  <span class="choice-title">Email</span>
-                  <span class="choice-copy">Share name, email, and the selected home.</span>
-                </button>
-                <button class="choice-card selectable is-selected" type="button" data-select-group="consent-channel" data-state-key="consentChannel" data-state-value="phone" aria-pressed="true">
-                  <span class="choice-title">Phone</span>
-                  <span class="choice-copy">Share name, phone, and the tour request.</span>
-                </button>
-                <button class="choice-card selectable" type="button" data-select-group="consent-channel" data-state-key="consentChannel" data-state-value="both" aria-pressed="false">
-                  <span class="choice-title">Both</span>
-                  <span class="choice-copy">Share email and phone for follow-up.</span>
-                </button>
-              </div>
-
-              <section class="share-preview">
-                <div class="panel">
-                  <p class="section-label">Will be shared</p>
-                  <h4 id="share-heading">Phone</h4>
-                  <ul class="fit-list">
-                    <li id="share-item-1">Name and phone number.</li>
-                    <li id="share-item-2">Maple &amp; Burnet House as the requested listing.</li>
-                    <li id="share-item-3">Preferred afternoon showing times.</li>
-                  </ul>
-                </div>
-
-                <div class="panel">
-                  <p class="section-label">Still private</p>
-                  <h4>Not included</h4>
-                  <ul class="fit-list">
-                    <li>The other shortlist homes.</li>
-                    <li>The full chat transcript.</li>
-                    <li>Anything not shown in this preview.</li>
-                  </ul>
-                </div>
-              </section>
-
-              <section class="panel">
-                <p class="section-label">Editable request note</p>
-                <h4>The user stays in the loop before contact happens.</h4>
-                <div class="message-box message-box-editable" id="consent-note-draft" contenteditable="true" role="textbox" aria-label="Editable request note">
-                  Hi Maya, I&apos;m interested in Maple &amp; Burnet House. Afternoons are best for me,
-                  and phone is the easiest way to reach me.
-                </div>
-                <p class="subtle-copy">Edit the note if needed before sending.</p>
-              </section>
-
-              <div class="action-row">
-                <a class="button button-primary" href="#schedule-showing">Approve preview</a>
-                <a class="button button-secondary" href="#shortlist-confirmation">Back to shortlist</a>
-              </div>
-            </section>
-          </div>
-        </article>
-      </section>
-
-      <section class="frame-shell reveal" id="schedule-showing" data-nav="schedule-showing">
-        <div class="frame-heading">
-          <div>
-            <p class="frame-kicker">Frame 7</p>
-            <h2>Schedule Showing</h2>
-          </div>
-          <p class="frame-note">
-            Bounded afternoon slots keep the handoff narrow, easy to scan, and easy to confirm.
-          </p>
-        </div>
-
-        <article class="artboard product-frame">
-          <div class="window-chrome">
-            <div class="window-brand">
-              <span class="brand-mark">TC</span>
-              <div>
-                <strong>Trusted Concierge</strong>
-                <p>Schedule showing</p>
-              </div>
-            </div>
-            <div class="window-status">
-              <span class="status-chip">Afternoon slots</span>
-              <span class="status-chip status-chip-soft">Still not sent</span>
-            </div>
-          </div>
-
-          <div class="product-layout">
-            <aside class="context-panel">
-              <div class="context-top">
-                <div>
-                  <p class="section-label">Showing context</p>
-                  <h3 id="schedule-home-title">Maple &amp; Burnet House</h3>
-                </div>
-                <span class="status-pill" id="schedule-home-chip">Balcony home</span>
-              </div>
-
-              <section class="context-card">
-                <p class="card-label">Assigned Realtor</p>
-                <div class="identity-row">
-                  <div class="avatar">MB</div>
-                  <div>
-                    <strong>Maya Brooks</strong>
-                    <p class="subtle-copy">Compass Austin • Verified partner</p>
-                  </div>
-                </div>
-              </section>
-
-              <section class="context-card">
-                <p class="card-label">Contact method</p>
-                <strong class="field-value" id="schedule-contact-method">Name + phone</strong>
-              </section>
-            </aside>
-
-            <section class="workspace">
-              <div class="workspace-header">
-                <div>
-                  <p class="section-label">Schedule</p>
-                  <h3>Choose one afternoon slot for Maya Brooks.</h3>
-                </div>
-              </div>
-
-              <div class="schedule-shell" data-select-scope>
-                <div class="day-strip">
-                  <button class="choice-chip selectable is-selected" type="button" data-select-group="showing-day" data-state-key="showingDay" data-state-value="wed" aria-pressed="true">
-                    Wed Jun 5
-                  </button>
-                  <button class="choice-chip selectable" type="button" data-select-group="showing-day" data-state-key="showingDay" data-state-value="thu" aria-pressed="false">
-                    Thu Jun 6
-                  </button>
-                </div>
-
-                <div class="slot-grid">
-                  <button class="slot-button selectable" type="button" data-select-group="showing-slot" data-state-key="showingSlot" data-state-value="1:30 PM" aria-pressed="false">
-                    <span class="slot-time">1:30 PM</span>
-                    <span class="slot-note">Earliest afternoon slot</span>
-                  </button>
-                  <button class="slot-button selectable is-selected" type="button" data-select-group="showing-slot" data-state-key="showingSlot" data-state-value="3:00 PM" aria-pressed="true">
-                    <span class="slot-time">3:00 PM</span>
-                    <span class="slot-note">Best overlap for Maya</span>
-                  </button>
-                  <button class="slot-button selectable" type="button" data-select-group="showing-slot" data-state-key="showingSlot" data-state-value="4:30 PM" aria-pressed="false">
-                    <span class="slot-time">4:30 PM</span>
-                    <span class="slot-note">Late afternoon</span>
-                  </button>
-                  <button class="slot-button selectable" type="button" data-select-group="showing-slot" data-state-key="showingSlot" data-state-value="5:30 PM" aria-pressed="false">
-                    <span class="slot-time">5:30 PM</span>
-                    <span class="slot-note">Last slot today</span>
-                  </button>
-                </div>
-
-                <section class="panel">
-                  <p class="section-label">Selected slot</p>
-                  <h4 id="schedule-selected-slot">Wednesday, June 5 at 3:00 PM</h4>
-                  <p class="subtle-copy">One time only. Maya can confirm it or offer the nearest alternative.</p>
-                </section>
-              </div>
-
-              <div class="action-row">
-                <a class="button button-primary" href="#review-send">Review request</a>
-                <a class="button button-secondary" href="#contact-consent">Back to preview</a>
-              </div>
-            </section>
-          </div>
-        </article>
-      </section>
-
-      <section class="frame-shell reveal" id="review-send" data-nav="review-send">
-        <div class="frame-heading">
-          <div>
-            <p class="frame-kicker">Frame 8</p>
-            <h2>Review and Send</h2>
-          </div>
-          <p class="frame-note">
-            The final frame keeps the send step cautious and legible without overexplaining it.
-          </p>
-        </div>
-
-        <article class="artboard product-frame">
-          <div class="window-chrome">
-            <div class="window-brand">
-              <span class="brand-mark">TC</span>
-              <div>
-                <strong>Trusted Concierge</strong>
-                <p>Review and send</p>
-              </div>
-            </div>
-            <div class="window-status">
-              <span class="status-chip" id="review-status-chip">Ready to send</span>
-              <span class="status-chip status-chip-soft" id="review-status-meta">Verified agent</span>
-            </div>
-          </div>
-
-          <div class="product-layout">
-            <aside class="context-panel">
-              <div class="context-top">
-                <div>
-                  <p class="section-label">Request status</p>
-                  <h3>Final check</h3>
-                </div>
-              </div>
-
-              <div class="summary-steps">
-                <div class="step-pill">
-                  <span>Search</span>
-                  <strong>Done</strong>
-                </div>
-                <div class="step-pill">
-                  <span>Shortlist</span>
-                  <strong>3 homes</strong>
-                </div>
-                <div class="step-pill">
-                  <span>Consent</span>
-                  <strong id="review-consent-step">Phone</strong>
-                </div>
-                <div class="step-pill is-current">
-                  <span>Tour time</span>
-                  <strong id="review-time-step">Wed Jun 5 • 3:00 PM</strong>
-                </div>
-              </div>
-            </aside>
-
-            <section class="workspace">
-              <div class="workspace-header">
-                <div>
-                  <p class="section-label">Review</p>
-                  <h3>Final check before the request goes out to Maya Brooks.</h3>
-                </div>
-              </div>
-
-              <section class="review-sheet">
-                <div class="review-banner">
-                  <div>
-                    <p class="section-label">Outbound request</p>
-                    <h4 id="review-headline">Tour request for Maple &amp; Burnet House</h4>
-                  </div>
-                  <p class="subtle-copy" id="review-status-note">Editable until the request is sent.</p>
-                </div>
-
-                <div id="review-draft-content">
-                  <div class="review-grid">
-                    <section class="review-block">
-                      <p class="card-label">Property</p>
-                      <strong id="review-property-name">Maple &amp; Burnet House</strong>
-                      <p class="subtle-copy" id="review-property-meta">Clarksville • Balcony • $2,320/mo</p>
-                    </section>
-
-                    <section class="review-block">
-                      <p class="card-label">Realtor</p>
-                      <strong>Maya Brooks</strong>
-                      <p class="subtle-copy">Compass Austin • TX 718422</p>
-                    </section>
-
-                    <section class="review-block">
-                      <p class="card-label">Contact channel</p>
-                      <strong id="review-contact-channel">Phone</strong>
-                      <p class="subtle-copy" id="review-contact-copy">Name and phone number only.</p>
-                    </section>
-
-                    <section class="review-block">
-                      <p class="card-label">Selected time</p>
-                      <strong id="review-selected-time">Wednesday, June 5 at 3:00 PM</strong>
-                      <p class="subtle-copy">Single requested slot.</p>
-                    </section>
-
-                    <section class="review-block review-block-wide">
-                      <p class="card-label">Shared details</p>
-                      <ul class="fit-list">
-                        <li id="review-shared-1">Name and phone number.</li>
-                        <li id="review-shared-2">Maple &amp; Burnet House as the selected listing.</li>
-                        <li id="review-shared-3">Preferred afternoon slot and the current move-in window.</li>
-                      </ul>
-                    </section>
-
-                    <section class="review-block review-block-wide">
-                      <p class="card-label">Message preview</p>
-                      <div class="message-box message-box-editable" id="review-message-draft" contenteditable="true" role="textbox" aria-label="Editable message preview">
-                        Hi Maya, I&apos;d like to request a tour for Maple &amp; Burnet House on
-                        Wednesday, June 5 at 3:00 PM. I&apos;m the renter who shortlisted the balcony
-                        listing through Trusted Concierge.
-                      </div>
-                    </section>
-                  </div>
-
-                  <div class="action-row action-row-end">
-                    <button class="button button-primary" type="button" id="review-send-button">Send to Maya</button>
-                    <a class="button button-secondary button-secondary-quiet" href="#schedule-showing">Cancel</a>
-                  </div>
-                </div>
-
-                <section class="review-confirmation is-hidden" id="review-sent-content" aria-live="polite">
-                  <p class="section-label">Request sent</p>
-                  <h4 id="review-sent-heading">Maya Brooks now has the tour request.</h4>
-                  <p class="subtle-copy" id="review-sent-copy">
-                    The selected home, contact method, and time were shared exactly as previewed.
-                  </p>
-                  <div class="review-confirmation-grid">
-                    <div class="mini-home is-selected">
-                      <strong id="review-sent-home">Maple &amp; Burnet House</strong>
-                      <span id="review-sent-time">Wednesday, June 5 at 3:00 PM</span>
-                    </div>
-                    <div class="mini-home is-selected">
-                      <strong id="review-sent-channel">Phone</strong>
-                      <span id="review-sent-summary">Name and phone number only.</span>
-                    </div>
-                  </div>
-                  <div class="action-row action-row-end">
-                    <button class="button button-secondary" type="button" id="review-back-button">Back to review</button>
-                    <a class="button button-primary" href="#schedule-showing">Back to schedule</a>
-                  </div>
-                </section>
-              </section>
-            </section>
-          </div>
-        </article>
-      </section>
-    </main>
-
-    <script src="./app.js"></script>
-  </body>
+        <div id="uwbody"></div>
+      </div>
+    </div>`;
+
+  $("#view-deal").innerHTML=`<div class="deal">${left}${center}${right}</div>`;
+  renderComps();
+  renderUw();
+  initDealMap();
+}
+
+function renderComps(){
+  const p=prop(); const box=$("#comps"); if(!box)return;
+  box.innerHTML=p.comps.map((c,i)=>{
+    const sm=SRCMETA[c.src];
+    const photo = c.photo ? '<img src="'+c.photo+'">' : 'No photo yet';
+    let meta='<span class="tag '+sm.cls+'">'+sm.t+'</span>';
+    if(c.dist>0) meta+='<span class="metabit"><b>'+c.dist+'</b> mi away</span>';
+    if(c.date&&c.date!=="current"&&c.date!=="prior") meta+='<span class="metabit">sold <b>'+c.date+'</b></span>';
+    if(c.ppsf) meta+='<span class="metabit"><b>$'+c.ppsf+'</b>/sq ft</span>';
+    if(typeof c.sim==="number") meta+='<span class="simbar" title="similarity"><i style="width:'+c.sim+'%"></i></span>';
+    meta+= c.url ? '<span class="sourcelink">View source</span>' : '<span class="sourcelink disabled">Source link pending</span>';
+    return '<div class="comp'+(selComp===i?" sel":"")+'" onclick="pickComp('+i+')">'+
+      '<div class="comp-top"><div class="comp-photo">'+photo+'</div>'+
+      '<div class="comp-mid"><div class="comp-label">'+c.label+'</div><div class="comp-note">'+c.note+'</div></div>'+
+      '<div class="comp-val">'+c.val+'</div></div>'+
+      '<div class="comp-meta">'+meta+'</div></div>';
+  }).join("");
+}
+function pickComp(i){ selComp=i; renderComps(); if(dealOK&&dealMarkers[i]) dealMarkers[i].openPopup(); }
+function toggleLayer(k){ dealLayers[k]=!dealLayers[k]; drawDealMap(); renderDeal(); }
+
+function setUw(mode){ APP.uwMode=mode; renderUw(); }
+function setTarget(d){ APP.target=Math.max(5,Math.min(80,APP.target+d)); renderUw(); }
+function toggleAdv(){ APP.advOpen=!APP.advOpen; renderUw(); }
+
+const SLIDERS_CORE=[["bid","Winning bid",M],["arv","Resale value",M],["rehab","Rehab budget",M],["months","Months to sell",v=>v+" months"]];
+const SLIDERS_ADV=[["title","Cost to clear title",M],["holdPerMo","Holding cost per month",M],["sellPct","Selling cost",v=>v+"%"]];
+const FMT={bid:M,arv:M,rehab:M,months:v=>v+" months",title:M,holdPerMo:M,sellPct:v=>v+"%"};
+const FMT_MINI={bid:M,arv:M,rehab:M,months:v=>v+"mo"};
+
+function chainHtml(s,r){
+  const scale=Math.max(r.totalCost,s.arv);
+  const segs=[["Winning bid",s.bid,"#BE7C16"],["Title",s.title,"#9C6610"],["Rehab",s.rehab,"#C46A26"],["Holding",r.holding,"#A98A4E"],["Selling",r.sellCost,"#8A7A5E"]];
+  let bars=segs.map(seg=>{const v=seg[1];if(v<=0)return"";const w=v/scale*100;return '<div class="seg2" style="width:'+w+'%;background:'+seg[2]+'">'+(w>11?'<span>'+Mk(v)+'</span>':"")+'</div>';}).join("");
+  let leg=segs.filter(s2=>s2[1]>0).map(seg=>'<div><span class="csw" style="background:'+seg[2]+'"></span>'+seg[0]+'</div>').join("");
+  return `<div class="chainwrap">
+    <div class="chain-cap"><span>Everything you put in</span><span>${M(r.totalCost)}</span></div>
+    <div class="track">${bars}</div>
+    <div class="chain-cap" style="margin-top:7px"><span>What you sell for</span><span>${M(s.arv)}</span></div>
+    <div class="track"><div class="seg2" style="width:${s.arv/scale*100}%;background:linear-gradient(90deg,#2E8460,#3FA178)"><span>${M(s.arv)}</span></div></div>
+    <div class="chain-legend">${leg}</div>
+  </div>`;
+}
+/* the readouts that change as you drag, kept separate from the sliders */
+function singleDynHtml(s,r){
+  const over=s.bid>r.walk, headroom=r.walk-s.bid;
+  const walk=`<div class="walk${over?" over":""}">
+      <div class="wk">${over?"You are above your ceiling":"Bid up to this and stop"}</div>
+      <div class="wv">${M(Math.max(0,r.walk))}</div>
+      <div class="ws">${over
+        ? 'Your planned bid of <b>'+M(s.bid)+'</b> is <b>'+M(s.bid-r.walk)+'</b> more than the most you can pay and still earn your '+APP.target+' percent return.'
+        : 'This is the highest you can bid and still clear your '+APP.target+' percent target. You have <b>'+M(headroom)+'</b> of room above your planned bid of <b>'+M(s.bid)+'</b>.'}</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:11px;font-size:12.5px;color:var(--ink-soft)">
+        <span>Target return</span>
+        <button class="btn ghost" style="padding:3px 9px" onclick="setTarget(-5)">–</button>
+        <b style="font-family:var(--mono);color:var(--brand-deep)">${APP.target}%</b>
+        <button class="btn ghost" style="padding:3px 9px" onclick="setTarget(5)">+</button>
+      </div>
+    </div>`;
+  const outs=`<div class="outs">
+      <div class="ocell"><div class="k">Net profit</div><div class="v ${r.net>=0?"pos":"neg"}">${Mk(r.net)}</div></div>
+      <div class="ocell"><div class="k">Return</div><div class="v ${r.roi>=0?"pos":"neg"}">${r.roi>=0?"+":""}${r.roi.toFixed(0)}%</div></div>
+      <div class="ocell"><div class="k">Per year</div><div class="v ${r.ann>=0?"pos":"neg"}">${r.ann>=0?"+":""}${r.ann.toFixed(0)}%</div></div>
+    </div>`;
+  return walk+outs+chainHtml(s,r);
+}
+function ctrlHtml(letter,k,lab,fmt,s,p){
+  let mn,mx,step;
+  if(k==="months"){mn=3;mx=18;step=1;}
+  else if(k==="sellPct"){mn=3;mx=12;step=0.5;}
+  else if(k==="holdPerMo"){mn=0;mx=1200;step=50;}
+  else if(k==="title"){mn=0;mx=12000;step=50;}
+  else {mn=0;mx=(p.max&&p.max[k])||s[k]*2;step=(k==="arv"||k==="bid")?500:250;}
+  return '<div class="ctrl"><div class="ctrl-top"><label>'+lab+'</label><span class="val" id="val-'+letter+'-'+k+'">'+fmt(s[k])+'</span></div>'+
+    '<input type="range" min="'+mn+'" max="'+mx+'" step="'+step+'" value="'+s[k]+'" oninput="onSlide(\''+letter+'\',\''+k+'\',+this.value)"></div>';
+}
+
+function renderUw(){
+  const p=prop(); const box=$("#uwbody"); if(!box)return;
+  if(APP.uwMode==="single"){
+    const s=scenarioFor(p.id,"A"); const r=calc(s,APP.target);
+    const core=SLIDERS_CORE.map(([k,lab,fmt])=>ctrlHtml("A",k,lab,fmt,s,p)).join("");
+    const adv=SLIDERS_ADV.map(([k,lab,fmt])=>ctrlHtml("A",k,lab,fmt,s,p)).join("");
+    box.innerHTML='<div id="uw-dyn">'+singleDynHtml(s,r)+'</div>'+
+      '<div style="margin-top:16px">'+core+'</div>'+
+      '<div class="advanced"><div class="adv-toggle" onclick="toggleAdv()">'+(APP.advOpen?"▾":"▸")+' Every other assumption</div><div class="adv-body'+(APP.advOpen?" open":"")+'">'+adv+'</div></div>'+
+      '<button class="reset" onclick="resetScenario(\'A\')">Reset to the researched estimate</button>';
+  } else {
+    const sA=scenarioFor(p.id,"A"), sB=scenarioFor(p.id,"B");
+    const rA=calc(sA,APP.target), rB=calc(sB,APP.target);
+    function col(s,r,color,letter){
+      const mini=[["bid","Bid"],["arv","Resale"],["rehab","Rehab"],["months","Months"]].map(([k,lab])=>
+        '<div class="mini-ctrl"><div class="ctrl-top"><label>'+lab+'</label><span class="val" id="val-'+letter+'-'+k+'">'+FMT_MINI[k](s[k])+'</span></div>'+
+        '<input type="range" min="'+(k==="months"?3:0)+'" max="'+((p.max&&p.max[k])||(k==="months"?18:s[k]*2))+'" step="'+(k==="months"?1:500)+'" value="'+s[k]+'" oninput="onSlide(\''+letter+'\',\''+k+'\',+this.value)"></div>').join("");
+      return '<div class="cmp-col"><h4><span class="badge" style="background:'+color+'">'+letter+'</span>Scenario '+letter+'</h4>'+
+        '<div id="cmpdyn-'+letter+'">'+cmpDynHtml(r)+'</div><div style="margin-top:12px">'+mini+'</div></div>';
+    }
+    box.innerHTML='<div class="cmp">'+col(sA,rA,"#BE7C16","A")+col(sB,rB,"#3F7AA6","B")+'</div>'+
+      '<div class="delta" id="cmp-delta">'+cmpDeltaHtml(rA,rB)+'</div>'+
+      '<button class="reset" onclick="resetScenario(\'B\')">Reset scenario B to match A</button>';
+  }
+}
+function cmpDynHtml(r){
+  return '<div class="cmp-walk">'+M(Math.max(0,r.walk))+'</div><div style="font-size:11px;color:var(--ink-soft);margin-bottom:8px">walk-away bid</div>'+
+    '<div class="cmp-line"><span class="l">Net profit</span><span class="r" style="color:'+(r.net>=0?'var(--good)':'var(--risk)')+'">'+Mk(r.net)+'</span></div>'+
+    '<div class="cmp-line"><span class="l">Return</span><span class="r" style="color:'+(r.roi>=0?'var(--good)':'var(--risk)')+'">'+(r.roi>=0?"+":"")+r.roi.toFixed(0)+'%</span></div>';
+}
+function cmpDeltaHtml(rA,rB){
+  const dNet=rB.net-rA.net, dRoi=rB.roi-rA.roi;
+  return 'Compared with scenario A, scenario B '+(dNet>=0?"earns":"loses")+' <b style="color:'+(dNet>=0?'var(--good)':'var(--risk)')+'">'+Mk(Math.abs(dNet))+'</b> '+(dNet>=0?"more":"less")+' and shifts the return by <b style="color:'+(dRoi>=0?'var(--good)':'var(--risk)')+'">'+(dRoi>=0?"+":"")+dRoi.toFixed(0)+' points</b>. Drag either column to test a different situation.';
+}
+
+/* onSlide updates state and patches only the readouts, leaving the slider you
+   are dragging in place so the drag is never interrupted */
+function onSlide(letter,k,v){
+  const p=prop(); scenarioFor(p.id,letter)[k]=v;
+  const lab=document.getElementById('val-'+letter+'-'+k);
+  if(lab) lab.textContent=(APP.uwMode==="compare"?FMT_MINI[k]:FMT[k])(v);
+  if(APP.uwMode==="single"){
+    const s=scenarioFor(p.id,"A"); const dyn=document.getElementById('uw-dyn');
+    if(dyn) dyn.innerHTML=singleDynHtml(s,calc(s,APP.target));
+  } else {
+    const rA=calc(scenarioFor(p.id,"A"),APP.target), rB=calc(scenarioFor(p.id,"B"),APP.target);
+    const a=document.getElementById('cmpdyn-A'), b=document.getElementById('cmpdyn-B'), d=document.getElementById('cmp-delta');
+    if(a) a.innerHTML=cmpDynHtml(rA); if(b) b.innerHTML=cmpDynHtml(rB); if(d) d.innerHTML=cmpDeltaHtml(rA,rB);
+  }
+}
+function setUw(mode){ APP.uwMode=mode; renderUw(); }
+function setTarget(d){ APP.target=Math.max(5,Math.min(80,APP.target+d)); renderUw(); }
+function toggleAdv(){ APP.advOpen=!APP.advOpen; renderUw(); }
+function resetScenario(letter){ const id=prop().id; if(letter==="A"){APP.scenarios[id].A=Object.assign({},prop().d);} else {APP.scenarios[id].B=Object.assign({},scenarioFor(id,"A"));} renderUw(); }
+
+/* ============================================================
+   CHAT — scripted surface that drives the app
+   ============================================================ */
+const CHAT_SCRIPTS=[
+ {q:"Show me the cheapest land play",act:()=>{APP.filter="land";APP.view="list";render();setTimeout(()=>openDeal("237-005"),350);},
+  a:"The standout piece of land is <b>2003 Park Ave in Lafayette Square</b>, opening at just over four thousand dollars. I have filtered the list to land and opened it for you. Because it is an empty lot, there is nothing to inspect or evict, and it sits in one of the strongest infill markets in the city."},
+ {q:"Which deal has the strongest evidence?",act:()=>openDeal("237-156"),
+  a:"That would be <b>7353 Virginia Ave</b>. It is the rare case where the house itself is listed for sale right now, and two houses on the same block have recorded sales that bracket the value. I have opened it so you can see the comparables. Notice the recorded-sale tags, which carry more weight than an automated estimate."},
+ {q:"What if I had to sell in six months?",act:()=>{if(APP.view!=="deal"||!prop().researched)openDeal("237-156");APP.uwMode="single";const s=scenarioFor(prop().id,"A");s.months=6;render();},
+  a:"I have set the timeline on the property you are viewing to six months. Watch the walk-away bid and the annual return update. A shorter hold lowers your holding cost but leaves less room for surprises, so the per-year return often looks better while the cushion gets thinner."},
+ {q:"Compare two ways to play 920 Bates",act:()=>{openDeal("237-125");setTimeout(()=>{APP.uwMode="compare";const sB=scenarioFor("237-125","B");sB.bid=45000;sB.rehab=30000;sB.months=14;renderUw();},300);},
+  a:"I have opened <b>920 Bates St</b> and set up a comparison. Scenario A is the conservative researched estimate. Scenario B imagines paying more at auction and doing a deeper renovation over a longer hold. Drag either column to see how the return moves between a quick light touch and a fuller project."},
+ {q:"Why is the Hickory house risky if it looks cheap?",act:()=>openDeal("237-002"),
+  a:"Good instinct to ask. <b>2350 Hickory</b> shows a huge paper spread, but the risk is not the value, it is whether you can win it. It is already listed at three hundred thousand, so the owner will likely pay off the taxes before sale day, and if it does reach the auction it gets bid into the six figures. I opened it so you can see the confidence read explains exactly this."}
+];
+function renderChatSuggest(){
+  $("#sugg").innerHTML=CHAT_SCRIPTS.map((s,i)=>'<button onclick="askChat('+i+')">'+s.q+'</button>').join("");
+}
+function pushMsg(who,html){
+  const b=$("#chatbody"); const d=document.createElement("div"); d.className="msg "+who; d.innerHTML=html; b.appendChild(d); b.scrollTop=b.scrollHeight;
+}
+function askChat(i){
+  const s=CHAT_SCRIPTS[i];
+  pushMsg("user",s.q);
+  setTimeout(()=>{ s.act(); pushMsg("bot",s.a); },200);
+}
+$("#chatfab").onclick=()=>{APP.chatOpen=true;$("#chatpanel").classList.add("open");$("#chatfab").style.display="none";
+  if(!$("#chatbody").dataset.init){$("#chatbody").dataset.init="1";pushMsg("bot","Hello. I can help you navigate this sale and reason about any property. Tap one of the questions below and watch the list, the map, and the numbers respond. In the live version you will be able to type freely.");}};
+$("#chatx").onclick=()=>{APP.chatOpen=false;$("#chatpanel").classList.remove("open");$("#chatfab").style.display="flex";};
+
+/* ============================================================
+   RENDER ROOT + crumbs + footnote
+   ============================================================ */
+function renderCrumbs(){
+  if(APP.view==="list"){ $("#crumbs").innerHTML='Sale 237 overview'; }
+  else { const p=prop(); $("#crumbs").innerHTML='<a onclick="backToList()">Sale 237 overview</a> &nbsp;›&nbsp; '+p.addr; }
+}
+function renderFootnote(){
+  $("#footnote").innerHTML=`<b>About this prototype.</b> The full sale list is real, taken from the Sale 237 notice. Fifteen properties carry researched valuations with real comparables pulled from public sources. Every remaining parcel is sorted into an honest category with a stated reason rather than left blank, so the leads worth your time are separated from the parcels to pass on. Map positions are approximate placeholders until addresses are geocoded, the nearby-places layer is illustrative until a places data source is connected, and comparable photos and source links appear as empty states because that data needs a live listing feed. None of this is investment advice. Always confirm condition, occupancy, title, and redemption status before bidding.`;
+}
+function render(){
+  renderCrumbs();
+  if(APP.view==="list"){ $("#view-list").classList.remove("hidden"); $("#view-deal").classList.add("hidden"); renderList(); }
+  else { $("#view-list").classList.add("hidden"); $("#view-deal").classList.remove("hidden"); renderDeal(); }
+  renderFootnote();
+}
+renderChatSuggest();
+render();
+</script>
+</body>
 </html>
