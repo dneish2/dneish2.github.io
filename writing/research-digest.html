@@ -172,12 +172,12 @@ $ <span class="hl">claude mcp add research-digest -- research-digest mcp</span><
 
       <figure>
         <img src="../assets/img/research-digest/search.jpg" alt="The Research Digest search view: a query for agentic evaluation returning 444 of 1,320 papers, each with a score bar, the matched terms, and a plain-English line explaining the ranking." loading="lazy" />
-        <figcaption><b>Search.</b> Every result says why it is there. The chips are the terms that matched and what each was worth, and the line underneath reads the ranking back in plain English. When a paper you expected is missing, you can see which term failed to hit instead of guessing.</figcaption>
+        <figcaption><b>Search.</b> Every result says why it is there. The chips are the terms that matched, and the line underneath reads the ranking back in plain English, so a paper you expected but did not get is a question you can answer. This is my own shelf after a few months of daily fetches. A new install starts empty and fills up from the categories you pick.</figcaption>
       </figure>
 
       <figure>
         <img src="../assets/img/research-digest/similar.jpg" alt="A paper expanded to show its nearest neighbours by embedding similarity, each with a similarity score and a small gauge." loading="lazy" />
-        <figcaption><b>Find similar.</b> Cosine similarity over the whole library. Under a millisecond once the index is warm, so it is fast enough to use as a browsing gesture rather than a search you commit to.</figcaption>
+        <figcaption><b>Find similar.</b> Open any paper and the nearest ones come with it. It is instant, so it works as a browsing gesture rather than a search you have to commit to. Here a paper on manipulation in multi-turn agents pulls the benchmark paper for exactly that, which is the case it needs to get right.</figcaption>
       </figure>
 
       <figure>
@@ -221,10 +221,10 @@ $ <span class="hl">claude mcp add research-digest -- research-digest mcp</span><
 $ <span class="hl">research-digest config --add-topic</span> <span class="s">"world model"</span></pre>
 
       <div class="stats">
-        <div><div class="n">1,320</div><div class="l">papers in my library</div></div>
-        <div><div class="n">6</div><div class="l">tools over MCP</div></div>
-        <div><div class="n">40ms</div><div class="l">to search all of it</div></div>
-        <div><div class="n">0</div><div class="l">API keys required</div></div>
+        <div><div class="n">6</div><div class="l">tools your agent can call</div></div>
+        <div><div class="n">1</div><div class="l">command to connect it</div></div>
+        <div><div class="n">arXiv</div><div class="l">the source, no account or key</div></div>
+        <div><div class="n">local</div><div class="l">your library stays on your machine</div></div>
       </div>
 
       <h2>What it does not do</h2>
