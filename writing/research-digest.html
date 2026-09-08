@@ -36,14 +36,30 @@
     .cs h3 { font-family: var(--font-display); font-size: 1.14rem; margin: 0 0 .6rem; }
 
     /* pipeline */
-    .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+    .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
       gap: 12px; margin: 2rem 0; }
     .node { background: var(--bg-raised); border: 1px solid var(--line-soft);
-      border-radius: 10px; padding: 15px 17px; }
-    .node b { display: block; font-family: var(--font-mono); font-size: .66rem;
-      letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
-      margin-bottom: 6px; font-weight: 500; }
-    .node span { font-size: .86rem; color: var(--ink-muted); }
+      border-radius: 10px; padding: 16px 18px; position: relative; cursor: help; }
+    .node .top { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+    .node svg { width: 19px; height: 19px; color: var(--accent); flex: none; }
+    .node b { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--accent); font-weight: 500; }
+    .node > span { font-size: .86rem; color: var(--ink-muted); }
+    .node .more { position: absolute; left: 12px; right: 12px; bottom: calc(100% + 8px);
+      background: var(--bg-inset); border: 1px solid var(--line-strong); border-radius: 8px;
+      padding: 11px 13px; font-size: .8rem; line-height: 1.55; color: var(--ink);
+      opacity: 0; visibility: hidden; transform: translateY(4px); z-index: 5;
+      box-shadow: 0 8px 24px rgba(1, 4, 9, .55); }
+    .node:hover .more, .node:focus-within .more { opacity: 1; visibility: visible;
+      transform: translateY(0); }
+    .node .more code { font-size: .92em; }
+    @media (prefers-reduced-motion: no-preference) {
+      .node .more { transition: opacity .15s ease, transform .15s ease; }
+    }
+    @media (max-width: 620px) {
+      .node .more { position: static; opacity: 1; visibility: visible; transform: none;
+        margin-top: 10px; box-shadow: none; }
+    }
 
     /* screenshots */
     figure { margin: 2rem 0; }
@@ -124,11 +140,40 @@
     <article class="article-body">
 
       <div class="flow">
-        <div class="node"><b>fetch</b><span>arXiv, by the categories you track</span></div>
-        <div class="node"><b>rank</b><span>Keyword scoring against your topics</span></div>
-        <div class="node"><b>embed</b><span>TF-IDF and SVD, cosine similarity</span></div>
-        <div class="node"><b>expose</b><span>MCP, 6 tools, over stdio</span></div>
+        <div class="node" tabindex="0">
+          <div class="top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><path d="M21 3v6h-6"/></svg>
+            <b>fetch</b>
+          </div>
+          <span>arXiv, by the categories you track</span>
+          <div class="more">Pulls the newest submissions in each category you list, three seconds apart because arXiv asks for that. Only papers you have not seen are added, so it is safe to run daily.</div>
+        </div>
+        <div class="node" tabindex="0">
+          <div class="top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
+            <b>rank</b>
+          </div>
+          <span>Keyword scoring against your topics</span>
+          <div class="more">A phrase match counts full, a distinctive word counts most of the way, and a word like &ldquo;learning&rdquo; that appears in every abstract counts for very little. Papers spanning several of your topics get a bump, recent ones get another.</div>
+        </div>
+        <div class="node" tabindex="0">
+          <div class="top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="7" r="2.4"/><circle cx="18" cy="10" r="2.4"/><circle cx="10" cy="18" r="2.4"/><path d="M8.2 8.3 15.7 9.2M16.6 12.2 11.7 16"/></svg>
+            <b>embed</b>
+          </div>
+          <span>TF-IDF and SVD, cosine similarity</span>
+          <div class="more">Turns each paper into 384 numbers so &ldquo;find similar&rdquo; works. Runs offline with no model download. Optional: skip it and everything except similarity still works.</div>
+        </div>
+        <div class="node" tabindex="0">
+          <div class="top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg>
+            <b>expose</b>
+          </div>
+          <span>MCP, 6 tools, over stdio</span>
+          <div class="more">The part your agent talks to. One JSON object per line in and out, no SDK, so Claude Code, Codex and Copilot CLI all connect with a couple of lines of config.</div>
+        </div>
       </div>
+      <p style="font-family:var(--font-mono);font-size:.72rem;color:var(--ink-muted);margin:-1rem 0 0">hover any step for detail</p>
 
       <h2>Why MCP instead of a REST API</h2>
 
@@ -252,7 +297,7 @@ $ <span class="hl">research-digest config --add-topic</span> <span class="s">"wo
       <a href="https://www.linkedin.com/in/david-neish-298b1a16b" rel="noopener">LinkedIn</a>
       <a href="../assets/resume/david-neish-resume.pdf" target="_blank" rel="noopener">R&eacute;sum&eacute;</a>
     </div>
-    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; St. Louis &middot; Plain HTML, no framework.</p>
+    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; St. Louis &middot; Plain HTML.</p>
   </div>
 </footer>
 <!-- /SITE-FOOTER -->
