@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAGE &mdash; David Neish</title>
+  <meta name="description" content="An AI coach for amateur athletes. One clip in, an AR overlay on the thing you did wrong. The design process, the user test, and the pipeline behind it." />
+  <link rel="canonical" href="https://dneish2.github.io/work/mage/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="MAGE — closing the latency of insight" />
+  <meta property="og:description" content="Amateur athletes get feedback hours after the shot. MAGE returns it on the clip itself." />
+  <meta name="theme-color" content="#0d1117" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%2358a6ff' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%2358a6ff'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../../assets/css/main.css" />
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    :root {
+      --bg:          #0d1117;
+      --bg-raised:   #161b22;
+      --bg-inset:    #010409;
+      --ink:         #e6edf3;
+      --ink-muted:   #8b949e;
+      --line:        rgba(240, 246, 252, 0.24);
+      --line-soft:   rgba(240, 246, 252, 0.12);
+      --line-strong: rgba(240, 246, 252, 0.36);
+      --accent:      #58a6ff;
+      --accent-hi:   #79c0ff;
+      --ok:          #3fb950;
+      --warn:        #f0883e;
+    }
+
+    .mg { max-width: 860px; }
+    .mg .article-body { max-width: none; }
+    .mg .article-body > p, .mg .article-head .dek { max-width: var(--measure); }
+    .mg h2 { margin-top: 3.1rem; }
+    .mg h3 { font-family: var(--font-display); font-size: 1.1rem; margin: 0 0 .5rem; }
+
+    /* the beat: before / after */
+    .beats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 2rem 0; }
+    .beat { background: var(--bg-raised); border: 1px solid var(--line-soft);
+      border-radius: 10px; padding: 20px 22px; }
+    .beat.now { border-left: 2px solid var(--warn); }
+    .beat.after { border-left: 2px solid var(--ok); }
+    .beat .tag { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em;
+      text-transform: uppercase; margin-bottom: 9px; display: block; }
+    .beat.now .tag { color: var(--warn); }
+    .beat.after .tag { color: var(--ok); }
+    .beat p { margin: 0; font-size: .94rem; color: var(--ink-muted); }
+    @media (max-width: 620px) { .beats { grid-template-columns: 1fr; } }
+
+    /* stage strip */
+    .stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft);
+      border-radius: 10px; overflow: hidden; margin: 1.8rem 0; }
+    .stages div { background: var(--bg-raised); padding: 16px 18px; }
+    .stages b { display: block; font-family: var(--font-mono); font-size: .64rem;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
+      margin-bottom: 6px; font-weight: 500; }
+    .stages span { font-size: .86rem; color: var(--ink-muted); }
+
+    .card { background: var(--bg-raised); border: 1px solid var(--line-soft);
+      border-radius: 10px; padding: 20px 24px; margin: 1.4rem 0; }
+    .card.lead { border-left: 2px solid var(--accent); }
+    .card p { margin: 0 0 .75rem; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .findings { margin: 1.4rem 0; border-top: 1px solid var(--line-soft); }
+    .findings div { display: grid; grid-template-columns: 128px 1fr; gap: 18px;
+      padding: 12px 2px; border-bottom: 1px solid var(--line-soft); font-size: .92rem; }
+    .findings span:first-child { font-family: var(--font-mono); font-size: .7rem;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
+    .findings span:last-child { color: var(--ink-muted); }
+    @media (max-width: 560px) { .findings div { grid-template-columns: 1fr; gap: 4px; } }
+
+    .cta { display: inline-block; font-family: var(--font-mono); font-size: .8rem;
+      border: 1px solid var(--accent); color: var(--accent); border-radius: 8px;
+      padding: 10px 18px; text-decoration: none; margin-top: .4rem; }
+    .cta:hover { background: var(--accent); color: var(--bg); }
+
+    .repo { font-family: var(--font-mono); font-size: .78rem; color: var(--ink-muted);
+      background: var(--bg-raised); border: 1px solid var(--line-soft); border-radius: 8px;
+      padding: .75rem 1.1rem; margin: 1.5rem 0 0; line-height: 1.8; }
+  </style>
+</head>
+<body>
+
+<!-- SITE-HEADER v1 -->
+<header class="site-header">
+  <div class="inner">
+    <a class="wordmark" href="../../index.html">DN<span class="tick">_</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Work</a>
+      <a href="../../writing/index.html">Writing</a>
+      <a href="../../index.html#about">About</a>
+      <a href="../../index.html#resume">R&eacute;sum&eacute;</a>
+      <a class="nav-cta" href="mailto:david.neishm@gmail.com">Email</a>
+    </nav>
+  </div>
+</header>
+<!-- /SITE-HEADER -->
+
+<main>
+  <div class="container mg">
+    <header class="article-head">
+      <span class="kicker">Case study &middot; MAGE</span>
+      <h1>The coach arrives hours too late</h1>
+      <p class="dek">Alex shoots alone. He misses, misses again, and has no way to tell why. He films himself, watches it that evening, and by then the feel of the shot is gone. MAGE returns the answer on the clip itself: one upload, one overlay, on the frame where it went wrong.</p>
+      <div class="byline"><span>David Neish</span></div>
+      <p class="repo">
+        HCI, Indiana University &middot; interactive prototype:
+        <a href="https://body-pose-87992014.figma.site/" rel="noopener">body-pose-87992014.figma.site</a>
+      </p>
+    </header>
+
+    <article class="article-body">
+
+      <div class="beats">
+        <div class="beat now">
+          <span class="tag">Today</span>
+          <p>He scrolls highlights and generic tips between shots. It is inspiring and impersonal. Nothing in it explains his elbow.</p>
+        </div>
+        <div class="beat after">
+          <span class="tag">With MAGE</span>
+          <p>He uploads one clip. The system finds the release frame and draws the correct elbow line over his actual arm. Abstract advice becomes his shot.</p>
+        </div>
+      </div>
+
+      <p>Coaching works because someone watches you and tells you the one thing to change while you can still feel what you just did. It is expensive, so most people practising alone never get it. Self-recording seems like the substitute, but it opens a gap between the action and the insight, and the gap is where the learning leaks out.</p>
+
+      <p>That gap is the whole design problem. Everything below is in service of closing it.</p>
+
+      <h2>How it was designed</h2>
+
+      <div class="stages">
+        <div><b>diverge</b><span>Ten ideas, then ten more. Yoga posture, an esports map coach, the basketball analyser.</span></div>
+        <div><b>converge</b><span>Basketball won on measurable joint angles and available pose research.</span></div>
+        <div><b>paper</b><span>Low-fidelity screens, role-played while people were actually shooting.</span></div>
+        <div><b>click-through</b><span>Mid-fidelity prototype, tested capture mode into analysis mode.</span></div>
+      </div>
+
+      <p>The decision that shaped the rest was narrowing from a universal coach to one sport and one joint. A system that grades every movement badly is worse than one that grades an elbow well, and elbow angle at release is both measurable and coachable.</p>
+
+      <div class="card lead">
+        <h3>The roleplay changed the design</h3>
+        <p>The prototype was tested with people mid-practice rather than at a desk. That surfaced a problem a screen review would have hidden: reading a report while holding a basketball does not work. Attention is already spent.</p>
+        <p>So the feedback moved onto the video. An AR overlay with a trajectory arc carries the correction visually, and you understand it without parsing a page of metrics.</p>
+      </div>
+
+      <h2>What the user test found</h2>
+
+      <p>Ashley, 27, worked through the click-through prototype without being told what it did.</p>
+
+      <div class="findings">
+        <div><span>worked</span><span>The overlay and trajectory arc landed immediately. She understood the correction before any real video was playing.</span></div>
+        <div><span>worked</span><span>The processing animation built anticipation rather than frustration.</span></div>
+        <div><span>changed it</span><span>She wanted to know what the system was doing at each stage, not just that it was busy.</span></div>
+        <div><span>changed it</span><span>She did not want to scroll a report. She wanted to click a timestamp and jump to the moment.</span></div>
+      </div>
+
+      <p>The last one is the useful kind of finding, because it contradicts the obvious build. A full analysis report feels generous and reads as work. Timestamps you can jump between respect that the user came for one moment, not a document.</p>
+
+      <h2>What it takes to run</h2>
+
+      <p>The phone is the sensor. It sits on a tripod so the whole body stays in frame, because a cropped ankle breaks the pose estimate. From there the video becomes a digital skeleton, a stream of joint coordinates, and everything downstream reasons over those numbers rather than over pixels.</p>
+
+      <div class="stages">
+        <div><b>ingest</b><span>DeepStream decodes high frame-rate video</span></div>
+        <div><b>pose</b><span>EITNet turns frames into joint coordinates</span></div>
+        <div><b>route</b><span>Triton loads the model for the domain in play</span></div>
+        <div><b>infer</b><span>TensorRT runs it at reduced precision for throughput</span></div>
+      </div>
+
+      <p>The router is the part that generalises. Basketball is the first domain, not the only one; the same pipeline accepts a golf swing or a yoga pose by loading a different model, without a restart. That is why the hardware target is heavy on memory rather than raw speed, so several domain models can stay resident and switch instantly.</p>
+
+      <p><a class="cta" href="https://body-pose-87992014.figma.site/" rel="noopener">Open the prototype &rarr;</a></p>
+
+      <h2>Where AI helped, and where it did not</h2>
+
+      <div class="card">
+        <p><strong>It was good at scaffolding.</strong> Structuring the opportunity space, generating breadth during the ten-plus-ten, and drafting a technical blueprint faster than sketching would have.</p>
+        <p><strong>It was not good at judgement.</strong> Narrowing to basketball, then to elbow mechanics, came from knowing what could actually be coached. It also never anticipated the thing that mattered most, which was a person holding a ball with no attention left to read a report.</p>
+        <p>The volume was its own problem. Generated ideas arrived faster than they could be evaluated, and the useful move was to stop and cut scope rather than keep generating.</p>
+      </div>
+
+      <h2>What I would build first</h2>
+
+      <p>One sport, one joint, asynchronous. Upload a clip, wait, get an overlay back. Real time is the eventual promise but it is not the thing to prove first. The thing to prove is that a person who missed ten shots gets one sentence about their elbow and makes the eleventh.</p>
+
+      <nav class="article-nav">
+        <a href="../index.html">&larr; All case studies</a>
+        <a href="../visual-vocabulary/">Visual Vocabulary &rarr;</a>
+      </nav>
+    </article>
+  </div>
+</main>
+
+<!-- SITE-FOOTER v1 -->
+<footer class="site-footer">
+  <div class="container">
+    <p class="signoff">If you&rsquo;re building decision systems, let&rsquo;s talk.</p>
+    <div class="links">
+      <a href="mailto:david.neishm@gmail.com">david.neishm@gmail.com</a>
+      <a href="https://github.com/dneish2" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/david-neish-298b1a16b" rel="noopener">LinkedIn</a>
+      <a href="../../assets/resume/david-neish-resume.pdf" target="_blank" rel="noopener">R&eacute;sum&eacute;</a>
+    </div>
+    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; St. Louis &middot; Plain HTML, no framework.</p>
+  </div>
+</footer>
+<!-- /SITE-FOOTER -->
+
+<script src="../../assets/js/main.js" defer></script>
+</body>
+</html>
