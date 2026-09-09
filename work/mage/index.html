@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MAGE &mdash; David Neish</title>
-  <meta name="description" content="An AI coach for amateur athletes. One clip in, an AR overlay on the thing you did wrong. The design process, the user test, and the pipeline behind it." />
+  <meta name="description" content="An AI coach for amateur athletes. One clip in, an AR overlay on the thing you did wrong. Three screens from the working prototype, the decision that made it work, and the pipeline behind it." />
   <link rel="canonical" href="https://dneish2.github.io/work/mage/" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="MAGE — closing the latency of insight" />
@@ -29,7 +29,7 @@
       --warn:        #f0883e;
     }
 
-    .mg { max-width: 860px; }
+    .mg { max-width: 940px; }
     .mg .article-body { max-width: none; }
     .mg .article-body > p, .mg .article-head .dek { max-width: var(--measure); }
     .mg h2 { margin-top: 3.1rem; }
@@ -58,19 +58,28 @@
       margin-bottom: 6px; font-weight: 500; }
     .stages span { font-size: .86rem; color: var(--ink-muted); }
 
+    /* the three screens */
+    .screens { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;
+      margin: 2rem 0 1.6rem; align-items: start; }
+    .screens figure { margin: 0; }
+    .screens img { width: 100%; height: auto; display: block; border-radius: 14px;
+      border: 1px solid var(--line-soft); background: #000; }
+    .screens figcaption { font-size: .84rem; color: var(--ink-muted); margin-top: .85rem;
+      line-height: 1.6; }
+    .screens figcaption b { display: block; font-family: var(--font-mono); font-size: .66rem;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
+      font-weight: 500; margin-bottom: .4rem; }
+    @media (max-width: 700px) { .screens { grid-template-columns: 1fr; gap: 28px;
+      max-width: 340px; margin-left: auto; margin-right: auto; } }
+
+    .note { font-size: .84rem; color: var(--ink-muted); border-left: 1px solid var(--line);
+      padding-left: 14px; margin: 1.6rem 0; max-width: 62ch; }
+
     .card { background: var(--bg-raised); border: 1px solid var(--line-soft);
       border-radius: 10px; padding: 20px 24px; margin: 1.4rem 0; }
     .card.lead { border-left: 2px solid var(--accent); }
     .card p { margin: 0 0 .75rem; }
     .card p:last-child { margin-bottom: 0; }
-
-    .findings { margin: 1.4rem 0; border-top: 1px solid var(--line-soft); }
-    .findings div { display: grid; grid-template-columns: 128px 1fr; gap: 18px;
-      padding: 12px 2px; border-bottom: 1px solid var(--line-soft); font-size: .92rem; }
-    .findings span:first-child { font-family: var(--font-mono); font-size: .7rem;
-      letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
-    .findings span:last-child { color: var(--ink-muted); }
-    @media (max-width: 560px) { .findings div { grid-template-columns: 1fr; gap: 4px; } }
 
     .cta { display: inline-block; font-family: var(--font-mono); font-size: .8rem;
       border: 1px solid var(--accent); color: var(--accent); border-radius: 8px;
@@ -125,39 +134,41 @@
         </div>
       </div>
 
-      <p>Coaching works because someone watches you and tells you the one thing to change while you can still feel what you just did. It is expensive, so most people practising alone never get it. Self-recording seems like the substitute, but it opens a gap between the action and the insight, and the gap is where the learning leaks out.</p>
+      <p>Coaching works because someone watches you and tells you the one thing to change while you can still feel what you just did. It is expensive, so most people practising alone never get it. Self-recording looks like the substitute, but it opens a gap between the action and the insight, and the gap is where the learning leaks out.</p>
 
-      <p>That gap is the whole design problem. Everything below is in service of closing it.</p>
+      <h2>What it is</h2>
 
-      <h2>How it was designed</h2>
+      <p>Three screens. You name what to look at, the answer comes back drawn on the clip, and the long version is there if you want it.</p>
 
-      <div class="stages">
-        <div><b>diverge</b><span>Ten ideas, then ten more. Yoga posture, an esports map coach, the basketball analyser.</span></div>
-        <div><b>converge</b><span>Basketball won on measurable joint angles and available pose research.</span></div>
-        <div><b>paper</b><span>Low-fidelity screens, role-played while people were actually shooting.</span></div>
-        <div><b>click-through</b><span>Mid-fidelity prototype, tested capture mode into analysis mode.</span></div>
+      <div class="screens">
+        <figure>
+          <img src="../../assets/img/mage/upload.jpg" alt="The MAGE upload screen: a selected clip called Airball, a free text field reading elbow alignment at release, and quick focus chips for elbow alignment, release timing, foot placement and shot arc." loading="lazy" />
+          <figcaption><b>You ask</b>Pick the clip, say what to look at. Naming one thing first is what keeps the answer to one sentence instead of a general critique of your shot.</figcaption>
+        </figure>
+        <figure>
+          <img src="../../assets/img/mage/replay.jpg" alt="The MAGE overlay replay screen: the clip with an AI overlay badge, three figures reading plus 15 degrees elbow deviation, 25 degree release angle and a C plus form grade, then jump to moment buttons for lift, release and follow-through." loading="lazy" />
+          <figcaption><b>It answers</b>The clip comes back with the overlay on it, three numbers, and the moments as buttons. Tap Release and you are at 0:03.1. That is the product: the correction sits on the frame where it happened.</figcaption>
+        </figure>
+        <figure>
+          <img src="../../assets/img/mage/report.jpg" alt="The MAGE feedback report: a summary giving one primary issue and one next action, followed by timestamped cards for setup, lift, release and follow-through, each with two coaching cues." loading="lazy" />
+          <figcaption><b>Detail, if you want it</b>One primary issue, one next action, then the moments in full. It is deliberately the screen after. Nobody holding a basketball reads this.</figcaption>
+        </figure>
       </div>
 
-      <p>The decision that shaped the rest was narrowing from a universal coach to one sport and one joint. A system that grades every movement badly is worse than one that grades an elbow well, and elbow angle at release is both measurable and coachable.</p>
+      <p class="note">Prototype, not a shipped app. The clip is a sample and the numbers on it are scripted, which the prototype says on its own screen. What is real is the interaction: what you are asked for, what comes back, and in what order.</p>
+
+      <h2>The decision that made it work</h2>
+
+      <p>Narrowing from a universal coach to one sport and one joint. A system that grades every movement badly is worse than one that grades an elbow well, and elbow angle at release is both measurable and coachable.</p>
 
       <div class="card lead">
-        <h3>The roleplay changed the design</h3>
-        <p>The prototype was tested with people mid-practice rather than at a desk. That surfaced a problem a screen review would have hidden: reading a report while holding a basketball does not work. Attention is already spent.</p>
-        <p>So the feedback moved onto the video. An AR overlay with a trajectory arc carries the correction visually, and you understand it without parsing a page of metrics.</p>
+        <h3>Testing mid-practice changed the design</h3>
+        <p>The paper version was role-played with people who were actually shooting, not with people at a desk. That surfaced something a screen review would have hidden: reading a report while holding a basketball does not work. The attention is already spent. So the feedback moved onto the video.</p>
+        <p>Ashley, 27, then worked through the click-through version without being told what it did. The overlay landed immediately, before any real video was playing. The report did not. She did not want to scroll it, she wanted to click a timestamp and jump to the moment.</p>
+        <p>That is the useful kind of finding, because it contradicts the obvious build. A full analysis report feels generous and reads as work. It is why the moments are buttons on the second screen and the document is the third.</p>
       </div>
 
-      <h2>What the user test found</h2>
-
-      <p>Ashley, 27, worked through the click-through prototype without being told what it did.</p>
-
-      <div class="findings">
-        <div><span>worked</span><span>The overlay and trajectory arc landed immediately. She understood the correction before any real video was playing.</span></div>
-        <div><span>worked</span><span>The processing animation built anticipation rather than frustration.</span></div>
-        <div><span>changed it</span><span>She wanted to know what the system was doing at each stage, not just that it was busy.</span></div>
-        <div><span>changed it</span><span>She did not want to scroll a report. She wanted to click a timestamp and jump to the moment.</span></div>
-      </div>
-
-      <p>The last one is the useful kind of finding, because it contradicts the obvious build. A full analysis report feels generous and reads as work. Timestamps you can jump between respect that the user came for one moment, not a document.</p>
+      <p>AI was good at the breadth here: ten ideas, then ten more, then a technical blueprint faster than sketching one. It was no help on the two judgement calls that mattered, which were cutting the scope down to an elbow and noticing that a person holding a ball has no attention left to read.</p>
 
       <h2>What it takes to run</h2>
 
@@ -173,14 +184,6 @@
       <p>The router is the part that generalises. Basketball is the first domain, not the only one; the same pipeline accepts a golf swing or a yoga pose by loading a different model, without a restart. That is why the hardware target is heavy on memory rather than raw speed, so several domain models can stay resident and switch instantly.</p>
 
       <p><a class="cta" href="https://body-pose-87992014.figma.site/" rel="noopener">Open the prototype &rarr;</a></p>
-
-      <h2>Where AI helped, and where it did not</h2>
-
-      <div class="card">
-        <p><strong>It was good at scaffolding.</strong> Structuring the opportunity space, generating breadth during the ten-plus-ten, and drafting a technical blueprint faster than sketching would have.</p>
-        <p><strong>It was not good at judgement.</strong> Narrowing to basketball, then to elbow mechanics, came from knowing what could actually be coached. It also never anticipated the thing that mattered most, which was a person holding a ball with no attention left to read a report.</p>
-        <p>The volume was its own problem. Generated ideas arrived faster than they could be evaluated, and the useful move was to stop and cut scope rather than keep generating.</p>
-      </div>
 
       <h2>What I would build first</h2>
 
