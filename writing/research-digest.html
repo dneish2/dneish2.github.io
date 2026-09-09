@@ -94,15 +94,6 @@
     .prompt::before { content: "you"; font-family: var(--font-mono); font-size: .64rem;
       letter-spacing: .12em; text-transform: uppercase; color: var(--accent); flex: none; }
 
-    /* stats */
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft);
-      border-radius: 10px; overflow: hidden; margin: 2rem 0; }
-    .stats div { background: var(--bg-raised); padding: 17px 19px; }
-    .stats .n { font-family: var(--font-mono); font-size: 1.5rem; color: var(--accent);
-      line-height: 1.1; font-variant-numeric: tabular-nums; }
-    .stats .l { font-size: .8rem; color: var(--ink-muted); margin-top: 5px; }
-
     .repo { font-family: var(--font-mono); font-size: .78rem; color: var(--ink-muted);
       background: var(--bg-raised); border: 1px solid var(--line-soft); border-radius: 8px;
       padding: .75rem 1.1rem; margin: 1.5rem 0 0; }
@@ -237,6 +228,46 @@ args = [<span class="s">"mcp"</span>]</pre>
         <img src="../assets/img/research-digest/trends.jpg" alt="The trends view reporting no_data, explaining that too few papers were fetched this week to compare against last week." loading="lazy" />
         <figcaption><b>Trends,</b> caught being honest. Week over week on concepts in your own feed. If you have not fetched recently it says so, rather than reporting the gap as every topic collapsing. The version I ported from showed <code>-100%</code> across the board, which was measuring my uptime, not the field.</figcaption>
       </figure>
+
+      <h2>Why every result explains itself</h2>
+
+      <p>The ranking is arithmetic, so it can be read back. Every paper carries the topics it matched, how each one matched, and the two bonuses that moved it. One function turns that record into a sentence:</p>
+
+      <pre>&gt;&gt;&gt; <span class="hl">explain_sentence</span>(why)
+<span class="c">matched retrieval (distinctive word), agent (distinctive word),
+tool use (phrase); +0.30 for spanning 3 topics; +0.18 for being
+3 days old.</span></pre>
+
+      <div class="card lead">
+        <p>The point is not the line in the browser. <strong>The same string goes out through MCP</strong>, so when the agent answers "what do I have on retrieval" it can also say why those and not the others.</p>
+        <p>A ranking you cannot interrogate is one you end up either trusting or ignoring, and neither is much use when you are deciding what to read.</p>
+      </div>
+
+      <p>The case worth printing is the one where nothing matched. Then it says <code>No topic matched. It ranks on recency alone.</code> A score on its own reads as a judgement about the paper. That sentence is the difference between a weak match and no match at all, and the number will not tell you which one you are looking at.</p>
+
+      <h2>Why a side panel and not a modal</h2>
+
+      <p>A modal says stop what you are doing and look at this. A side panel says here is more detail, your list is still where you left it. When you are working through four hundred results, that difference is the whole browsing experience.</p>
+
+      <p>So the paper detail is a 460px drawer: open one, read the abstract, look at its nearest neighbours, close it, and you are still on the same row. It is the pattern from Figma, VS Code and Linear, and the reason it works is that the primary view never goes away.</p>
+
+      <pre><span class="c">/* 460px drawer, bottom sheet on a phone */</span>
+.detail-panel {
+  <span class="k">position</span>: fixed; <span class="k">right</span>: 0; <span class="k">top</span>: 0; <span class="k">height</span>: 100vh;
+  <span class="k">width</span>: min(<span class="p">460px</span>, <span class="p">92vw</span>);
+  <span class="k">transform</span>: translateX(100%);
+}
+.detail-panel.open { <span class="k">transform</span>: translateX(0); }
+
+<span class="k">@media</span> (max-width: 720px) {
+  .detail-panel {
+    <span class="k">width</span>: 100%; <span class="k">height</span>: <span class="p">78vh</span>; <span class="k">bottom</span>: 0; <span class="k">top</span>: auto;
+    <span class="k">transform</span>: translateY(100%);
+  }
+  .detail-panel.open { <span class="k">transform</span>: translateY(0); }
+}</pre>
+
+      <p>Below 720px it becomes a bottom sheet instead, because a 460px drawer on a phone is a modal wearing a costume. The transition is inside a <code>prefers-reduced-motion</code> query, so if you have asked your system not to animate things, it simply appears.</p>
 
       <h2>Why TF-IDF instead of transformer embeddings</h2>
 
