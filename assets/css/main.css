@@ -542,6 +542,40 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
 }
 .origin .beat strong { color: var(--ink); font-weight: 600; }
 
+/* toolbox — the skills strip a recruiter or an ATS scans for */
+.toolbox {
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line-soft);
+  display: grid;
+  gap: 0.6rem;
+}
+.toolbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.7rem;
+  align-items: baseline;
+}
+.toolbox-row .cat {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  flex: 0 0 150px;
+}
+.toolbox-row .items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  flex: 1 1 auto;
+}
+.toolbox-row .chip { cursor: default; }
+@media (max-width: 640px) {
+  .toolbox-row { flex-direction: column; gap: 0.35rem; }
+  .toolbox-row .cat { flex: none; }
+}
+
 /* work sections */
 .work-section { padding: var(--s-7) 0 0; }
 

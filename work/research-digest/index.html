@@ -35,30 +35,63 @@
     .cs h2 { margin-top: 3.2rem; }
     .cs h3 { font-family: var(--font-display); font-size: 1.14rem; margin: 0 0 .6rem; }
 
-    /* pipeline */
-    .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
-      gap: 12px; margin: 2rem 0; }
-    .node { background: var(--bg-raised); border: 1px solid var(--line-soft);
-      border-radius: 10px; padding: 16px 18px; position: relative; cursor: help; }
-    .node .top { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
-    .node svg { width: 19px; height: 19px; color: var(--accent); flex: none; }
-    .node b { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em;
-      text-transform: uppercase; color: var(--accent); font-weight: 500; }
-    .node > span { font-size: .86rem; color: var(--ink-muted); }
-    .node .more { position: absolute; left: 12px; right: 12px; bottom: calc(100% + 8px);
-      background: var(--bg-inset); border: 1px solid var(--line-strong); border-radius: 8px;
-      padding: 11px 13px; font-size: .8rem; line-height: 1.55; color: var(--ink);
-      opacity: 0; visibility: hidden; transform: translateY(4px); z-index: 5;
-      box-shadow: 0 8px 24px rgba(1, 4, 9, .55); }
-    .node:hover .more, .node:focus-within .more { opacity: 1; visibility: visible;
-      transform: translateY(0); }
-    .node .more code { font-size: .92em; }
-    @media (prefers-reduced-motion: no-preference) {
-      .node .more { transition: opacity .15s ease, transform .15s ease; }
+    /* pipeline — data, ranked into intelligence, shown in an interface, exposed to an agent */
+    .pipeline { display: flex; align-items: stretch; gap: 0; margin: 2.2rem 0 1rem;
+      border: 1px solid var(--line-soft); border-radius: 12px; background: var(--bg-inset);
+      padding: 6px; }
+    .pl-node { flex: 1 1 0; display: flex; flex-direction: column; gap: 7px;
+      background: var(--bg-raised); border: 1px solid transparent; border-radius: 8px;
+      padding: 16px 14px; text-align: center; align-items: center; cursor: pointer; }
+    .pl-node .pl-icon { width: 26px; height: 26px; display: grid; place-items: center;
+      color: var(--accent); }
+    .pl-node.pl-data .pl-icon { color: var(--ok); }
+    .pl-node .pl-icon svg { width: 22px; height: 22px; }
+    .pl-node b { font-family: var(--font-display); font-size: 1rem; color: var(--ink);
+      font-weight: 600; }
+    .pl-node .pl-stat { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .02em;
+      color: var(--ink-muted); line-height: 1.4; }
+    .pl-node:hover, .pl-node:focus-visible, .pl-node.is-active {
+      border-color: var(--accent); background: var(--bg-inset); outline: none; }
+    .pl-node.pl-data:hover, .pl-node.pl-data:focus-visible, .pl-node.pl-data.is-active {
+      border-color: var(--ok); }
+    .pl-edge { flex: 0 0 auto; width: 64px; display: flex; align-items: center; justify-content: center;
+      position: relative; }
+    .pl-edge::before { content: ""; position: absolute; left: 6px; right: 6px; top: 50%;
+      height: 1px; background: var(--line-strong); }
+    .pl-edge span { position: relative; background: var(--bg-inset); padding: 0 6px;
+      font-family: var(--font-mono); font-size: .62rem; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--ink-muted); }
+    .pl-edge.is-active::before { background: var(--accent); }
+    .pl-edge.is-active span { color: var(--accent); }
+    .pl-detail { min-height: 2.6em; padding: 12px 16px; background: var(--bg-raised);
+      border: 1px solid var(--line-soft); border-left: 2px solid var(--accent); border-radius: 8px;
+      font-size: .86rem; line-height: 1.6; color: var(--ink-muted); margin: 0 0 2rem; }
+    .pl-detail code { font-size: .92em; }
+    @media (max-width: 700px) {
+      .pipeline { flex-direction: column; }
+      .pl-edge { width: auto; height: 28px; }
+      .pl-edge::before { left: 50%; right: auto; top: 6px; bottom: 6px; width: 1px; height: auto;
+        background: var(--line-strong); }
+      .pl-edge span { padding: 6px 0; }
     }
-    @media (max-width: 620px) {
-      .node .more { position: static; opacity: 1; visibility: visible; transform: none;
-        margin-top: 10px; box-shadow: none; }
+
+    /* eval results table */
+    .table-figure { margin: 2rem 0; }
+    .table-figure table { width: 100%; border-collapse: collapse;
+      background: var(--bg-raised); border: 1px solid var(--line-soft); border-radius: 10px;
+      overflow: hidden; }
+    .table-figure th, .table-figure td { padding: 11px 16px; text-align: left;
+      border-bottom: 1px solid var(--line-soft); font-size: .9rem; }
+    .table-figure thead th { font-family: var(--font-mono); font-size: .68rem;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted);
+      font-weight: 500; background: var(--bg-inset); line-height: 1.5; }
+    .table-figure td + td, .table-figure th + th { text-align: right;
+      font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .table-figure tbody tr:first-child td { color: var(--ink); }
+    .table-figure tbody tr:not(:first-child) td { color: var(--ink-muted); }
+    .table-figure tbody tr:last-child td { border-bottom: 0; }
+    @media (max-width: 560px) {
+      .table-figure th, .table-figure td { padding: 9px 10px; font-size: .82rem; }
     }
 
     /* screenshots */
@@ -106,7 +139,7 @@
   <div class="inner">
     <a class="wordmark" href="../../index.html">DN<span class="tick">_</span></a>
     <nav class="site-nav" aria-label="Site">
-      <a href="../../index.html#work" aria-current="page">Work</a>
+      <a href="../" aria-current="page">Work</a>
       <a href="../../writing/index.html">Writing</a>
       <a href="../../index.html#about">About</a>
       <a href="../../index.html#resume">R&eacute;sum&eacute;</a>
@@ -130,41 +163,36 @@
 
     <article class="article-body">
 
-      <div class="flow">
-        <div class="node" tabindex="0">
-          <div class="top">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><path d="M21 3v6h-6"/></svg>
-            <b>fetch</b>
-          </div>
-          <span>arXiv, by the categories you track</span>
-          <div class="more">Pulls the newest submissions in each category you list, three seconds apart because arXiv asks for that. Only papers you have not seen are added, so it is safe to run daily. Already have a library elsewhere? <code>research-digest import</code> loads it in one shot.</div>
+      <div class="pipeline" id="pipeline">
+        <div class="pl-node pl-data" data-node="data" tabindex="0" role="button" aria-describedby="pl-detail"
+             data-detail="Pulls the newest submissions in the categories you track, three seconds apart because arXiv asks for that. Only papers you have not seen are added, so it is safe to run daily. Already have a library elsewhere? &lt;code&gt;research-digest import&lt;/code&gt; loads it in one shot.">
+          <span class="pl-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><path d="M21 3v6h-6"/></svg></span>
+          <b>Data</b>
+          <span class="pl-stat">arXiv, by category</span>
         </div>
-        <div class="node" tabindex="0">
-          <div class="top">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
-            <b>rank</b>
-          </div>
-          <span>An explainable score, not a model</span>
-          <div class="more">A phrase match counts full, a distinctive word counts most of the way, and a word like &ldquo;learning&rdquo; that appears in every abstract counts for very little. Papers spanning several of your topics get a bump, recent ones get another. This is the thesis: no model decides the order, so a paper you expected but did not get is a question you can answer.</div>
+        <div class="pl-edge" data-edge="0"><span>Fetch</span></div>
+        <div class="pl-node" data-node="intel" tabindex="0" role="button" aria-describedby="pl-detail"
+             data-detail="A phrase match counts full, a distinctive word counts most of the way, and a word like &ldquo;learning&rdquo; that appears in every abstract counts for very little &mdash; no model decides the order, so a paper you expected but did not get is a question you can answer. TF-IDF and SVD turn each paper into 384 numbers offline, so &ldquo;find similar&rdquo; works too.">
+          <span class="pl-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="7" r="2.4"/><circle cx="18" cy="10" r="2.4"/><circle cx="10" cy="18" r="2.4"/><path d="M8.2 8.3 15.7 9.2M16.6 12.2 11.7 16"/></svg></span>
+          <b>Intelligence</b>
+          <span class="pl-stat">TF-IDF &middot; explainable score &middot; cosine similarity</span>
         </div>
-        <div class="node" tabindex="0">
-          <div class="top">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="7" r="2.4"/><circle cx="18" cy="10" r="2.4"/><circle cx="10" cy="18" r="2.4"/><path d="M8.2 8.3 15.7 9.2M16.6 12.2 11.7 16"/></svg>
-            <b>embed</b>
-          </div>
-          <span>TF-IDF and SVD, cosine similarity &middot; optional</span>
-          <div class="more">Turns each paper into 384 numbers so &ldquo;find similar&rdquo; works. Runs offline with no model download. Skip it and everything else still works.</div>
+        <div class="pl-edge" data-edge="1"><span>Embed</span></div>
+        <div class="pl-node" data-node="interface" tabindex="0" role="button" aria-describedby="pl-detail"
+             data-detail="Press / to search, j or the down arrow to move to the next result, k or up to go back. The detail panel opens in place, so you never lose where you were in the list.">
+          <span class="pl-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></span>
+          <b>Interface</b>
+          <span class="pl-stat">Side panel &middot; keyboard nav</span>
         </div>
-        <div class="node" tabindex="0">
-          <div class="top">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg>
-            <b>expose</b>
-          </div>
-          <span>MCP, 8 tools, over stdio</span>
-          <div class="more">The part your agent talks to. One JSON object per line in and out, no SDK, so Claude Code, Codex and Copilot CLI all connect with a couple of lines of config. The browser UI and your agent read this same layer &mdash; neither is privileged.</div>
+        <div class="pl-edge" data-edge="2"><span>Expose</span></div>
+        <div class="pl-node" data-node="agent" tabindex="0" role="button" aria-describedby="pl-detail"
+             data-detail="The part your agent talks to. One JSON object per line in and out, no SDK, so Claude Code, Codex and Copilot CLI all connect with a couple of lines of config. The browser UI and your agent read this same layer &mdash; neither is privileged.">
+          <span class="pl-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+          <b>Agent</b>
+          <span class="pl-stat">MCP &middot; 8 tools &middot; stdio</span>
         </div>
       </div>
-      <p style="font-family:var(--font-mono);font-size:.72rem;color:var(--ink-muted);margin:-1rem 0 0">hover any step for detail</p>
+      <p class="pl-detail" id="pl-detail">Hover or tab to a stage for detail.</p>
 
       <h2>Why MCP instead of a REST API</h2>
 
@@ -214,18 +242,14 @@ args = [<span class="s">"mcp"</span>]</pre>
 
       <h2>What it looks like</h2>
 
-      <div class="card">
-        <p>The screenshots below are from an earlier build of the interface — the current one leads every card with a plain sentence describing the paper before anything about how it scored, and folds the detail panel into a single request instead of two. Run it locally (below) to see the current version; a fresh set of screenshots is the next thing this page gets.</p>
-      </div>
-
       <figure>
-        <img src="../../assets/img/research-digest/search.jpg" alt="An earlier build of the Research Digest search view, showing score bars and matched-term chips on each result." loading="lazy" />
-        <figcaption><b>Search.</b> Every result says why it is there. The chips are the terms that matched, and a line underneath reads the ranking back in plain English, so a paper you expected but did not get is a question you can answer.</figcaption>
+        <img src="../../assets/img/research-digest/search.jpg" alt="The Research Digest search view. Each result card leads with a plain sentence describing what the paper did, above its concept tags." loading="lazy" />
+        <figcaption><b>Search.</b> Every card leads with what the paper actually did — pulled out of the abstract by looking for the sentence that announces the contribution, no model involved. The score used to lead instead, and the first version of this page showed a result whose entire description was <code>0.580 matched agent (distinctive word)&hellip; +0.16 for being 6 days old</code>. That is the derivation of a number standing in for the thing a reader needs. It is still one click away, and still exact.</figcaption>
       </figure>
 
       <figure>
-        <img src="../../assets/img/research-digest/similar.jpg" alt="An earlier build showing a paper expanded to its nearest neighbours by embedding similarity, each with a similarity score and a small gauge." loading="lazy" />
-        <figcaption><b>Find similar.</b> Open any paper and the nearest ones come with it — precomputed and prefetched on hover, so it reads as a browsing gesture rather than a search you have to commit to.</figcaption>
+        <img src="../../assets/img/research-digest/similar.jpg" alt="A paper opened in the detail panel, showing its full abstract and its nearest neighbours by embedding similarity, each with a similarity score and a small gauge." loading="lazy" />
+        <figcaption><b>Find similar.</b> Open any paper and the whole record comes with it — the full abstract and the nearest neighbours in a single request, prefetched on hover, so it reads as a browsing gesture rather than a search you have to commit to. The score sits at the bottom as <code>match 1.00 &middot; why?</code>, and it is the score the list you arrived from actually ranked by. It used to quietly show a different one.</figcaption>
       </figure>
 
       <figure>
@@ -248,6 +272,35 @@ tool use (phrase); +0.30 for spanning 3 topics; +0.18 for being
       </div>
 
       <p>The case worth printing is the one where nothing matched. Then it says <code>No topic matched. It ranks on recency alone.</code> A score on its own reads as a judgement about the paper. That sentence is the difference between a weak match and no match at all, and the number will not tell you which one you are looking at.</p>
+
+      <h2>Whether any of it works</h2>
+
+      <p>&ldquo;Explainable keyword scoring is good enough for a personal library&rdquo; is a claim, and claims want measuring. Two evals, deliberately built to fail in opposite directions.</p>
+
+      <p>The first mines 26 queries out of the library itself &mdash; any two-to-four word phrase appearing verbatim in 3 to 40 papers &mdash; and takes &ldquo;contains the exact phrase&rdquo; as ground truth. No judgement, no model, fixed seed, so it reproduces exactly. The second asks eight real questions, pools the top five from three rankers, strips every trace of which ranker produced what, and judges all 115 papers blind on a 0&ndash;3 scale against their full abstracts.</p>
+
+      <figure class="table-figure">
+        <table>
+          <thead><tr><th>Ranker</th><th>26 mined phrases<br />precision@5</th><th>8 judged queries<br />precision@5</th></tr></thead>
+          <tbody>
+            <tr><td><b>This ranker</b></td><td><b>0.708</b></td><td><b>0.80</b></td></tr>
+            <tr><td>Sort by date</td><td>0.008</td><td>0.23</td></tr>
+            <tr><td>Random</td><td>0.000</td><td>0.12</td></tr>
+          </tbody>
+        </table>
+        <figcaption>Better than the two baselines anyone would actually reach for. That is the whole of what these numbers establish.</figcaption>
+      </figure>
+
+      <div class="card lead">
+        <p><strong>The measurement caught a regression I had already shipped.</strong> The judged eval found one query, <code>chain of thought faithfulness</code>, scoring zero &mdash; because &ldquo;of&rdquo; was not on the list of words that count for less, so it scored as a <em>distinctive</em> word and matched nearly every paper. I added a stopword list and shipped it.</p>
+        <p>Nobody checked it against the other eval. It cost <strong>0.708 &rarr; 0.531</strong>. Filtering ran before the exact-phrase bonus was assembled, so &ldquo;chain of thought&rdquo; became the phrase &ldquo;chain thought&rdquo;, which appears in no paper, and every query with a function word inside it silently lost the bonus. All 11 affected phrases fell; none of the other 15 moved. Building the phrase from the raw query restores 0.708 with the stopword fix kept.</p>
+      </div>
+
+      <p>A fix motivated by one eval and never checked against the other is a coin flip, and this one landed wrong, in a build with a green test suite &mdash; because the tests encoded the bug that motivated the fix, and nothing encoded its cost.</p>
+
+      <p>The most useful result is the query that still scores zero. Of 1,376 papers, ten mention chain-of-thought and eighteen mention faithfulness; <b>zero mention both</b>. The one paper the judge rated relevant across the entire pool shares not a single word with the query &mdash; not &ldquo;chain&rdquo;, not &ldquo;thought&rdquo;, not &ldquo;faithful&rdquo;. A string matcher cannot reach it, which is exactly the failure this approach is supposed to have. Worth adding: the embedding store already built over this library does not reach it either, so &ldquo;just use embeddings&rdquo; is a hypothesis here, not an answer.</p>
+
+      <p>What none of this proves, stated plainly because it is the first thing I would ask: exact-phrase ground truth rewards a string matcher by construction, eight queries is not a benchmark, the judged numbers are one model&rsquo;s opinion rendered once, and there is no held-out set &mdash; every figure above comes from the data that motivated the fixes. The <a href="https://github.com/dneish2/research-digest-mcp/blob/main/docs/EVAL.md" rel="noopener">full write-up</a> leads with that list, and ships the harness and all 115 judgments so the numbers are checkable rather than quotable.</p>
 
       <h2>Why a side panel and not a modal</h2>
 
@@ -341,5 +394,41 @@ $ <span class="hl">research-digest config --add-topic</span> <span class="s">"wo
 <!-- /SITE-FOOTER -->
 
 <script src="../../assets/js/main.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  var pipeline = document.getElementById('pipeline');
+  if (!pipeline) return;
+  var nodes = Array.prototype.slice.call(pipeline.querySelectorAll('.pl-node'));
+  var edges = Array.prototype.slice.call(pipeline.querySelectorAll('.pl-edge'));
+  var detail = document.getElementById('pl-detail');
+  var defaultText = detail.textContent;
+
+  function activate(node) {
+    var i = nodes.indexOf(node);
+    nodes.forEach(function (n) { n.classList.toggle('is-active', n === node); });
+    edges.forEach(function (e, j) { e.classList.toggle('is-active', j === i - 1 || j === i); });
+    detail.innerHTML = node.getAttribute('data-detail');
+  }
+  function reset() {
+    nodes.forEach(function (n) { n.classList.remove('is-active'); });
+    edges.forEach(function (e) { e.classList.remove('is-active'); });
+    detail.textContent = defaultText;
+  }
+
+  nodes.forEach(function (node) {
+    node.addEventListener('mouseenter', function () { activate(node); });
+    node.addEventListener('focus', function () { activate(node); });
+  });
+  pipeline.addEventListener('mouseleave', function () {
+    if (!pipeline.contains(document.activeElement)) reset();
+  });
+  pipeline.addEventListener('focusout', function () {
+    setTimeout(function () {
+      if (!pipeline.contains(document.activeElement)) reset();
+    }, 0);
+  });
+})();
+</script>
 </body>
 </html>
