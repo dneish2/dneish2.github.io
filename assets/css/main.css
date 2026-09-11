@@ -24,7 +24,7 @@
 
   /* per-project accents (set --proj-accent on each showcase) */
   --c-finplatform: #E3A83B;
-  --c-passage:     #A34A58;
+  --c-passage:     #B86370;
   --c-prompting:   #8CA37E;
   --c-realestate:  #7D96B5;
 
@@ -794,8 +794,8 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
 .vg-sun { cursor: pointer; transition: transform 2.8s ease, fill 2.8s ease; }
 .vg-shimmer { opacity: 0.3; transition: stroke 2.8s ease; }
 .beach.sunset .vg-sky { opacity: 0.35; }
-.beach.sunset .vg-sun { transform: translateY(44px); fill: #A34A58; animation: none; }
-.beach.sunset .vg-shimmer { stroke: #A34A58; }
+.beach.sunset .vg-sun { transform: translateY(44px); fill: #B86370; animation: none; }
+.beach.sunset .vg-shimmer { stroke: #B86370; }
 
 /* hover — the laptop wakes up and a thought appears */
 .vg-bubble {
