@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A 4B model beat a 27B — David Neish</title>
+  <title>How a 4B model beat a 27B &mdash; David Neish</title>
   <meta name="description" content="Three things building a translation tool measured: the smallest model won, six of seven ignored an explicit instruction, and a reasoning model spent 8,786 characters producing nothing." />
   <link rel="canonical" href="https://dneish2.github.io/writing/passage-measured.html" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="A 4B model beat a 27B" />
+  <meta property="og:title" content="How a 4B model beat a 27B" />
   <meta property="og:description" content="The best model for the job was the smallest. Picking it beat every prompt I wrote." />
   <meta name="theme-color" content="#0E0D0B" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23E3A83B' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23E3A83B'/%3E%3C/svg%3E" />
@@ -113,8 +113,8 @@
   <div class="container arch">
     <header class="article-head">
       <span class="kicker">Engineering notes &middot; <a href="../index.html#passage">Passage</a></span>
-      <h1>A 4B model beat a 27B</h1>
-      <p class="dek">Three things building a translation tool measured, each of which changed the code. The biggest one: the best model for the job was the smallest, and picking it was worth more than any amount of prompting.</p>
+      <h1>How a 4B model beat a 27B</h1>
+      <p class="dek">Models are sized in parameters. A 4B has four billion of them and fits in 3.3 GB. A 27B has twenty-seven billion and wants 17.4 GB, which is more than most laptops will hand over. I tested seven on the same translation work expecting the big one to win, and it came sixth. Here is what I measured, plus two other things that surprised me enough to change the code.</p>
       <div class="byline">
         <span>David Neish</span>
       </div>
@@ -126,7 +126,9 @@
 
       <h2>1. The smallest model won</h2>
 
-      <p>I ran the local candidates over the same translations and scored how often each agreed with the reference. The winner was the smallest model in the test, and the model it beat most clearly was the 27B from its own family: five times the size, worse agreement, and nearly twice the latency.</p>
+      <p>Every model got the same sentences to translate, and I already had a known-good translation of each one. The score below is how often a model's answer lined up with that known-good version. Higher is better, 1.0 would be perfect agreement, and nothing real gets close to that.</p>
+
+      <p>The smallest model in the test won. The one it beat most clearly was the 27B from its own family: five times the size, worse agreement, and nearly twice as slow to answer.</p>
 
       <div class="chart" role="img" aria-label="Agreement scores. translategemma 4B 0.788 at 3.3 GB; gemma3 12B 0.787; translategemma 12B 0.779; qwen2.5 7B 0.763; gemma4 0.741; translategemma 27B 0.734 at 17.4 GB; gemma3 1B 0.668.">
         <div class="crow">

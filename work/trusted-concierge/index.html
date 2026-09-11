@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trusted Concierge &mdash; David Neish</title>
+  <meta name="description" content="A home search assistant where the conversation turns into criteria you can see and edit, and nothing reaches a realtor until you approve exactly what gets sent. Six sessions, the numbers, and the one that stayed stubborn." />
+  <link rel="canonical" href="https://dneish2.github.io/work/trusted-concierge/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Trusted Concierge — trust is a process, not a screen" />
+  <meta property="og:description" content="Effort came down. Comfort sharing data stopped at 3 out of 5. That number is the finding." />
+  <meta name="theme-color" content="#0d1117" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%2358a6ff' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%2358a6ff'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../../assets/css/main.css" />
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    :root {
+      --bg:          #0d1117;
+      --bg-raised:   #161b22;
+      --bg-inset:    #010409;
+      --ink:         #e6edf3;
+      --ink-muted:   #8b949e;
+      --line:        rgba(240, 246, 252, 0.24);
+      --line-soft:   rgba(240, 246, 252, 0.12);
+      --line-strong: rgba(240, 246, 252, 0.36);
+      --accent:      #58a6ff;
+      --accent-hi:   #79c0ff;
+      --ok:          #3fb950;
+      --warn:        #f0883e;
+    }
+
+    .tc { max-width: 900px; }
+    .tc .article-body { max-width: none; }
+    .tc .article-body > p, .tc .article-head .dek { max-width: var(--measure); }
+    .tc h2 { margin-top: 3.1rem; }
+    .tc h3 { font-family: var(--font-display); font-size: 1.1rem; margin: 0 0 .5rem; }
+
+    /* the two bad options */
+    .beats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 2rem 0; }
+    .beat { background: var(--bg-raised); border: 1px solid var(--line-soft);
+      border-radius: 10px; padding: 20px 22px; border-left: 2px solid var(--warn); }
+    .beat .tag { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em;
+      text-transform: uppercase; margin-bottom: 9px; display: block; color: var(--warn); }
+    .beat p { margin: 0; font-size: .94rem; color: var(--ink-muted); }
+    @media (max-width: 620px) { .beats { grid-template-columns: 1fr; } }
+
+    /* screens */
+    figure { margin: 2.2rem 0; }
+    figure img { width: 100%; height: auto; display: block; border-radius: 10px;
+      border: 1px solid var(--line-soft); }
+    figcaption { font-size: .86rem; color: var(--ink-muted); margin-top: .85rem;
+      line-height: 1.62; max-width: 68ch; }
+    figcaption b { color: var(--ink); font-weight: 600; }
+
+    /* the numbers */
+    .ratings { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft);
+      border-radius: 10px; overflow: hidden; margin: 2rem 0; }
+    .ratings div { background: var(--bg-raised); padding: 18px 20px; }
+    .ratings .n { font-family: var(--font-mono); font-size: 1.6rem; line-height: 1.1;
+      font-variant-numeric: tabular-nums; color: var(--accent); }
+    .ratings .n.soft { color: var(--warn); }
+    .ratings .l { font-size: .84rem; color: var(--ink-muted); margin-top: 6px; }
+
+    /* findings */
+    .rq { margin: 1.6rem 0; border-top: 1px solid var(--line-soft); }
+    .rq > div { display: grid; grid-template-columns: 132px 1fr; gap: 20px;
+      padding: 15px 2px; border-bottom: 1px solid var(--line-soft); font-size: .93rem; }
+    .rq b { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--ink-muted); font-weight: 500; }
+    .rq span { color: var(--ink-muted); }
+    .rq span em { color: var(--ink); font-style: normal; }
+    @media (max-width: 620px) { .rq > div { grid-template-columns: 1fr; gap: 5px; } }
+
+    .card { background: var(--bg-raised); border: 1px solid var(--line-soft);
+      border-radius: 10px; padding: 20px 24px; margin: 1.6rem 0; }
+    .card.lead { border-left: 2px solid var(--accent); }
+    .card p { margin: 0 0 .8rem; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .cta { display: inline-block; font-family: var(--font-mono); font-size: .8rem;
+      border: 1px solid var(--accent); color: var(--accent); border-radius: 8px;
+      padding: 10px 18px; text-decoration: none; margin: .4rem 10px .4rem 0; }
+    .cta:hover { background: var(--accent); color: var(--bg); }
+    .cta.ghost { border-color: var(--line); color: var(--ink-muted); }
+    .cta.ghost:hover { background: none; border-color: var(--ink-muted); color: var(--ink); }
+
+    .repo { font-family: var(--font-mono); font-size: .78rem; color: var(--ink-muted);
+      background: var(--bg-raised); border: 1px solid var(--line-soft); border-radius: 8px;
+      padding: .75rem 1.1rem; margin: 1.5rem 0 0; line-height: 1.8; }
+  </style>
+</head>
+<body>
+
+<!-- SITE-HEADER v1 -->
+<header class="site-header">
+  <div class="inner">
+    <a class="wordmark" href="../../index.html">DN<span class="tick">_</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Work</a>
+      <a href="../../writing/index.html">Writing</a>
+      <a href="../../index.html#about">About</a>
+      <a href="../../index.html#resume">R&eacute;sum&eacute;</a>
+      <a class="nav-cta" href="mailto:david.neishm@gmail.com">Email</a>
+    </nav>
+  </div>
+</header>
+<!-- /SITE-HEADER -->
+
+<main>
+  <div class="container tc">
+    <header class="article-head">
+      <span class="kicker">Case study &middot; Trusted Concierge</span>
+      <h1>Trust is a process, not a screen</h1>
+      <p class="dek">A home search assistant where the conversation becomes criteria you can see and edit, and nothing reaches a realtor until you approve exactly what gets sent. Six people worked through it. Effort came down. Comfort sharing their details stopped at 3 out of 5, and that number turned out to be the finding.</p>
+      <div class="byline"><span>David Neish</span></div>
+      <p class="repo">
+        Conversational UI, Indiana University &middot; <a href="demo/index.html">coded walkthrough</a> &middot;
+        <a href="https://www.figma.com/design/G9Y984pPGvUQavoe4bmzJU/Real-Estate-Search-Support?node-id=53-2" rel="noopener">Figma file</a> &middot; 8 screens, 6 sessions
+      </p>
+    </header>
+
+    <article class="article-body">
+
+      <p>Renting or buying is one of the largest financial decisions a person makes in a year, and it is the one they are least equipped to specify up front. You know you want somewhere walkable, somewhere the dog is allowed, somewhere you can be in by the end of next month. You do not know yet which of those is the one you would actually give up.</p>
+
+      <p>Every housing site asks you to know anyway. Pick a price band, tick the boxes, sort the list. That is a filter form pretending to be a conversation, and you end up with fourteen tabs open because nothing helps you reason across the listings.</p>
+
+      <p>Putting a chatbot on top does not fix it. I tested that too.</p>
+
+      <div class="beats">
+        <div class="beat">
+          <span class="tag">Too rigid</span>
+          <p>Filters demand exact constraints before you have enough context to set them well. You are translating a fuzzy goal into dropdowns, badly, on turn one.</p>
+        </div>
+        <div class="beat">
+          <span class="tag">Too opaque</span>
+          <p>Pure chat feels natural for a minute. Then you need to correct something, and you are retyping your whole search in prose to move one number.</p>
+        </div>
+      </div>
+
+      <p>So the design question was not "chat or filters." It was: which parts of this belong in language, and which parts belong in something you can point at and change?</p>
+
+      <h2>What I built</h2>
+
+      <p>Language is good at fuzzy goals, follow-up questions, and referring to a house as "the one with the balcony." Structure is better at editing a budget, picking a time slot, and approving what leaves the building. The prototype uses each where it is strong, and it shows you the seam.</p>
+
+      <figure>
+        <img src="../../assets/img/trusted-concierge/search.jpg" alt="The Trusted Concierge start screen: a left panel of current criteria built up from the chat, a conversation in the middle where the assistant asks about budget, pets and parking, and a right panel showing the draft recap of what it is about to send into search." loading="lazy" />
+        <figcaption><b>The conversation becomes state you can see.</b> The assistant asks a few bounded questions instead of one open-ended prompt, and every answer lands in the left panel as a criterion. The right panel is the part I care about most: a draft recap headed "what the assistant is sending into search," with the gaps named out loud. Budget still needs to be pinned to a range. It is suggesting walkable neighbourhoods, not one exact zone. You can read the system's interpretation of you before it acts on it.</figcaption>
+      </figure>
+
+      <figure>
+        <img src="../../assets/img/trusted-concierge/repair.jpg" alt="The repair screen: the recap open in edit mode with budget range, move-in window and parking importance as editable controls, and a panel headed what stays the same listing the parts of the search the correction does not touch." loading="lazy" />
+        <figcaption><b>Fixing it costs one click, not a paragraph.</b> The recap is editable rather than frozen, so "actually parking is not required and I am more like 2,200 to 2,600" is two controls, not a retyped search. The panel on the right is the detail I would defend hardest: <b>what stays the same.</b> When you change one thing, the system tells you what it did not touch. Correcting a system is frightening in proportion to how much of it you think you might have broken.</figcaption>
+      </figure>
+
+      <figure>
+        <img src="../../assets/img/trusted-concierge/consent.jpg" alt="The contact preview screen: the assigned realtor marked as a verified partner, a note saying nothing reaches her until the user approves, contact method options, and two columns headed will be shared and still private." loading="lazy" />
+        <figcaption><b>The handoff is the hard part, so it gets its own screen.</b> You say "request a tour for the one with the balcony," it resolves that to the listing, and then it stops. Two columns: <b>will be shared</b> and <b>still private</b>. Your name and phone and the one listing go. The other shortlist homes and the full chat transcript do not. The draft message is editable before you approve it. Nothing reaches Maya until you press the button, and the screen says so in those words.</figcaption>
+      </figure>
+
+      <h2>What six sessions actually said</h2>
+
+      <p>Moderated think-aloud walkthroughs, about 45 minutes each, six participants aged 27 to 46 with a mix of renting and buying experience. Wizard of Oz, because there is no listing feed behind it. I was testing whether the interaction model reads as clear and trustworthy, not whether the recommendations are any good. I asked three questions.</p>
+
+      <div class="rq">
+        <div><b>R1 &middot; clarification</b><span>Do bounded clarifying questions reduce ambiguity without wearing the user out? <em>Yes, when they stayed concrete.</em></span></div>
+        <div><b>R2 &middot; repair</b><span>Can correction stay cheap when the input keeps changing? <em>This was the strongest part. Five of six preferred editing the recap to retyping.</em></span></div>
+        <div><b>R3 &middot; trust</b><span>Does an explicit preview before contacting a realtor increase comfort? <em>It increased control. It did not finish the job.</em></span></div>
+      </div>
+
+      <div class="ratings">
+        <div><div class="n">2.0 <span style="font-size:.9rem;color:var(--ink-muted)">/ 5</span></div><div class="l">Task effort, where 1 is easiest. Low, and it matched what people said out loud about repair.</div></div>
+        <div><div class="n soft">3.0 <span style="font-size:.9rem;color:var(--ink-muted)">/ 5</span></div><div class="l">Comfort sharing data. Cautious but not confident, after a screen built specifically to fix that.</div></div>
+        <div><div class="n">6 <span style="font-size:.9rem;color:var(--ink-muted)">/ 6</span></div><div class="l">Understood the value of the preview step. Several still wanted more before they would trust it.</div></div>
+      </div>
+
+      <h3>The number I did not like</h3>
+
+      <div class="card lead">
+        <p>I built the consent preview to solve the discomfort. Then comfort came back at 3 out of 5, which is the polite middle of the scale. It would have been easy to write that up as a win, because everyone praised the screen.</p>
+        <p>What they were telling me is that <strong>transparency is necessary and it is not sufficient.</strong> Showing someone exactly what you will send answers "what is happening." It does not answer "who is this person and why them." The follow-ups were consistent: is this realtor verified, why was she assigned to me, where did this listing detail come from, how do I know you are not sending more than you are showing me.</p>
+        <p>That is a different design problem. It is not disclosure, it is legitimacy, and one screen cannot carry it. Trust is a process, not a screen, and the reason I can say that is that I built the screen and measured what it left behind.</p>
+      </div>
+
+      <p>The other finding that changed my mind: people did not want abstract reasons. Four of six asked for consequences in plain housing terms. "This one fits better" persuaded nobody. "Closer to groceries, worse parking, about 200 over your range" persuaded everybody. Explanation has to live in the domain the user is actually standing in, not in the model's vocabulary.</p>
+
+      <h2>What it would take to be real</h2>
+
+      <p>The Figma prototype proves the interaction. It proves nothing about the data, because there is no data. So the next step was to rebuild the flow as an actual interface and see which parts survive contact with code.</p>
+
+      <p><a class="cta" href="demo/index.html">Open the coded walkthrough &rarr;</a><a class="cta ghost" href="https://www.figma.com/design/G9Y984pPGvUQavoe4bmzJU/Real-Estate-Search-Support?node-id=53-2" rel="noopener">See the Figma file</a></p>
+
+      <p>That version runs on Austin sample data, and the honest gap is the same one the report ended on: it needs a real listing feed. MLS access is the blocker, and it is a business problem rather than an engineering one. Until then the consent screen is telling the truth about a house that does not exist, which is a fine way to test an interaction and a poor way to ship a product.</p>
+
+      <p>The same flow is what <a href="../deal-lens/index.html">Deal Lens</a> applies to St. Louis tax-sale property, where the stakes are higher and the data is public. Different buyer, same three moves: show the interpretation, make the correction cheap, and stop before you act on someone's behalf.</p>
+
+      <h2>Why I keep coming back to this one</h2>
+
+      <p>The pattern is not really about housing. Any time software is about to do something on your behalf and money is involved, the same three questions show up, and almost nothing in the market answers them at the interface: what does it think I asked for, how do I fix it when it is wrong, and what exactly is about to leave the building with my name on it.</p>
+
+      <p>Payments have spent two years solving the first half of that, at the protocol layer, in the plumbing. The half that a person has to look at and press a button on is still mostly empty. This project is the closest thing I have to a study of that half, and it came out of a housing search.</p>
+
+      <nav class="article-nav">
+        <a href="../index.html">&larr; All case studies</a>
+        <a href="../deal-lens/index.html">Deal Lens &rarr;</a>
+      </nav>
+    </article>
+  </div>
+</main>
+
+<!-- SITE-FOOTER v1 -->
+<footer class="site-footer">
+  <div class="container">
+    <p class="signoff">If you&rsquo;re building decision systems, let&rsquo;s talk.</p>
+    <div class="links">
+      <a href="mailto:david.neishm@gmail.com">david.neishm@gmail.com</a>
+      <a href="https://github.com/dneish2" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/david-neish-298b1a16b" rel="noopener">LinkedIn</a>
+      <a href="../../assets/resume/david-neish-resume.pdf" target="_blank" rel="noopener">R&eacute;sum&eacute;</a>
+    </div>
+    <p class="colophon">&copy; <span data-year>2026</span> David Neish &middot; St. Louis &middot; Plain HTML.</p>
+  </div>
+</footer>
+<!-- /SITE-FOOTER -->
+
+<script src="../../assets/js/main.js" defer></script>
+</body>
+</html>
