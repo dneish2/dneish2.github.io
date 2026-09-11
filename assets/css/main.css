@@ -132,8 +132,7 @@ img { max-width: 100%; height: auto; display: block; }
 .kicker {
   font-family: var(--font-mono);
   font-size: var(--text-micro);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
   color: var(--ink-muted);
   display: block;
   margin-bottom: var(--s-2);
@@ -360,7 +359,7 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   color: var(--ink-muted);
   margin: var(--s-3) 0;
 }
-.stack-line::before { content: "STACK — "; color: var(--proj-accent, var(--accent)); }
+.stack-line::before { content: "Built with "; color: var(--proj-accent, var(--accent)); }
 
 /* CTA row */
 .cta-row {
