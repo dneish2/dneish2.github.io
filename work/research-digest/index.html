@@ -267,24 +267,24 @@ tool use (phrase); +0.30 for spanning 3 topics; +0.18 for being
 
       <figure class="table-figure">
         <table>
-          <thead><tr><th>Ranker</th><th>26 mined phrases<br />precision@5</th><th>8 judged queries<br />precision@5</th></tr></thead>
+          <thead><tr><th>Ranker</th><th>26 pinned phrases<br />precision@5</th><th>8 judged queries<br />precision@5</th></tr></thead>
           <tbody>
-            <tr><td><b>This ranker</b></td><td><b>0.708</b></td><td><b>0.80</b></td></tr>
-            <tr><td>Sort by date</td><td>0.008</td><td>0.23</td></tr>
+            <tr><td><b>This ranker</b></td><td><b>0.769</b></td><td><b>0.80</b></td></tr>
+            <tr><td>Sort by date</td><td>0.031</td><td>0.23</td></tr>
             <tr><td>Random</td><td>0.000</td><td>0.12</td></tr>
           </tbody>
         </table>
-        <figcaption>Better than the two baselines anyone would actually reach for. That is the whole of what these numbers establish.</figcaption>
+        <figcaption>Better than the two baselines anyone would actually reach for. That is the whole of what these numbers establish. The left column runs in CI on every push, against a frozen corpus committed to the repository.</figcaption>
       </figure>
 
       <div class="card lead">
         <p><strong>The measurement caught a regression I had already shipped.</strong> The judged eval found one query, <code>chain of thought faithfulness</code>, scoring zero &mdash; because &ldquo;of&rdquo; was not on the list of words that count for less, so it scored as a <em>distinctive</em> word and matched nearly every paper. I added a stopword list and shipped it.</p>
-        <p>Nobody checked it against the other eval. It cost <strong>0.708 &rarr; 0.531</strong>. Filtering ran before the exact-phrase bonus was assembled, so &ldquo;chain of thought&rdquo; became the phrase &ldquo;chain thought&rdquo;, which appears in no paper, and every query with a function word inside it silently lost the bonus. All 11 affected phrases fell; none of the other 15 moved. Building the phrase from the raw query restores 0.708 with the stopword fix kept.</p>
+        <p>Nobody checked it against the other eval. It cost <strong>0.708 &rarr; 0.531</strong> &mdash; those two figures are on the phrase set in use at the time, which is why they sit below the 0.769 above. Filtering ran before the exact-phrase bonus was assembled, so &ldquo;chain of thought&rdquo; became the phrase &ldquo;chain thought&rdquo;, which appears in no paper, and every query with a function word inside it silently lost the bonus. All 11 affected phrases fell; none of the other 15 moved. Building the phrase from the raw query restores 0.708 with the stopword fix kept.</p>
       </div>
 
       <p>A fix motivated by one eval and never checked against the other is a coin flip, and this one landed wrong, in a build with a green test suite &mdash; because the tests encoded the bug that motivated the fix, and nothing encoded its cost.</p>
 
-      <p>The most useful result is the query that still scores zero. Of 1,376 papers, ten mention chain-of-thought and eighteen mention faithfulness; <b>zero mention both</b>. The one paper the judge rated relevant across the entire pool shares not a single word with the query &mdash; not &ldquo;chain&rdquo;, not &ldquo;thought&rdquo;, not &ldquo;faithful&rdquo;. A string matcher cannot reach it, which is exactly the failure this approach is supposed to have. Worth adding: the embedding store already built over this library does not reach it either, so &ldquo;just use embeddings&rdquo; is a hypothesis here, not an answer.</p>
+      <p>The most useful result is the query that still scores zero. Of 1,373 papers, ten mention chain-of-thought and eighteen mention faithfulness; <b>zero mention both</b>. The one paper the judge rated relevant across the entire pool shares not a single word with the query &mdash; not &ldquo;chain&rdquo;, not &ldquo;thought&rdquo;, not &ldquo;faithful&rdquo;. A string matcher cannot reach it, which is exactly the failure this approach is supposed to have. Worth adding: the embedding store already built over this library does not reach it either, so &ldquo;just use embeddings&rdquo; is a hypothesis here, not an answer.</p>
 
       <p>What none of this proves, stated plainly because it is the first thing I would ask: exact-phrase ground truth rewards a string matcher by construction, eight queries is not a benchmark, the judged numbers are one model&rsquo;s opinion rendered once, and there is no held-out set &mdash; every figure above comes from the data that motivated the fixes. The <a href="https://github.com/dneish2/research-digest-mcp/blob/main/docs/EVAL.md" rel="noopener">full write-up</a> leads with that list, and ships the harness and all 115 judgments so the numbers are checkable rather than quotable.</p>
 
