@@ -508,7 +508,7 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
 }
 .origin-grid {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: minmax(300px, 400px) 1fr;
   gap: var(--s-5);
   align-items: center;
 }
@@ -533,6 +533,73 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.65s cubic-bezier(0.2, 0.6, 0.2, 1), filter 0.5s ease;
+}
+
+/* hover: the decision graph from the hero, firing across the sculpture behind him.
+   Edges light in sequence, then the chosen node holds. */
+.portrait .synapse {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.portrait .synapse line {
+  stroke: var(--accent);
+  stroke-width: 0.5;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.portrait .synapse circle {
+  fill: var(--accent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.portrait .frame { transition: border-color 0.4s ease, box-shadow 0.5s ease; }
+.portrait:hover .frame,
+.portrait:focus-within .frame {
+  border-top-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(227, 168, 59, 0.25), 0 18px 50px -28px rgba(227, 168, 59, 0.55);
+}
+.portrait:hover .frame img,
+.portrait:focus-within .frame img { transform: scale(1.035); filter: saturate(1.06); }
+.portrait:hover .synapse line,
+.portrait:focus-within .synapse line { opacity: 0.6; }
+.portrait:hover .synapse circle,
+.portrait:focus-within .synapse circle { opacity: 0.92; }
+.portrait .synapse line:nth-child(1)  { transition-delay: 0.05s; }
+.portrait .synapse line:nth-child(2)  { transition-delay: 0.11s; }
+.portrait .synapse line:nth-child(3)  { transition-delay: 0.17s; }
+.portrait .synapse line:nth-child(4)  { transition-delay: 0.21s; }
+.portrait .synapse line:nth-child(5)  { transition-delay: 0.25s; }
+.portrait .synapse line:nth-child(6)  { transition-delay: 0.29s; }
+.portrait .synapse line:nth-child(7)  { transition-delay: 0.35s; }
+.portrait .synapse line:nth-child(8)  { transition-delay: 0.39s; }
+.portrait .synapse line:nth-child(9)  { transition-delay: 0.43s; }
+.portrait .synapse line:nth-child(10) { transition-delay: 0.47s; }
+.portrait .synapse circle:nth-child(1) { transition-delay: 0.02s; }
+.portrait .synapse circle:nth-child(2) { transition-delay: 0.14s; }
+.portrait .synapse circle:nth-child(3) { transition-delay: 0.2s; }
+.portrait .synapse circle:nth-child(4) { transition-delay: 0.26s; }
+.portrait .synapse circle:nth-child(5) { transition-delay: 0.3s; }
+.portrait .synapse circle:nth-child(6) { transition-delay: 0.34s; }
+.portrait .synapse circle:nth-child(7) { transition-delay: 0.52s; }
+.portrait .synapse circle:nth-child(8) { transition-delay: 0.44s; }
+.portrait:hover .synapse circle:nth-child(7),
+.portrait:focus-within .synapse circle:nth-child(7) {
+  animation: pick 1.9s 0.55s ease-in-out infinite;
+}
+@keyframes pick {
+  0%, 100% { opacity: 0.92; }
+  50%      { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portrait .frame img { transition: none; }
+  .portrait:hover .frame img, .portrait:focus-within .frame img { transform: none; }
+  .portrait .synapse line, .portrait .synapse circle { transition: none; }
+  .portrait:hover .synapse circle:nth-child(7),
+  .portrait:focus-within .synapse circle:nth-child(7) { animation: none; }
 }
 .portrait .frame.placeholder::before {
   content: "DN";
@@ -1007,14 +1074,14 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
 }
 
 @media (max-width: 860px) and (min-width: 641px) {
-  .origin-grid { grid-template-columns: 220px 1fr; gap: var(--s-4); }
+  .origin-grid { grid-template-columns: minmax(240px, 300px) 1fr; gap: var(--s-4); }
   .origin .beats { grid-template-columns: 1fr; gap: var(--s-3); }
 }
 
 @media (max-width: 640px) {
   .hero { min-height: 60vh; padding-top: var(--s-6); }
   .origin-grid { grid-template-columns: 1fr; gap: var(--s-4); }
-  .portrait { max-width: 260px; margin: 0 auto; width: 100%; }
+  .portrait { max-width: 330px; margin: 0 auto; width: 100%; }
   .origin .beats { grid-template-columns: 1fr; }
   .origin .beats { grid-template-columns: 1fr; gap: var(--s-3); }
   .writing-row { grid-template-columns: 1fr; gap: 0.5rem; }
@@ -1025,3 +1092,24 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   .site-nav a.nav-cta { padding: 0.3rem 0.6rem; }
   .proof-row { grid-template-columns: 1fr 1fr; }
 }
+
+/* skill row on a case study — the same vocabulary the /work filter uses, so a
+   tag here is a link back to every other study that shares it. */
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0.9rem 0 0;
+}
+.skills a {
+  font-family: var(--font-mono);
+  font-size: 0.655rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-muted);
+  border: 1px solid var(--line-soft);
+  border-radius: 99px;
+  padding: 3px 10px;
+  text-decoration: none;
+}
+.skills a:hover { color: var(--accent); border-color: var(--accent); }
+.skills a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

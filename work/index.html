@@ -42,10 +42,23 @@
     .hub-head .line { color: var(--ink-muted); font-size: 1.08rem; max-width: 58ch;
       margin: 1rem 0 0; line-height: 1.65; }
 
-    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.7rem; }
-    .pill { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .04em;
-      padding: 4px 11px; border-radius: 99px; border: 1px solid var(--line-soft);
-      color: var(--ink-muted); background: var(--bg-raised); }
+    /* skill filter. The bar lists every skill that covers two or more studies;
+       a card carries all of its tags either way. Selecting one narrows the grid
+       and shows the one line that says what that skill meant on that project. */
+    .filterbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.7rem; }
+    .fb { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .04em;
+      padding: 5px 12px; border-radius: 99px; border: 1px solid var(--line-soft);
+      color: var(--ink-muted); background: var(--bg-raised); cursor: pointer;
+      display: inline-flex; align-items: baseline; gap: 7px;
+      transition: border-color .15s ease, color .15s ease; }
+    .fb:hover { border-color: var(--line-strong); color: var(--ink); }
+    .fb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .fb .n { font-size: .64rem; opacity: .65; font-variant-numeric: tabular-nums; }
+    .fb[aria-pressed="true"] { border-color: var(--accent); color: var(--accent);
+      background: var(--bg-inset); }
+    .filter-status { font-family: var(--font-mono); font-size: .71rem; letter-spacing: .04em;
+      color: var(--ink-muted); margin: 1.1rem 0 0; }
+    html:not(.js) .filterbar, html:not(.js) .filter-status { display: none; }
 
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
       gap: 16px; padding-bottom: 4.5rem; }
@@ -56,6 +69,7 @@
       position: relative; overflow: hidden; }
     .card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 2px;
       background: var(--accent); opacity: 0; transition: opacity .18s ease; }
+    .card[hidden], .card .why[hidden] { display: none; }
     a.card:hover { border-color: var(--line-strong); }
     a.card:hover::before { opacity: 1; }
     a.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -65,9 +79,14 @@
     .card h2 { font-family: var(--font-display); font-size: 1.22rem; line-height: 1.3;
       margin: 0; color: var(--ink); }
     .card p { margin: 0; font-size: .92rem; color: var(--ink-muted); line-height: 1.6; }
-    .card .stats { font-family: var(--font-mono); font-size: .73rem; color: var(--ink-muted);
-      border-top: 1px solid var(--line-soft); padding-top: 10px; margin-top: auto;
-      line-height: 1.7; }
+    .card .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto;
+      border-top: 1px solid var(--line-soft); padding-top: 11px; }
+    .card .tag { font-family: var(--font-mono); font-size: .655rem; letter-spacing: .03em;
+      color: var(--ink-muted); border: 1px solid var(--line-soft); border-radius: 99px;
+      padding: 3px 9px; }
+    .card .tag.on { color: var(--accent); border-color: var(--accent); }
+    .card .why { margin: 11px 0 0; font-size: .85rem; line-height: 1.6; color: var(--ink);
+      border-left: 2px solid var(--accent); padding-left: 12px; }
     .card .go { font-family: var(--font-mono); font-size: .74rem; color: var(--accent); }
 
     @media (prefers-reduced-motion: no-preference) {
@@ -101,92 +120,122 @@
       <span class="kicker">Case studies</span>
       <h1>I design how humans interact with intelligent systems</h1>
       <p class="line">Tools I built and use daily, written up so you can run them yourself. Each one lists what it does, what it costs, and how to get it going.</p>
-      <div class="pills">
-        <span class="pill">MCP</span>
-        <span class="pill">Embeddings</span>
-        <span class="pill">LLM routing</span>
-        <span class="pill">Explainable ranking</span>
-        <span class="pill">Distributed systems</span>
-        <span class="pill">HCI</span>
-        <span class="pill">Agentic systems</span>
+      <div class="filterbar" id="filterbar" role="group" aria-label="Filter case studies by skill">
+        <button type="button" class="fb" data-skill="all" aria-pressed="true">All<span class="n">8</span></button>
+        <button type="button" class="fb" data-skill="evaluation" aria-pressed="false">Evaluation &amp; measurement<span class="n">4</span></button>
+        <button type="button" class="fb" data-skill="systems-architecture" aria-pressed="false">Systems architecture<span class="n">4</span></button>
+        <button type="button" class="fb" data-skill="multimodal" aria-pressed="false">Multimodal AI<span class="n">3</span></button>
+        <button type="button" class="fb" data-skill="data-pipelines" aria-pressed="false">Data pipelines<span class="n">2</span></button>
+        <button type="button" class="fb" data-skill="interaction-design" aria-pressed="false">Interaction design<span class="n">2</span></button>
+        <button type="button" class="fb" data-skill="llm-routing" aria-pressed="false">LLM routing &amp; cost<span class="n">2</span></button>
+        <button type="button" class="fb" data-skill="retrieval" aria-pressed="false">Retrieval &amp; ranking<span class="n">2</span></button>
+        <button type="button" class="fb" data-skill="user-research" aria-pressed="false">User research<span class="n">2</span></button>
       </div>
+      <p class="filter-status" id="filter-status" role="status"></p>
     </header>
 
     <div class="grid">
 
-      <a class="card" href="price-of-a-question/index.html">
+      <a class="card" data-skills="llm-routing evaluation systems-architecture" data-note-llm-routing="Five tiers, each priced per call, and a simulator that shows where a question lands before you pay for it." data-note-evaluation="Measured costs and estimates are marked as different things, so the figures can be checked rather than quoted." data-note-systems-architecture="One desk served by five models, with the routing rule written down instead of implied." href="price-of-a-question/index.html">
         <span class="kind">Interactive</span>
         <h2>The Price of a Question</h2>
         <p>What a single question costs to answer, why it takes five models to serve one desk, and which hardware is actually worth owning. Ships with a working router simulator.</p>
-        <div class="stats">
-          5 model tiers &middot; measured vs estimated marked separately<br />
-          live unit-economics model
-        </div>
+        <div class="tags">
+            <span class="tag" data-skill="llm-routing">LLM routing &amp; cost</span>
+            <span class="tag" data-skill="evaluation">Evaluation &amp; measurement</span>
+            <span class="tag" data-skill="systems-architecture">Systems architecture</span>
+          </div>
+          <p class="why" hidden></p>
         <span class="go">Open the model &rarr;</span>
       </a>
 
-      <a class="card" href="research-digest/index.html">
+      <a class="card" data-skills="retrieval mcp evaluation" data-note-retrieval="TF-IDF and SVD over the library, and every result carries the derivation that ranked it." data-note-mcp="Eight MCP tools over stdio, one JSON object per line, no SDK on either side." data-note-evaluation="Precision@5 of 0.769 against a corpus frozen in CI, plus the regression a green test suite hid." href="research-digest/index.html">
         <span class="kind">MCP tool</span>
         <h2>Research Digest</h2>
         <p>Ask Claude Code what you have read about retrieval and it answers from your own arXiv library instead of the open web. One command to connect, no API key.</p>
-        <div class="stats">
-          8 MCP tools &middot; explainable ranking &middot; zero-dep core
-        </div>
+        <div class="tags">
+            <span class="tag" data-skill="retrieval">Retrieval &amp; ranking</span>
+            <span class="tag" data-skill="mcp">MCP &amp; agent tooling</span>
+            <span class="tag" data-skill="evaluation">Evaluation &amp; measurement</span>
+          </div>
+          <p class="why" hidden></p>
         <span class="go">See it running &rarr;</span>
       </a>
 
-      <a class="card" href="../writing/finplatform-architecture.html">
+      <a class="card" data-skills="systems-architecture llm-routing retrieval data-pipelines" data-note-systems-architecture="Five apps behind one terminal, every surface returning the same report contract." data-note-llm-routing="One task-to-tier map picks the model; feature code never names one, so swapping is a one-file edit." data-note-retrieval="News and filings retrieved and ranked behind a budget ceiling and a tiered cache." data-note-data-pipelines="What the market data actually costs, and the ladder a request falls through before it gives up." href="../writing/finplatform-architecture.html">
         <span class="kind">Architecture</span>
         <h2>finplatform: a reference architecture</h2>
         <p>Five consolidated apps behind one terminal, with a router that spans a local GPU to Claude. What the data costs, the one contract every surface returns, and the full trace of a single output.</p>
-        <div class="stats">
-          local GPU to frontier, metered per model<br />
-          one report contract &middot; evals gate every ship
-        </div>
+        <div class="tags">
+            <span class="tag" data-skill="systems-architecture">Systems architecture</span>
+            <span class="tag" data-skill="llm-routing">LLM routing &amp; cost</span>
+            <span class="tag" data-skill="retrieval">Retrieval &amp; ranking</span>
+            <span class="tag" data-skill="data-pipelines">Data pipelines</span>
+          </div>
+          <p class="why" hidden></p>
         <span class="go">Walk the system &rarr;</span>
       </a>
 
-      <a class="card" href="trusted-concierge/index.html">
+      <a class="card" data-skills="user-research conversation-design interaction-design" data-note-user-research="Six moderated think-aloud sessions, where comfort stopped at 3 of 5 after the screen built to fix it." data-note-conversation-design="Bounded clarifying questions instead of one open prompt, and the answers become criteria you can edit." data-note-interaction-design="Change one criterion and the screen tells you what it did not change." href="trusted-concierge/index.html">
         <span class="kind">HCI case study</span>
         <h2>Trusted Concierge</h2>
         <p>A home search that starts as a conversation. The chat becomes criteria you can see and edit, and nothing reaches a realtor until you approve exactly what gets sent. Six people tested it, and the rating that refused to move is the finding.</p>
-        <div class="stats">
-          6 sessions &middot; effort 2.0/5 &middot; comfort 3.0/5<br />
-          8 screens, plus a coded walkthrough
-        </div>
+        <div class="tags">
+            <span class="tag" data-skill="user-research">User research</span>
+            <span class="tag" data-skill="conversation-design">Conversation design</span>
+            <span class="tag" data-skill="interaction-design">Interaction design</span>
+          </div>
+          <p class="why" hidden></p>
         <span class="go">Read the finding &rarr;</span>
       </a>
 
-      <a class="card" href="../writing/passage-measured.html">
+      <a class="card" data-skills="evaluation multimodal" data-note-evaluation="Seven models tested, six ignored an explicit instruction, so the instruction became code." data-note-multimodal="Text, a document, a photograph or speech, all entering one pipeline." href="../writing/passage-measured.html">
         <span class="kind">Engineering notes</span>
         <h2>A prompt is not a mechanism</h2>
         <p>The best translation model I tested was the smallest one, and it beat the 27B from its own family. Picking the right model beat every prompt I wrote.</p>
-        <div class="stats">
-          7 models tested &middot; 4B beat the 27B<br />
-          6 of 7 ignored an explicit instruction
-        </div>
+        <div class="tags">
+            <span class="tag" data-skill="evaluation">Evaluation &amp; measurement</span>
+            <span class="tag" data-skill="multimodal">Multimodal AI</span>
+          </div>
+          <p class="why" hidden></p>
         <span class="go">Read the notes &rarr;</span>
       </a>
 
-      <a class="card" href="mage/index.html">
+      <a class="card" data-skills="multimodal evaluation systems-architecture" data-note-multimodal="Text, a document, a photograph or speech, each becoming the unit the pipeline can actually check." data-note-evaluation="Six local engines on one sentence: the 4B answered in 2,285 ms, the 27B took 8,082 ms." data-note-systems-architecture="Local model first, your own endpoint second, hosted last, and every request names which one served it." href="passage/index.html">
+        <span class="kind">Translation workspace</span>
+        <h2>Passage</h2>
+        <p>Translate text, a document, a photograph or your voice, and see which engine answered. It runs on a model on your own machine whenever one is reachable, and says so per request.</p>
+        <div class="tags">
+            <span class="tag" data-skill="multimodal">Multimodal AI</span>
+            <span class="tag" data-skill="evaluation">Evaluation &amp; measurement</span>
+            <span class="tag" data-skill="systems-architecture">Systems architecture</span>
+          </div>
+          <p class="why" hidden></p>
+        <span class="go">See it running &rarr;</span>
+      </a>
+
+      <a class="card" data-skills="multimodal user-research interaction-design" data-note-multimodal="One clip in, an overlay on the frame where the elbow went wrong." data-note-user-research="Paper roleplay first, then a user test, then a click-through people could hold." data-note-interaction-design="The correction sits on the frame it belongs to, not in a report that arrives that evening." href="mage/index.html">
         <span class="kind">HCI case study</span>
         <h2>MAGE</h2>
         <p>An AI coach for people practising alone. Upload one clip of your jump shot and get an AR overlay on the frame where your elbow went wrong, instead of advice that arrives that evening.</p>
-        <div class="stats">
-          paper roleplay &middot; user test &middot; click-through<br />
-          interactive prototype, live
-        </div>
+        <div class="tags">
+            <span class="tag" data-skill="multimodal">Multimodal AI</span>
+            <span class="tag" data-skill="user-research">User research</span>
+            <span class="tag" data-skill="interaction-design">Interaction design</span>
+          </div>
+          <p class="why" hidden></p>
         <span class="go">See the overlay &rarr;</span>
       </a>
 
-      <a class="card" href="deal-lens/index.html">
+      <a class="card" data-skills="data-pipelines systems-architecture" data-note-data-pipelines="A public sale list ingested, enriched with comps, scored, and put on a map." data-note-systems-architecture="Bid ceiling, title cost and redemption risk computed separately, so you can disagree with one." href="deal-lens/index.html">
         <span class="kind">Live tool</span>
         <h2>Deal Lens</h2>
         <p>Underwriting for the St. Louis land tax sale. Every property on the list with comps, a bid ceiling, what it costs to clear title, and the chance the owner redeems before you ever own it.</p>
-        <div class="stats">
-          Sale 237 &middot; mapped and scored<br />
-          bid ceiling &middot; title cost &middot; redemption risk
-        </div>
+        <div class="tags">
+            <span class="tag" data-skill="data-pipelines">Data pipelines</span>
+            <span class="tag" data-skill="systems-architecture">Systems architecture</span>
+          </div>
+          <p class="why" hidden></p>
         <span class="go">Open Deal Lens &rarr;</span>
       </a>
 
@@ -210,5 +259,67 @@
 <!-- /SITE-FOOTER -->
 
 <script src="../assets/js/main.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  var bar = document.getElementById('filterbar');
+  var grid = document.querySelector('.grid');
+  if (!bar || !grid) return;
+  var buttons = Array.prototype.slice.call(bar.querySelectorAll('.fb'));
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.card'));
+  var status = document.getElementById('filter-status');
+
+  function noteFor(card, skill) {
+    return card.getAttribute('data-note-' + skill);
+  }
+
+  function apply(skill, push) {
+    var shown = 0;
+    buttons.forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-skill') === skill));
+    });
+    cards.forEach(function (card) {
+      var skills = (card.getAttribute('data-skills') || '').split(' ');
+      var match = skill === 'all' || skills.indexOf(skill) !== -1;
+      card.hidden = !match;
+      if (match) shown++;
+      var why = card.querySelector('.why');
+      var note = skill === 'all' ? null : noteFor(card, skill);
+      if (why) {
+        why.textContent = note || '';
+        why.hidden = !note;
+      }
+      Array.prototype.forEach.call(card.querySelectorAll('.tag'), function (t) {
+        t.classList.toggle('on', skill !== 'all' && t.getAttribute('data-skill') === skill);
+      });
+    });
+    var label = skill === 'all' ? '' : (bar.querySelector('[data-skill="' + skill + '"]') || {}).firstChild;
+    status.textContent = skill === 'all'
+      ? ''
+      : shown + ' of ' + cards.length + ' · ' + (label ? label.textContent : skill);
+    if (push) {
+      var hash = skill === 'all' ? ' ' : '#s=' + skill;
+      history.replaceState(null, '', skill === 'all' ? location.pathname : hash);
+    }
+  }
+
+  bar.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.fb') : null;
+    if (!b) return;
+    var skill = b.getAttribute('data-skill');
+    apply(b.getAttribute('aria-pressed') === 'true' ? 'all' : skill, true);
+  });
+
+  function fromHash() {
+    var m = /^#s=([a-z-]+)$/.exec(location.hash || '');
+    var skill = m && buttons.some(function (b) { return b.getAttribute('data-skill') === m[1]; })
+      ? m[1] : 'all';
+    apply(skill, false);
+  }
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
+
 </body>
 </html>
