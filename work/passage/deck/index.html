@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Twelve slides on Passage: the measurements that contradicted an assumption and changed the code, including the ones where the first number was wrong and 419 passing tests were hiding a data leak." />
+  <link rel="canonical" href="https://dneish2.github.io/work/passage/deck/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Passage — a local-first translator, and the models behind it" />
+  <meta property="og:description" content="Twelve slides: model selection by measurement, latency economics, the prove-it pass, and the negative results." />
+  <meta name="theme-color" content="#1B1713" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23B86370' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23B86370'/%3E%3C/svg%3E" />
+  <title>Passage — a local-first translator, and the models behind it</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    img { max-width: 100%; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+
+<a class="back" href="../index.html">&larr; Passage case study</a>
+<style>
+  /* Return path to the case study. Fixed, low-contrast, out of the way of the
+     slide numbers in the opposite corner. */
+  .back { position: fixed; top: .75rem; left: .9rem; z-index: 11;
+    font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-3); background: var(--paper); border: 1px solid var(--rule);
+    border-radius: 999px; padding: .28rem .7rem; text-decoration: none; }
+  .back:hover { color: var(--burgundy); border-color: var(--burgundy); }
+  @media print { .back, .hint { display: none; } }
+</style>
+<style>
+  :root {
+    --paper:#F6F0E3; --paper-2:#EFE7D6; --ink:#2B241C; --ink-2:#5A5044; --ink-3:#8A8073;
+    --rule:#D8CDB6; --burgundy:#802F3D; --local:#9C3444; --hosted:#0B6FA4; --good:#4A6B3D;
+    --display:"Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L",Georgia,serif;
+    --body:Georgia,"Iowan Old Style","Times New Roman",serif;
+    --mono:"SF Mono","Cascadia Mono",Consolas,"Liberation Mono",monospace;
+    --pad:clamp(1.5rem,3.6vw,4rem);
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#1B1713;--paper-2:#241F19;--ink:#EDE4D3;--ink-2:#B9AE9B;--ink-3:#8B8172;
+    --rule:#3A322A;--burgundy:#D98A96;--local:#CE6F7C;--hosted:#249BD4;--good:#8FB27C;}}
+  :root[data-theme="dark"]{
+    --paper:#1B1713;--paper-2:#241F19;--ink:#EDE4D3;--ink-2:#B9AE9B;--ink-3:#8B8172;
+    --rule:#3A322A;--burgundy:#D98A96;--local:#CE6F7C;--hosted:#249BD4;--good:#8FB27C;}
+  :root[data-theme="light"]{
+    --paper:#F6F0E3;--paper-2:#EFE7D6;--ink:#2B241C;--ink-2:#5A5044;--ink-3:#8A8073;
+    --rule:#D8CDB6;--burgundy:#802F3D;--local:#9C3444;--hosted:#0B6FA4;--good:#4A6B3D;}
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
+    font-size:clamp(16px,1.28vw,20px);line-height:1.6;-webkit-font-smoothing:antialiased;}
+
+  .deck{scroll-snap-type:y mandatory;overflow-y:auto;height:100dvh;scroll-behavior:smooth;}
+  @media (prefers-reduced-motion:reduce){.deck{scroll-behavior:auto;}}
+
+  .slide{scroll-snap-align:start;scroll-snap-stop:always;min-height:100dvh;
+    padding:calc(var(--pad) * 1.5) var(--pad) calc(var(--pad) * 1.2);
+    display:flex;flex-direction:column;justify-content:center;gap:clamp(1rem,2.2vh,1.9rem);
+    position:relative;}
+  /* left rail, not centre: each child is its own block, so margin-inline:auto
+     would centre short paragraphs independently and break the left margin. */
+  .slide > *{width:100%;max-width:88rem;margin-inline:0 auto;}
+  .slide::after{content:"";position:absolute;left:var(--pad);right:var(--pad);bottom:0;
+    height:1px;background:var(--rule);}
+
+  .num{position:absolute;top:calc(var(--pad) * .8);right:var(--pad);font-family:var(--mono);
+    font-size:.66rem;letter-spacing:.12em;color:var(--ink-3);font-variant-numeric:tabular-nums;
+    max-width:none;margin:0;}
+
+  .eyebrow{font-family:var(--mono);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--burgundy);display:flex;align-items:center;gap:.8rem;}
+  .eyebrow::after{content:"";flex:1;height:1px;background:var(--rule);}
+
+  h1{font-family:var(--display);font-weight:400;text-wrap:balance;
+    font-size:clamp(3rem,9vw,7rem);line-height:.95;margin:0;letter-spacing:-.03em;}
+  h2{font-family:var(--display);font-weight:400;text-wrap:balance;
+    font-size:clamp(1.75rem,3.5vw,3rem);line-height:1.06;margin:0;letter-spacing:-.015em;max-width:26ch;}
+  h3{font-family:var(--mono);font-weight:400;font-size:.66rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 .5rem;}
+  p{margin:0;max-width:36rem;color:var(--ink-2);}
+  p.wide{max-width:62rem;}
+  p.lede{font-size:clamp(1.05rem,1.6vw,1.35rem);color:var(--ink);max-width:44rem;line-height:1.4;}
+  strong{color:var(--ink);font-weight:700;}
+  em{font-style:italic;color:var(--ink);}
+  /* Underline in the rule colour, not the text colour: a link inside a
+     paragraph should read as a paper-and-ink footnote mark, not a web button. */
+  a{color:inherit;text-decoration:underline;text-decoration-color:var(--burgundy);
+    text-underline-offset:.18em;text-decoration-thickness:1px;
+    transition:color .12s ease,text-decoration-color .12s ease;}
+  a:hover{color:var(--burgundy);text-decoration-color:var(--burgundy);}
+  a.src-link{font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-3);text-decoration-color:var(--rule);}
+  a.src-link:hover{color:var(--burgundy);}
+  .sources{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;padding-top:.2rem;}
+
+  .cols{display:grid;gap:clamp(1.2rem,3vw,3rem);grid-template-columns:1fr;align-items:start;}
+  @media (min-width:920px){
+    .cols.two{grid-template-columns:1fr 1fr;}
+    .cols.wide-left{grid-template-columns:1.55fr 1fr;}
+    .cols.wide-right{grid-template-columns:1fr 1.5fr;}
+  }
+  .stack{display:flex;flex-direction:column;gap:.85rem;}
+  .stack.tight{gap:.4rem;}
+
+  .scroller{overflow-x:auto;padding-bottom:.3rem;}
+  table.chart{width:100%;min-width:30rem;border-collapse:collapse;font-size:.84rem;}
+  .chart th{font-family:var(--mono);font-weight:400;font-size:.62rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-3);text-align:left;padding:0 .65rem .45rem 0;
+    border-bottom:1px solid var(--rule);white-space:nowrap;}
+  .chart td{padding:.28rem .65rem .28rem 0;vertical-align:middle;border-bottom:1px solid transparent;}
+  .chart tbody tr:hover td{background:var(--paper-2);}
+  .chart td.lbl{font-family:var(--mono);font-size:.72rem;color:var(--ink);white-space:nowrap;}
+  .chart td.note{color:var(--ink-2);font-size:.8rem;min-width:14rem;}
+  .chart td.val{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink-2);
+    text-align:right;white-space:nowrap;}
+  .chart tr.hi td.lbl,.chart tr.hi td.val{color:var(--ink);font-weight:700;}
+  .chart tr.out td.lbl,.chart tr.out td.val,.chart tr.out td.note{color:var(--ink-3);}
+  .bar-cell{width:34%;}
+  .bar{height:12px;border-radius:0 3px 3px 0;background:var(--hosted);display:block;
+    transition:filter .12s ease;}
+  .bar.local{background:var(--local);}
+  .bar.mut{background:var(--ink-3);opacity:.5;}
+  tr:hover .bar{filter:brightness(1.15);}
+
+  .legend{display:flex;flex-wrap:wrap;gap:1.1rem;font-family:var(--mono);font-size:.66rem;color:var(--ink-2);}
+  .key{display:inline-flex;align-items:center;gap:.4rem;}
+  .dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
+  .dot.local{background:var(--local);}.dot.hosted{background:var(--hosted);}
+  .dot.mut{background:var(--ink-3);opacity:.5;}
+
+  .stat{display:flex;flex-direction:column;gap:.05rem;}
+  .stat .n{font-family:var(--display);font-size:clamp(2.2rem,4.8vw,3.8rem);line-height:1;
+    letter-spacing:-.03em;font-variant-numeric:tabular-nums;}
+  .stat .n.local{color:var(--local);}.stat .n.hosted{color:var(--hosted);}
+  .stat .n small{font-size:.38em;letter-spacing:0;}
+  .stat .cap{font-family:var(--mono);font-size:.63rem;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--ink-3);}
+  .strip{display:grid;gap:1.2rem 2.2rem;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));}
+
+  .quote{border-left:2px solid var(--burgundy);padding-left:1rem;display:flex;flex-direction:column;gap:.25rem;}
+  .quote .src{font-family:var(--mono);font-size:.64rem;color:var(--ink-3);letter-spacing:.06em;}
+  .quote .txt{font-family:var(--display);font-size:clamp(1rem,1.9vw,1.35rem);line-height:1.25;}
+
+  code{font-family:var(--mono);font-size:.78rem;color:var(--ink);}
+  pre.code{background:var(--paper-2);border:1px solid var(--rule);border-radius:3px;
+    padding:.75rem .9rem;overflow-x:auto;margin:0;line-height:1.6;color:var(--ink-2);
+    font-family:var(--mono);font-size:.74rem;}
+  pre.code b{color:var(--local);font-weight:700;}
+  pre.code i{color:var(--hosted);font-style:normal;}
+  pre.code u{text-decoration:none;color:var(--ink-3);}
+
+  ul.marks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.55rem;max-width:40rem;}
+  /* NOT display:grid — inline children each become their own grid item, so a <b>
+     lands in row 1 and the trailing text wraps to row 2. Marker is positioned instead. */
+  ul.marks li{position:relative;padding-left:1.4rem;color:var(--ink-2);font-size:.92rem;}
+  ul.marks li::before{content:"—";position:absolute;left:0;top:0;
+    color:var(--burgundy);font-family:var(--mono);}
+  ul.marks li b{color:var(--ink);}
+
+  .flow{display:flex;flex-direction:column;gap:.45rem;min-width:32rem;}
+  .flow-row{display:grid;grid-template-columns:6rem 1fr;gap:.7rem;align-items:center;}
+  .flow-row .mode{font-family:var(--mono);font-size:.68rem;color:var(--ink);text-align:right;}
+  .chain{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;}
+  .node{font-family:var(--mono);font-size:.64rem;padding:.25rem .45rem;border:1px solid var(--rule);
+    border-radius:3px;background:var(--paper-2);color:var(--ink-2);white-space:nowrap;}
+  .node.l{border-color:var(--local);color:var(--local);}
+  .node.h{border-color:var(--hosted);color:var(--hosted);}
+  .arrow{color:var(--ink-3);font-family:var(--mono);font-size:.66rem;}
+
+  .tag{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.09em;
+    text-transform:uppercase;padding:.14rem .4rem;border-radius:2px;border:1px solid currentColor;}
+  .tag.ok{color:var(--good);}.tag.no{color:var(--local);}.tag.unk{color:var(--ink-3);}
+
+  .hint{position:fixed;bottom:.8rem;left:50%;transform:translateX(-50%);font-family:var(--mono);
+    font-size:.6rem;letter-spacing:.1em;color:var(--ink-3);background:var(--paper);
+    padding:.25rem .65rem;border:1px solid var(--rule);border-radius:999px;z-index:10;
+    transition:opacity .4s ease;}
+  .hint.gone{opacity:0;pointer-events:none;}
+  :focus-visible{outline:2px solid var(--burgundy);outline-offset:3px;}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+</style>
+
+<div class="hint" id="hint">↑ ↓ or scroll</div>
+
+<main class="deck" id="deck">
+
+  <!-- 1 -->
+  <section class="slide">
+    <p class="num">01 / 12</p>
+    <div class="eyebrow">Local-first translation · 2026</div>
+    <h1>Passage</h1>
+    <p class="lede">Translate text, documents, photos and speech. It runs on your own hardware when your hardware can handle it, and it names the engine that served every request.</p>
+    <div class="strip">
+      <div class="stat"><span class="n">4</span><span class="cap">modalities</span></div>
+      <div class="stat"><span class="n">8</span><span class="cap">models measured</span></div>
+      <div class="stat"><span class="n local">589</span><span class="cap">tests, engine-asserting</span></div>
+      <div class="stat"><span class="n">3</span><span class="cap">OS tiers, all green</span></div>
+    </div>
+    <p class="wide">It started as an internal tool for people doing real translation work, and it was paid for. This is the rebuild. The original never answered one question: <em>where did this text actually go?</em></p>
+    <p class="wide">This is not a feature tour. It is the places where a measurement proved an assumption wrong and the code changed. That includes the ones that went badly: a first number that was wrong, a clever fix that got reverted, and 419 passing tests that were hiding a data leak.</p>
+    <div class="sources">
+      <a class="src-link" href="https://github.com/dneish2/LanguageTranslation">github.com/dneish2/LanguageTranslation</a>
+      <a class="src-link" href="https://github.com/dneish2/LanguageTranslation/blob/main/RESEARCH.md">RESEARCH.md — every measurement</a>
+      <a class="src-link" href="https://github.com/dneish2/LanguageTranslation/blob/main/DECISIONS.md">DECISIONS.md — every call, with reasoning</a>
+    </div>
+  </section>
+
+  <!-- 2 — the AI systems slide -->
+  <section class="slide">
+    <p class="num">02 / 12</p>
+    <div class="eyebrow">How the models are used</div>
+    <h2>Seven jobs, seven different answers.</h2>
+    <div class="legend">
+      <span class="key"><span class="dot local"></span> on this machine</span>
+      <span class="key"><span class="dot hosted"></span> hosted</span>
+      <span class="key"><span class="dot mut"></span> no model involved</span>
+    </div>
+    <div class="scroller">
+      <table class="chart">
+        <caption class="sr">Which model serves which feature, and why</caption>
+        <thead><tr><th>Job</th><th>Model</th><th>Runs</th><th>Cost</th><th>Why this one</th></tr></thead>
+        <tbody>
+          <tr class="hi"><td class="lbl">live typing</td><td class="lbl">translategemma:4b</td>
+            <td><span class="dot local"></span></td><td class="val">368 ms</td>
+            <td class="note">Beats a generalist 5x its size. One-line prompt.</td></tr>
+          <tr><td class="lbl">fallback</td><td class="lbl">gpt-5.4-nano</td>
+            <td><span class="dot hosted"></span></td><td class="val">616 ms</td>
+            <td class="note">Only when the local probe fails. Metered, and labelled as such.</td></tr>
+          <tr><td class="lbl">documents</td><td class="lbl">same routing</td>
+            <td><span class="dot local"></span><span class="dot hosted"></span></td><td class="val">143 tok</td>
+            <td class="note">Injection-hardened preamble — a file came from someone else.</td></tr>
+          <tr class="hi"><td class="lbl">photo OCR</td><td class="lbl">qwen3-vl:8b</td>
+            <td><span class="dot local"></span></td><td class="val">2.6 s</td>
+            <td class="note">Reads a menu, accents and currency intact. <code>think:false</code>.</td></tr>
+          <tr><td class="lbl">overlay geometry</td><td class="lbl">pixel projection</td>
+            <td><span class="dot mut"></span></td><td class="val">—</td>
+            <td class="note">The vision model reads the text but cannot say where it sits. So no model.</td></tr>
+          <tr class="hi"><td class="lbl">speech in</td><td class="lbl">faster-whisper base</td>
+            <td><span class="dot local"></span></td><td class="val">0.6 s</td>
+            <td class="note">On CPU. The GPU bought nothing but ~700 MB of wheels.</td></tr>
+          <tr class="hi"><td class="lbl">speech out</td><td class="lbl">Piper (VITS)</td>
+            <td><span class="dot local"></span></td><td class="val">~63 MB</td>
+            <td class="note">Not a language model. Structurally cannot answer instead of read.</td></tr>
+          <tr class="out"><td class="lbl">excluded</td><td class="lbl">qwen3:30b</td>
+            <td><span class="dot mut"></span></td><td class="val">8,786 ch</td>
+            <td class="note">Wrote 8,786 characters of deliberation on a one-line translation, then returned nothing.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="wide"><strong>Match the model to the job.</strong> Translation is not reasoning, so a thinking model spends its budget deliberating over work that never needed it, and no token limit reliably stops it. Extraction is different. With <code>think:false</code>, the same class of model reads a whole menu photo in 2.6 seconds.</p>
+  </section>
+
+  <!-- 3 — the finding that governs the whole codebase -->
+  <section class="slide">
+    <p class="num">03 / 12</p>
+    <div class="eyebrow">The rule everything else follows</div>
+    <h2>Six of seven models ignored the instruction. So the instruction became code.</h2>
+    <div class="cols wide-left">
+      <div class="stack tight">
+        <div class="strip">
+          <div class="stat"><span class="n local">6<small> / 7</small></span><span class="cap">models mangled protected spans</span></div>
+          <div class="stat"><span class="n">1</span><span class="cap">line of prompt telling them not to</span></div>
+        </div>
+        <p class="lede">Every model in the roster was given one sentence containing a URL, an email address and a figure, and an explicit instruction to leave them alone. Six of the seven altered them anyway.</p>
+        <p>Which one complied is not recorded, because one pass on one sentence is a coin landing the right way, not a compliant model. The six failures are the finding, and they say something about this class of model rather than about six bad ones.</p>
+      </div>
+      <div class="stack">
+        <h3>What replaced the instruction</h3>
+        <pre class="code">mask   see <b>https://a.co/x</b> for €1,200
+       ↓  deterministic, pre-flight
+       see <u>⟦P0⟧</u> for <u>⟦P1⟧</u>
+       ↓  model never sees the span
+unmask see <b>https://a.co/x</b> for €1,200</pre>
+        <p>The model gets text it cannot corrupt, because the fragile parts are not in it. <code>_mask_protected_spans</code> is deterministic, so one test covers it instead of sampling across runs. The test checks the <strong>mechanism</strong>, not the wording of a prompt that the next model version might quietly stop following.</p>
+        <div class="quote">
+          <span class="src">the standing rule in this codebase</span>
+          <span class="txt">Never enforce a model rule by asking for it. Mask it, route it, or validate it, then test that.</span>
+        </div>
+        <p>It has paid off three times here. URL masking. A speech model with no ability to answer the text instead of reading it. And injection defence that translates embedded instructions literally instead of trusting the model to refuse them.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <p class="num">04 / 12</p>
+    <div class="eyebrow">Model selection by measurement</div>
+    <h2>A purpose-built 4B beat a general 27B from its own family.</h2>
+    <div class="cols wide-left">
+      <div class="stack tight">
+        <div class="legend"><span class="key"><span class="dot local"></span> chosen default</span><span class="key"><span class="dot mut"></span> also evaluated</span></div>
+        <div class="scroller">
+          <table class="chart">
+            <caption class="sr">Agreement score, size and latency for seven local models</caption>
+            <thead><tr><th>Model</th><th>Agree</th><th class="bar-cell"></th><th style="text-align:right">Size</th><th style="text-align:right">p50</th></tr></thead>
+            <tbody>
+              <tr class="hi"><td class="lbl">translategemma:4b</td><td class="val">0.788</td><td class="bar-cell"><span class="bar local" style="width:100%" title="0.788"></span></td><td class="val">3.3 GB</td><td class="val">368 ms</td></tr>
+              <tr><td class="lbl">gemma3:12b</td><td class="val">0.787</td><td class="bar-cell"><span class="bar mut" style="width:99.7%" title="0.787"></span></td><td class="val">8.2 GB</td><td class="val">582 ms</td></tr>
+              <tr><td class="lbl">translategemma:12b</td><td class="val">0.779</td><td class="bar-cell"><span class="bar mut" style="width:96.4%" title="0.779"></span></td><td class="val">8.1 GB</td><td class="val">495 ms</td></tr>
+              <tr><td class="lbl">qwen2.5:7b</td><td class="val">0.763</td><td class="bar-cell"><span class="bar mut" style="width:89.9%" title="0.763"></span></td><td class="val">4.7 GB</td><td class="val">237 ms</td></tr>
+              <tr><td class="lbl">gemma4:latest</td><td class="val">0.741</td><td class="bar-cell"><span class="bar mut" style="width:80.7%" title="0.741"></span></td><td class="val">9.6 GB</td><td class="val">398 ms</td></tr>
+              <tr><td class="lbl">translategemma:27b</td><td class="val">0.734</td><td class="bar-cell"><span class="bar mut" style="width:77.8%" title="0.734"></span></td><td class="val">17.4 GB</td><td class="val">679 ms</td></tr>
+              <tr class="out"><td class="lbl">gemma3:1b</td><td class="val">0.668</td><td class="bar-cell"><span class="bar mut" style="width:50%" title="0.668"></span></td><td class="val">0.8 GB</td><td class="val">334 ms</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="stack">
+        <p>5x smaller than the 27B, nearly 2x faster, and it scored higher. Before spending VRAM on a bigger model, check whether someone has built a small one for your actual task.</p>
+        <div class="quote">
+          <span class="src">gemma3:1b · source → es → back to English</span>
+          <span class="txt">“the board pushed back on the buyback” became “the council <em>regulated</em> the share purchase”</span>
+        </div>
+        <p>That is the floor, and it is why the 0.8 GB model was cut instead of tuned. It is not rougher than the others. It reports a different event, with the same confidence.</p>
+        <p>Agreement means average similarity to the other models on the same input. There is no reference translation, so it rewards the mainstream reading and flags outliers. It is triage, not a leaderboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <p class="num">05 / 12</p>
+    <div class="eyebrow">Latency economics</div>
+    <h2>Local won on cost and on speed.</h2>
+    <div class="cols two">
+      <div class="stack">
+        <div class="legend"><span class="key"><span class="dot local"></span> local</span><span class="key"><span class="dot hosted"></span> hosted</span></div>
+        <div class="scroller">
+          <table class="chart">
+            <caption class="sr">Median latency per translation call</caption>
+            <thead><tr><th>Engine</th><th class="bar-cell">Median</th><th style="text-align:right">p50</th><th style="text-align:right">Cost</th></tr></thead>
+            <tbody>
+              <tr class="hi"><td class="lbl">qwen2.5:7b</td><td class="bar-cell"><span class="bar local" style="width:38.5%" title="237 ms"></span></td><td class="val">237 ms</td><td class="val">free</td></tr>
+              <tr class="hi"><td class="lbl">translategemma:4b</td><td class="bar-cell"><span class="bar local" style="width:59.7%" title="368 ms"></span></td><td class="val">368 ms</td><td class="val">free</td></tr>
+              <tr><td class="lbl">gpt-5.4-nano</td><td class="bar-cell"><span class="bar" style="width:100%" title="616 ms"></span></td><td class="val">616 ms</td><td class="val">metered</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="strip">
+          <div class="stat"><span class="n">~8</span><span class="cap">calls per sentence</span></div>
+          <div class="stat"><span class="n">143</span><span class="cap">tokens of preamble</span></div>
+          <div class="stat"><span class="n">~4</span><span class="cap">tokens of real text</span></div>
+        </div>
+        <p>Typing retranslates on every 350 ms pause. So the live path drops the hardening preamble, which matters for a file a stranger sent you and does nothing for a box you are typing in yourself. URL masking stays, because that one is correctness.</p>
+      </div>
+      <div class="stack">
+        <h3>Cold start, before and after</h3>
+        <pre class="code">warming on first request
+  [<b>2957</b>, <b>1875</b>, <b>1013</b>, …] ms
+
+pre-warming at page load
+  [<i>125</i>, <i>135</i>, <i>154</i>, …] ms</pre>
+        <p>Warming on first request put the probe, the VRAM load and the user's first keystroke on the same instant. Moving that work to page load made the first interaction about 24x quicker, with no change to the model.</p>
+        <p>Every background fetch since then copies it, including the Piper voices and the Whisper weights. Threaded, silent on failure, never awaited, never able to block a translation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide">
+    <p class="num">06 / 12</p>
+    <div class="eyebrow">Speech</div>
+    <h2>5× faster and private, from picking the smaller dependency twice.</h2>
+    <div class="cols wide-left">
+      <div class="stack tight">
+        <div class="legend"><span class="key"><span class="dot local"></span> faster-whisper + Piper</span><span class="key"><span class="dot hosted"></span> hosted</span></div>
+        <div class="scroller">
+          <table class="chart">
+            <caption class="sr">Voice round trip, median of 3 runs on one 6.6 second clip</caption>
+            <thead><tr><th>Path</th><th class="bar-cell">Round trip</th><th style="text-align:right">Median</th><th>Reported engines</th></tr></thead>
+            <tbody>
+              <tr class="hi"><td class="lbl">local</td><td class="bar-cell"><span class="bar local" style="width:19.8%" title="1.51 s"></span></td><td class="val">1.51 s</td><td class="lbl">stt=local:base · tts=local:piper</td></tr>
+              <tr><td class="lbl">hosted</td><td class="bar-cell"><span class="bar" style="width:100%" title="7.62 s"></span></td><td class="val">7.62 s</td><td class="lbl">stt=hosted · tts=hosted</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>One clip, cache cleared, 3 runs each. This is one machine. The ranking should hold elsewhere; the absolute numbers should not be quoted.</p>
+      </div>
+      <div class="stack">
+        <h3>Two dependency calls that paid off</h3>
+        <p><strong>CPU over CUDA.</strong> <code>ctranslate2</code> wanted <code>cublas64_12.dll</code> and about 700 MB of wheels for work that already took 0.6 s on CPU. It later turned out to be the only option that works on Apple Silicon, where CUDA does not exist. That was luck, not foresight.</p>
+        <p><strong>Piper over a general text-to-speech model.</strong> It is a VITS model, so it has no capacity to answer the text instead of reading it. A big model would need a prompt asking it to behave. This one cannot do the wrong thing in the first place.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide">
+    <p class="num">07 / 12</p>
+    <div class="eyebrow">Routing, and the trap inside it</div>
+    <h2>Everything falls back. That's good for users and dangerous for testing.</h2>
+    <div class="cols wide-left">
+      <div class="scroller">
+        <div class="flow">
+          <div class="flow-row"><span class="mode">text</span><div class="chain">
+            <span class="node">keystroke</span><span class="arrow">→</span><span class="node l">probe</span><span class="arrow">→</span><span class="node l">translategemma:4b</span><span class="arrow">→</span><span class="node h">hosted</span></div></div>
+          <div class="flow-row"><span class="mode">document</span><div class="chain">
+            <span class="node">segment</span><span class="arrow">→</span><span class="node">BYO profile</span><span class="arrow">→</span><span class="node l">local</span><span class="arrow">/</span><span class="node h">hosted</span><span class="arrow">→</span><span class="node">trace</span></div></div>
+          <div class="flow-row"><span class="mode">camera</span><div class="chain">
+            <span class="node">validate</span><span class="arrow">→</span><span class="node l">qwen3-vl:8b</span><span class="arrow">→</span><span class="node">row geometry</span><span class="arrow">→</span><span class="node">composite</span></div></div>
+          <div class="flow-row"><span class="mode">voice</span><div class="chain">
+            <span class="node l">whisper</span><span class="arrow">→</span><span class="node l">translate</span><span class="arrow">→</span><span class="node l">piper</span><span class="arrow">·</span><span class="node h">each falls back alone</span></div></div>
+        </div>
+      </div>
+      <div class="stack">
+        <p>Voice is three independent decisions, so a missing voice for one language does not push the whole recording off the machine.</p>
+        <p>That independence hid the subtlest bug here. The engine line was computed from two of the three steps, so it could say <em>“this machine”</em> while the middle step went hosted. The middle step is the one carrying the actual words.</p>
+        <pre class="code">assert meta["stt"] == "local:base"
+assert engine == "local:translategemma:4b"
+<u># not: assert response.ok</u></pre>
+        <p>With no Ollama running, every local path quietly goes hosted and the app looks perfect. So every test here has to answer one question: <strong>would this fail if the local engine never ran?</strong> If it would not, it proves nothing.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide">
+    <p class="num">08 / 12</p>
+    <div class="eyebrow">The prove-it pass</div>
+    <h2>419 passing tests, and the app was still lying about where data went.</h2>
+    <div class="cols wide-right">
+      <div class="stack">
+        <div class="strip">
+          <div class="stat"><span class="n">7</span><span class="cap">adversarial agents</span></div>
+          <div class="stat"><span class="n">42</span><span class="cap">claims raised</span></div>
+          <div class="stat"><span class="n local">~35</span><span class="cap">reproduced as real</span></div>
+        </div>
+        <p>Seven agents that had not written the code drove the real app in a real browser. One per modality, plus degradation, cross-user and mobile. Every claim had to be reproduced before it was accepted.</p>
+        <p>The tests were not wrong. They were narrow. They covered the one path that happened to be implemented correctly, and a green suite looks the same either way.</p>
+      </div>
+      <div class="stack">
+        <h3>Rendered live, clean session, no misconfiguration</h3>
+        <pre class="code">Runs on translategemma:4b on this machine —
+text isn't sent anywhere…
+<b>64% of your text stayed on this machine</b>
+<i>sent out: 1 runs · 38 chars</i>
+<i>38 of 50,000 free characters used · 1 metered run</i></pre>
+        <p>A cache hit was booked as “sent out” and metered. The test was <code>engine.startswith("local")</code> and the engine was <code>"cache"</code>. Underneath that: <strong>the privacy sentence came from a capability probe, not from what actually served the request.</strong></p>
+        <div class="quote">
+          <span class="src">worst finding · two browser sessions, separate cookies</span>
+          <span class="txt">User A's private-endpoint output was served verbatim to user B, labelled as B's own engine.</span>
+        </div>
+        <p>The cache key was <code>(text, target, mode)</code> on one shared backend, with no provider and no session in it. B made zero outbound calls, so nothing looked wrong.</p>
+        <p><strong>It took two rounds.</strong> Round one fixed it and verified against <code>/api/text_translate</code>. The Translate button does not use that route. It ran a bare <code>Thread</code>, ContextVars do not cross into threads, the scope fell back to <code>"shared"</code>, and the leak stayed live on the surface people actually click.</p>
+        <p><a href="https://github.com/dneish2/LanguageTranslation/blob/main/DECISIONS.md">Every finding, with its reasoning →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 — the shape, which is the actual lesson -->
+  <section class="slide">
+    <p class="num">09 / 12</p>
+    <div class="eyebrow">Why it took six rounds</div>
+    <h2>All four bugs had the same cause.</h2>
+    <div class="cols wide-left">
+      <div class="stack tight">
+        <div class="scroller">
+          <table class="chart">
+            <caption class="sr">Four defects, one shape</caption>
+            <thead><tr><th>Where it showed up</th><th>The claim</th><th>Derived from</th></tr></thead>
+            <tbody>
+              <tr><td class="lbl">cache hit</td><td class="note">“no model ran, nothing was sent”</td><td class="note">a process-wide counter every session bumps</td></tr>
+              <tr><td class="lbl">response body</td><td class="note">“runs on this machine”</td><td class="note">a capability probe taken at page render</td></tr>
+              <tr><td class="lbl">voice engine line</td><td class="note">“this machine”</td><td class="note">two of the three steps, not the middle one</td></tr>
+              <tr class="hi"><td class="lbl">failed photo</td><td class="note">“nothing translated yet”</td><td class="note">a ledger row that was never written at all</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lede">All four are the same bug: <strong>the app worked out a privacy claim from state it read at render time, instead of recording what happened when it happened.</strong></p>
+        <p>Six rounds is the cost of fixing that one surface at a time. Each round closed the case in front of it, the reviewer found the next surface, and the tests written each round passed honestly while the bug stayed alive.</p>
+      </div>
+      <div class="stack">
+        <h3>The last one, fixed at the shape</h3>
+        <pre class="code">with capture_provenance() as prov:
+    result = fn(*args)
+<u># ← exception escaped past the record() below</u>
+record(engine=…, chars=…)</pre>
+        <p>Photograph a blank wall. The vision model receives the image, answers “no text here”, the backend raises, and the row is never written. <code>/engines</code> then said <em>“Nothing translated yet.”</em> about a photo that had been sent to a hosted model on the app's key.</p>
+        <p>The fix catches, writes the row, and re-raises, on the path every surface shares. A call that was delivered and then failed is a disclosure. A connection that never opened is not, and saying otherwise would tell an offline user their words had left the machine.</p>
+        <div class="quote">
+          <span class="src">the first cut of that fix — caught by an existing test</span>
+          <span class="txt">It named the engine from the label the caller expected to use, and disclosed a send for a file that was rejected before a single byte left.</span>
+        </div>
+        <p>That is the same bug one level up: an expectation formed before the call, standing in for a record of the call. The only thing that counts as proof now is a row written at the outbound call.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide">
+    <p class="num">10 / 12</p>
+    <div class="eyebrow">Negative results</div>
+    <h2>What didn't work, and what stays unfixed on purpose.</h2>
+    <div class="cols two">
+      <div class="stack">
+        <h3>A number that didn't replicate</h3>
+        <div class="scroller">
+          <table class="chart">
+            <caption class="sr">Overlay error, single run versus five runs</caption>
+            <thead><tr><th>Reported from</th><th style="text-align:right">Before</th><th style="text-align:right">After</th><th>Verdict</th></tr></thead>
+            <tbody>
+              <tr class="out"><td class="lbl">one run</td><td class="val">17.5 px</td><td class="val">9.2 px</td><td class="note">a halving — and wrong</td></tr>
+              <tr class="hi"><td class="lbl">median of 5</td><td class="val">23.5 px</td><td class="val">20.5 px</td><td class="note">~13%, better in 4 of 5</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>It shipped anyway. It is cheap, it degrades gracefully, and it helps most of the time. But the headline needed a public correction, and it set the rule used everywhere here since: anything model-dependent gets a median across at least 5 runs, reported with how many of them improved.</p>
+        <h3>A fix that got reverted</h3>
+        <p>A per-channel ink map was meant to catch the burgundy headings that the greyscale threshold misses. It found one extra row and one phantom band over blank paper. No better on the numbers, so it was reverted.</p>
+      </div>
+      <div class="stack">
+        <h3>Left alone deliberately</h3>
+        <p>The coloured-heading overlay error is real and still open. It needs real OCR line geometry, which is a dependency decision, not a third threshold to tune. Three attempts was enough to learn which kind of problem it is.</p>
+        <h3>Not verified, and not claimed</h3>
+        <ul class="marks">
+          <li><b>Apple Silicon inference</b> — runners have no Ollama, no GPU</li>
+          <li><b>Real arm64 speech</b> — the nightly job exists, hasn't run</li>
+          <li><b>iOS Safari, Android Chrome</b> — emulation isn't a device</li>
+          <li><b>Real microphones</b> — every speech number came from a synthetic audio fixture, which is the clean input that flatters a small model</li>
+          <li><b>Latency off this box</b> — one 5090's opinion</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide">
+    <p class="num">11 / 12</p>
+    <div class="eyebrow">The framework trade</div>
+    <h2>NiceGUI made this fast to build and awkward to deploy.</h2>
+    <div class="cols wide-left">
+      <div class="stack tight">
+        <h3>Long sessions drop. Two causes, one already fixed.</h3>
+        <div class="scroller">
+          <table class="chart">
+            <caption class="sr">Event loop responsiveness during a health check against an unresponsive Ollama socket</caption>
+            <thead><tr><th>Health check vs dead socket</th><th style="text-align:right">Wall clock</th><th style="text-align:right">50 ms ticks</th><th>Heartbeat</th></tr></thead>
+            <tbody>
+              <tr class="out"><td class="lbl">four blocking probes on the loop</td><td class="val">15.31 s</td><td class="val">0</td><td class="note">client declares the socket dead</td></tr>
+              <tr class="hi"><td class="lbl">probes moved off the loop</td><td class="val">2.53 s</td><td class="val">41</td><td class="note">connection survives</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>NiceGUI runs a socket.io heartbeat on the asyncio loop. Block the loop and the heartbeat stops, so the browser reconnects. Median of 5 runs, 5 of 5 improved.</p>
+        <h3>The structural half: three Cloud Run defaults</h3>
+        <div class="scroller">
+          <table class="chart">
+            <caption class="sr">Cloud Run defaults hostile to a stateful WebSocket app</caption>
+            <thead><tr><th>Default</th><th>Effect on a stateful UI</th></tr></thead>
+            <tbody>
+              <tr><td class="lbl">timeout 300 s</td><td class="note">the WebSocket <em>is</em> the request — killed every 5 min</td></tr>
+              <tr><td class="lbl">affinity off</td><td class="note">a reconnect can land where this client never existed</td></tr>
+              <tr><td class="lbl">min-instances 0</td><td class="note">scale-to-zero takes every live session with it</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="stack">
+        <p>NiceGUI keeps UI state on the server. Elements live in process memory, keyed to a client id. That is why four modalities shipped fast in pure Python with no frontend build, and why scaling out is awkward.</p>
+        <p>Change the config before rewriting the app, but change it one flag at a time. Two of those three defaults cost nothing and are now set: <code>--timeout=3600 --session-affinity</code>. <code>--min-instances=1</code> is <strong>deliberately not set</strong>, because it bills continuously for an app with no users. Listing all three together is what made it tempting to reject the two free ones alongside the one that charges. Affinity is best-effort, so this reduces state loss rather than ending it. <span class="tag unk">unverified</span>: reasoned from the documentation, not observed on the real service.</p>
+        <h3>And the persistence that isn't being built</h3>
+        <ul class="marks">
+          <li><b>No accounts, no billing, no durable storage.</b> Auth is ported and live-tested, and left unwired on purpose. Abuse prevention sits where the risk is: a signed page token, per-IP rate limits, and size caps</li>
+          <li><b>No original file is kept, on any surface.</b> The segments and traces carry everything worth reviewing. Keeping the upload adds exposure and a deletion obligation and buys nothing, so <code>policy.py</code> enforces it instead of me remembering it</li>
+          <li><b>The translation cache stays in-process</b> and ephemeral, on purpose</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide">
+    <p class="num">12 / 12</p>
+    <div class="eyebrow">Portability, and what it takes to ship</div>
+    <h2>The CI matrix caught a real bug the first time it ran.</h2>
+    <div class="cols wide-left">
+      <div class="stack tight">
+        <div class="scroller">
+          <table class="chart">
+            <caption class="sr">CI matrix status by runner</caption>
+            <thead><tr><th>Runner</th><th>First run</th><th>Now</th><th>What it settled</th></tr></thead>
+            <tbody>
+              <tr><td class="lbl">windows-latest</td><td><span class="tag ok">pass</span></td><td><span class="tag ok">pass</span></td><td class="note">the dev box's own assumptions</td></tr>
+              <tr><td class="lbl">ubuntu-latest</td><td><span class="tag no">fail</span></td><td><span class="tag ok">pass</span></td><td class="note">host-specific path handling</td></tr>
+              <tr class="hi"><td class="lbl">macos-14</td><td><span class="tag no">fail</span></td><td><span class="tag ok">pass</span></td><td class="note">arm64, confirmed from runner output</td></tr>
+              <tr class="out"><td class="lbl">nightly speech · macos</td><td><span class="tag unk">not run</span></td><td><span class="tag unk">not run</span></td><td class="note">real arm64 speech — still open</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>A path-redaction helper cut a path down to its filename using the host's separator rules, so a Windows path leaked in full on Linux and macOS. Windows-only testing could never see it. It was caught the first time the code ran anywhere else.</p>
+        <p>So the code never asks “am I on a Mac?” It asks whether a model is reachable, whether a font resolved, whether the speech stack imported. Checking the platform records a guess. Checking the capability records a fact.</p>
+      </div>
+      <div class="stack">
+        <h3>Blocked on a device, not on engineering</h3>
+        <ul class="marks">
+          <li><b>A real Mac</b> — to settle Apple Silicon inference</li>
+          <li><b>A phone</b> — to answer for iOS Safari and Android Chrome</li>
+          <li><b>Ten real voice clips</b> — accents, noise, a phone mic. Half an hour of someone's time settles the base-vs-small question</li>
+        </ul>
+        <p>All of it is minutes of someone's time. Open <code>/diagnostics</code> on the device and paste back what it prints. The page exists so the hardware answers the question instead of an engineer guessing.</p>
+        <h3>What isn't being built, and why</h3>
+        <p>Accounts and billing, because a signup wall in front of a demo mostly measures who bounces off it. A traces dashboard, because there are no real human edits yet, and a chart computed from nothing is worse than no chart. A third overlay heuristic, because three attempts was enough to learn it needs real OCR geometry.</p>
+        <div class="sources">
+          <a class="src-link" href="https://github.com/dneish2/LanguageTranslation">Read the source</a>
+          <a class="src-link" href="https://github.com/dneish2/LanguageTranslation/blob/main/RESEARCH.md">RESEARCH.md</a>
+          <a class="src-link" href="https://github.com/dneish2/LanguageTranslation/blob/main/DECISIONS.md">DECISIONS.md</a>
+          <a class="src-link" href="https://github.com/dneish2/LanguageTranslation/blob/main/PORTABILITY.md">PORTABILITY.md</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  (function () {
+    var deck = document.getElementById('deck'), hint = document.getElementById('hint');
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    function current(){
+      var top = deck.scrollTop, best = 0, bestD = Infinity;
+      slides.forEach(function(s,i){var d=Math.abs(s.offsetTop-top); if(d<bestD){bestD=d;best=i;}});
+      return best;
+    }
+    function go(i){
+      i = Math.max(0, Math.min(slides.length-1, i));
+      slides[i].scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    document.addEventListener('keydown', function(e){
+      if(e.key==='ArrowDown'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(current()+1);}
+      else if(e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();go(current()-1);}
+      else if(e.key==='Home'){e.preventDefault();go(0);}
+      else if(e.key==='End'){e.preventDefault();go(slides.length-1);}
+    });
+    var hidden=false;
+    deck.addEventListener('scroll', function(){ if(!hidden){hidden=true;hint.classList.add('gone');} }, {passive:true});
+    setTimeout(function(){hint.classList.add('gone');}, 6000);
+  })();
+</script>
+</body>
+</html>

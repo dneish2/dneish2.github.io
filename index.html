@@ -77,20 +77,20 @@
         </figure>
         <div class="beats">
           <div class="beat" data-reveal style="--i:0">
-            <span class="mark">15 &rarr;</span>
-            <p><strong>Saved up for a gaming rig, and it was for winning.</strong> League of Legends tournaments and Minecraft tournaments, where the edge comes from reading the other player and committing before you are certain. I have been optimising decisions under pressure ever since.</p>
+            <span class="mark">13 &rarr;</span>
+            <p><strong>I saved up and built my own gaming rig at 13.</strong> Then I basically lived on it. Minecraft servers, League of Legends tournaments, nights that ran until the sun came up. Won some, lost plenty.</p>
           </div>
           <div class="beat" data-reveal style="--i:1">
             <span class="mark">&rarr; College</span>
-            <p><strong>CS at SUNY Fredonia, and a summer at Fidelity Investments.</strong> At Fidelity I wrote the S3 onboarding guide new teams started from, and a Spring Boot tool that automated the bucket work behind it. On campus: a voice assistant built with Paychex, 5,000 dorm residents kept online, and the eSports lounge I ran.</p>
+            <p><strong>CS at SUNY Fredonia.</strong> I built <a href="https://www.observertoday.com/news/local-region/2020/01/students-present-software-projects/" rel="noopener">Alexa and Google Home skills</a> that answered questions about the university&rsquo;s academic calendar, in a program Paychex ran: weekly reviews with their engineers, final presentation at their office. I worked the residential network desk, which kept about 5,000 students online in the dorms. And I ran the campus eSports lounge. The summer of 2020 I interned at Fidelity Investments, where I wrote the AWS S3 onboarding guide new teams used to set up storage and move files, and a Java Spring Boot app that ran the common bucket operations for them.</p>
           </div>
           <div class="beat" data-reveal style="--i:2">
             <span class="mark">&rarr; Mastercard</span>
-            <p><strong>Five years on payments, then on the AI behind them.</strong> Event-driven services on NATS, supporting workflows that clear 10M+ transactions a day. I rebuilt a retrieval pipeline that was returning nothing useful and took task success from 0% to 92% for the specialists who depend on it, and I keep the 37-model registry that decides which models the enterprise is allowed to use.</p>
+            <p><strong>Five years on payments, then on the AI behind them.</strong> I build and run event-driven services on NATS across authorization and clearing, and I connect those systems to the other components in the Mastercard network. The workflows they run in clear 10M+ transactions a day in South Africa. On the AI side I rebuilt an internal retrieval pipeline that was returning nothing usable and took task success from 0% to 92%, for the 20+ global sales specialists who work in it.</p>
           </div>
           <div class="beat" data-reveal style="--i:3">
             <span class="mark">&rarr; Now</span>
-            <p><strong>AI decision systems, end to end.</strong> Building the tools I use daily, and studying Human-Computer Interaction at Indiana University, where the question I care about is how long-horizon agent work comes back with results worth keeping.</p>
+            <p><strong>AI decision systems, end to end.</strong> I build the tools I use every day, and I finish an M.S. in Human-Computer Interaction at Indiana University in 2027, researching this: an agent is about to act for you, and you need to see what it is about to do while you can still change it. <a href="work/trusted-concierge/index.html">Trusted Concierge</a> is where I built that. Nothing reaches a realtor until you approve exactly what gets sent. I want to take it further, into agents that spend money on your behalf.</p>
           </div>
         </div>
       </div>
@@ -99,7 +99,7 @@
         <div class="toolbox-row">
           <span class="cat">AI &amp; ML</span>
           <span class="items">
-            <span class="chip">PyTorch</span><span class="chip">TensorFlow</span><span class="chip">LLMs &amp; GenAI</span><span class="chip">NLP</span><span class="chip">LangChain</span><span class="chip">LangGraph</span><span class="chip">MLOps</span><span class="chip">Embeddings &amp; retrieval</span><span class="chip">Evaluation harnesses</span><span class="chip">Inference optimization</span><span class="chip">GPU programming</span>
+            <span class="chip">PyTorch</span><span class="chip">TensorFlow</span><span class="chip">LLMs &amp; GenAI</span><span class="chip">NLP</span><span class="chip">LangChain</span><span class="chip">LangGraph</span><span class="chip">MLOps</span><span class="chip">Embeddings &amp; retrieval</span><span class="chip">Evaluation harnesses</span>
           </span>
         </div>
         <div class="toolbox-row">
@@ -322,8 +322,32 @@
       </div>
 
       <!-- 04 · Prompting-101 (field guide) -->
+      <!-- 04 &middot; Research Digest -->
+      <article class="showcase" id="research-digest" style="--proj-accent: var(--c-research)">
+        <span class="kicker" data-reveal><span class="idx">04</span> Agent tooling</span>
+        <h2 data-reveal>Research Digest. Your agent reads your library, not the web.</h2>
+        <p class="one-liner" data-reveal>A personal arXiv library your coding agent can search. Ask what you have on retrieval and it answers from the papers you kept.</p>
+
+        <div class="proof-row" data-reveal>
+          <div class="stat"><span class="n">8</span><span class="l">tools your agent gets over one connection</span></div>
+          <div class="stat"><span class="n">0.769</span><span class="l">precision@5 against a corpus frozen in CI</span></div>
+          <div class="stat"><span class="n">no key</span><span class="l">one command to connect, source is public</span></div>
+        </div>
+
+        <div data-reveal>
+          <p>Your agent already searches the web. What it does not know is which papers you decided were worth keeping. This puts that library behind an MCP interface, so the answer comes off your own shelf.</p>
+          <p>Every result shows the derivation that ranked it, so you can argue with the ranking instead of taking it. The ranker is gated in CI against a frozen corpus, because a fix I checked against one of two eval tracks cost 25% precision behind a green test suite.</p>
+        </div>
+
+        <p class="stack-line" data-reveal>Python 3.9+ &middot; zero-dependency core &middot; MCP over stdio &middot; MIT &middot; macOS, Linux, Windows</p>
+        <div class="cta-row" data-reveal>
+          <a class="btn btn-primary" href="work/research-digest/index.html">Read the case study &rarr;</a>
+          <a class="btn btn-ghost" href="https://github.com/dneish2/research-digest-mcp" rel="noopener">View on GitHub</a>
+        </div>
+      </article>
+
       <article class="showcase field-guide" id="prompting" style="--proj-accent: var(--c-prompting)">
-        <span class="kicker" data-reveal><span class="idx">04</span> Field guide</span>
+        <span class="kicker" data-reveal><span class="idx">05</span> Field guide</span>
         <blockquote data-reveal>
           &ldquo;Prompting is not asking a machine to think. It is <em>learning to think clearly yourself</em>.&rdquo;
           <cite>The Neish Principle &middot; Prompting-101</cite>
@@ -373,14 +397,6 @@
           <span>
             <h3>finplatform: a reference architecture</h3>
             <p class="dek">How the terminal routes local models to frontier models, meters credits per model, and evals itself before every ship.</p>
-          </span>
-          <span class="arrow">&rarr;</span>
-        </a>
-        <a class="writing-row" href="work/research-digest/index.html" data-reveal style="--i:3">
-          <span class="chip">Tool</span>
-          <span>
-            <h3>Research Digest</h3>
-            <p class="dek">Ask your AI assistant what you have read about retrieval and it answers from your own arXiv library. One command to connect, no API key, source is public.</p>
           </span>
           <span class="arrow">&rarr;</span>
         </a>

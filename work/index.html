@@ -62,6 +62,14 @@
 
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
       gap: 16px; padding-bottom: 4.5rem; }
+    /* Side quests sit below the main grid, same card, quieter frame. */
+    .grid-side { padding-bottom: 4.5rem; }
+    .side-head { border-top: 1px solid var(--line-soft); padding-top: 2rem; margin-bottom: 1.4rem; }
+    .side-head h2 { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--ink-muted); margin: 0; font-weight: 400; }
+    .side-head p { color: var(--ink-muted); font-size: .88rem; margin: .5rem 0 0; max-width: 56ch; }
+    .side-head[hidden] { display: none; }
+    .grid-side .card { background: none; }
 
     .card { display: flex; flex-direction: column; gap: 9px;
       background: var(--bg-raised); border: 1px solid var(--line-soft);
@@ -204,7 +212,7 @@
       <a class="card" data-skills="multimodal evaluation systems-architecture" data-note-multimodal="Text, a document, a photograph or speech, each becoming the unit the pipeline can actually check." data-note-evaluation="Six local engines on one sentence: the 4B answered in 2,285 ms, the 27B took 8,082 ms." data-note-systems-architecture="Local model first, your own endpoint second, hosted last, and every request names which one served it." href="passage/index.html">
         <span class="kind">Translation workspace</span>
         <h2>Passage</h2>
-        <p>Translate text, a document, a photograph or your voice, and see which engine answered. It runs on a model on your own machine whenever one is reachable, and says so per request.</p>
+        <p>Translate text, a document, a photograph or your voice, and see which engine answered. It runs on a model on your own machine whenever one is reachable, and says so per request. The case study, plus a twelve-slide walk through every measurement that changed the code.</p>
         <div class="tags">
             <span class="tag" data-skill="multimodal">Multimodal AI</span>
             <span class="tag" data-skill="evaluation">Evaluation &amp; measurement</span>
@@ -214,18 +222,7 @@
         <span class="go">See it running &rarr;</span>
       </a>
 
-      <a class="card" data-skills="multimodal user-research interaction-design" data-note-multimodal="One clip in, an overlay on the frame where the elbow went wrong." data-note-user-research="Paper roleplay first, then a user test, then a click-through people could hold." data-note-interaction-design="The correction sits on the frame it belongs to, not in a report that arrives that evening." href="mage/index.html">
-        <span class="kind">HCI case study</span>
-        <h2>MAGE</h2>
-        <p>An AI coach for people practising alone. Upload one clip of your jump shot and get an AR overlay on the frame where your elbow went wrong, instead of advice that arrives that evening.</p>
-        <div class="tags">
-            <span class="tag" data-skill="multimodal">Multimodal AI</span>
-            <span class="tag" data-skill="user-research">User research</span>
-            <span class="tag" data-skill="interaction-design">Interaction design</span>
-          </div>
-          <p class="why" hidden></p>
-        <span class="go">See the overlay &rarr;</span>
-      </a>
+
 
       <a class="card" data-skills="data-pipelines systems-architecture" data-note-data-pipelines="A public sale list ingested, enriched with comps, scored, and put on a map." data-note-systems-architecture="Bid ceiling, title cost and redemption risk computed separately, so you can disagree with one." href="deal-lens/index.html">
         <span class="kind">Live tool</span>
@@ -240,6 +237,28 @@
       </a>
 
     </div>
+
+      <div class="side-head">
+        <h2>Side quests</h2>
+        <p>Smaller pieces. Coursework and one-offs I kept because the finding was worth keeping.</p>
+      </div>
+
+      <div class="grid grid-side">
+
+      <a class="card" data-skills="multimodal user-research interaction-design" data-note-multimodal="One clip in, an overlay on the frame where the elbow went wrong." data-note-user-research="Paper roleplay first, then a user test, then a click-through people could hold." data-note-interaction-design="The correction sits on the frame it belongs to, not in a report that arrives that evening." href="mage/index.html">
+        <span class="kind">HCI case study</span>
+        <h2>MAGE</h2>
+        <p>An AI coach for people practising alone. Upload one clip of your jump shot and get an AR overlay on the frame where your elbow went wrong, instead of advice that arrives that evening.</p>
+        <div class="tags">
+            <span class="tag" data-skill="multimodal">Multimodal AI</span>
+            <span class="tag" data-skill="user-research">User research</span>
+            <span class="tag" data-skill="interaction-design">Interaction design</span>
+          </div>
+          <p class="why" hidden></p>
+        <span class="go">See the overlay &rarr;</span>
+      </a>
+
+      </div>
   </div>
 </main>
 
@@ -266,7 +285,9 @@
   var grid = document.querySelector('.grid');
   if (!bar || !grid) return;
   var buttons = Array.prototype.slice.call(bar.querySelectorAll('.fb'));
-  var cards = Array.prototype.slice.call(grid.querySelectorAll('.card'));
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var side = document.querySelector('.grid-side');
+  var sideHead = document.querySelector('.side-head');
   var status = document.getElementById('filter-status');
 
   function noteFor(card, skill) {
@@ -293,6 +314,11 @@
         t.classList.toggle('on', skill !== 'all' && t.getAttribute('data-skill') === skill);
       });
     });
+    if (side && sideHead) {
+      var anySide = Array.prototype.some.call(side.querySelectorAll('.card'), function (c) { return !c.hidden; });
+      sideHead.hidden = !anySide;
+      side.hidden = !anySide;
+    }
     var label = skill === 'all' ? '' : (bar.querySelector('[data-skill="' + skill + '"]') || {}).firstChild;
     status.textContent = skill === 'all'
       ? ''
