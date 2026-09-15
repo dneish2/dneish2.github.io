@@ -78,11 +78,11 @@
         <div class="beats">
           <div class="beat" data-reveal style="--i:0">
             <span class="mark">13 &rarr;</span>
-            <p><strong>I saved up and built my own gaming rig at 13.</strong> Then I basically lived on it. Minecraft servers, League of Legends tournaments, nights that ran until the sun came up. Won some, lost plenty.</p>
+            <p><strong>I saved up and built my own gaming rig at 13,</strong> then basically lived on it. Minecraft servers, League of Legends tournaments, nights that ran until the sun came up. Won some, lost plenty. I&rsquo;ve been building and tuning my own machines ever since.</p>
           </div>
           <div class="beat" data-reveal style="--i:1">
             <span class="mark">&rarr; College</span>
-            <p><strong>CS at SUNY Fredonia.</strong> I built <a href="https://www.observertoday.com/news/local-region/2020/01/students-present-software-projects/" rel="noopener">Alexa and Google Home skills</a> that answered questions about the university&rsquo;s academic calendar, in a program Paychex ran: weekly reviews with their engineers, final presentation at their office. I worked the residential network desk, which kept about 5,000 students online in the dorms. And I ran the campus eSports lounge. The summer of 2020 I interned at Fidelity Investments, where I wrote the AWS S3 onboarding guide new teams used to set up storage and move files, and a Java Spring Boot app that ran the common bucket operations for them.</p>
+            <p><strong>CS at SUNY Fredonia,</strong> where I kept building outside of class. In a program Paychex ran, weekly reviews with their engineers, I built <a href="https://www.observertoday.com/news/local-region/2020/01/students-present-software-projects/" rel="noopener">Alexa and Google Home skills</a> that answered questions about the university&rsquo;s academic calendar. I ran the campus eSports lounge and worked the residential network desk that kept about 5,000 students online. That summer I interned at Fidelity Investments, writing the AWS S3 onboarding guide new teams used to set up storage and move files.</p>
           </div>
           <div class="beat" data-reveal style="--i:2">
             <span class="mark">&rarr; Mastercard</span>
@@ -90,7 +90,7 @@
           </div>
           <div class="beat" data-reveal style="--i:3">
             <span class="mark">&rarr; Now</span>
-            <p><strong>AI decision systems, end to end.</strong> I build the tools I use every day, and I finish an M.S. in Human-Computer Interaction at Indiana University in 2027, researching this: an agent is about to act for you, and you need to see what it is about to do while you can still change it. <a href="work/trusted-concierge/index.html">Trusted Concierge</a> is where I built that. Nothing reaches a realtor until you approve exactly what gets sent. I want to take it further, into agents that spend money on your behalf.</p>
+            <p><strong>AI decision systems, end to end.</strong> I build the tools I use every day, and I finish an M.S. in Human-Computer Interaction at Indiana University in 2027, researching this: an agent is about to act for you, and you need to see what it is about to do while you can still change it, and it needs to ask you for what it&rsquo;s missing before it acts, not after. <a href="work/trusted-concierge/index.html">Trusted Concierge</a> is where I built that: nothing reaches a realtor until you approve exactly what gets sent. I want to take it further, into agents that spend money on your behalf.</p>
           </div>
         </div>
       </div>
@@ -307,13 +307,13 @@
 
         <div class="proof-row" data-reveal>
           <div class="stat"><span class="n">8</span><span class="l">tools your agent gets over one connection</span></div>
-          <div class="stat"><span class="n">0.769</span><span class="l">precision@5 against a corpus frozen in CI</span></div>
+          <div class="stat"><span class="n">4 of 5</span><span class="l">top results are right, checked on every change</span></div>
           <div class="stat"><span class="n">no key</span><span class="l">one command to connect, source is public</span></div>
         </div>
 
         <div data-reveal>
-          <p>Your agent already searches the web. What it does not know is which papers you decided were worth keeping. This puts that library behind an MCP interface, so the answer comes off your own shelf.</p>
-          <p>Every result shows the derivation that ranked it, so you can argue with the ranking instead of taking it. The ranker is gated in CI against a frozen corpus, because a fix I checked against one of two eval tracks cost 25% precision behind a green test suite.</p>
+          <p>It is a tool for searching the arXiv papers you actually saved, not the whole web. Use it directly, or connect it to your coding agent over MCP so the agent can search your library the same way.</p>
+          <p>Every result shows why it ranked where it did, so you can check the reasoning instead of just trusting a score.</p>
         </div>
 
         <p class="stack-line" data-reveal>Python 3.9+ &middot; zero-dependency core &middot; MCP over stdio &middot; MIT &middot; macOS, Linux, Windows</p>
@@ -334,17 +334,17 @@
           <span><b>8</b> domains templated</span>
           <span><b>3</b> guides: foundations &rarr; copiloting &rarr; mastery</span>
         </div>
-        <p data-reveal>A field guide, not a listicle. Ten techniques with the receipts, a copiloting model I use every day, and templates for eight domains you can deploy as-is. The point is bigger than prompting. Learn to think clearly, then delegate.</p>
+        <p data-reveal>A field guide, not a listicle: ten techniques for better prompting, each one backed by published research. A copiloting model I use every day, and templates for eight domains you can deploy as-is. The point is bigger than prompting. Learn to think clearly, then delegate.</p>
         <div class="cta-row" data-reveal>
           <a class="btn btn-primary" href="https://github.com/dneish2/Prompting-101" rel="noopener">Read the guide &rarr;</a>
         </div>
       </article>
 
-      <!-- side quest -->
+      <!-- also built -->
       <div class="exploring" data-reveal>
-        <span class="kicker">Side quest</span>
-        <h4>MAGE &mdash; an AI coach for people practising alone</h4>
-        <p>Coaching works because someone tells you the one thing to change while you can still feel the shot you just took. Film yourself instead and the insight arrives that evening, too late to be worth much. MAGE closes that gap: upload one clip, get an AR overlay drawn on the frame where your elbow went wrong. Designed end to end through paper roleplay with people mid-practice, a click-through prototype, and a user test that changed the build.</p>
+        <span class="kicker">Also shipped</span>
+        <h4>MAGE &mdash; an AI coach for anyone practicing alone, on video</h4>
+        <p>Coaching works because someone tells you the one thing to change while you can still feel the rep you just took. Film yourself instead and the insight arrives that evening, too late to matter. MAGE closes that gap: upload one clip and get an overlay drawn right on the frame where it broke down, an elbow in basketball to start, a League of Legends fight next. Designed end to end through paper roleplay with people mid-practice, a click-through prototype, and a user test that changed the build.</p>
         <div class="cta-row" style="margin-top:1rem">
           <a class="btn btn-primary" href="work/mage/index.html">See the overlay &rarr;</a>
           <a class="btn btn-ghost" href="https://body-pose-87992014.figma.site/" rel="noopener">Open the prototype</a>
@@ -388,6 +388,22 @@
           </span>
           <span class="arrow">&rarr;</span>
         </a>
+        <a class="writing-row" href="work/price-of-a-question/index.html" data-reveal style="--i:3">
+          <span class="chip">Interactive</span>
+          <span>
+            <h3>The Price of a Question</h3>
+            <p class="dek">What one question costs to answer, why it takes five models to serve it, and which hardware is worth owning. Includes a working router and a live cost model.</p>
+          </span>
+          <span class="arrow">&rarr;</span>
+        </a>
+        <a class="writing-row" href="work/research-digest/index.html" data-reveal style="--i:4">
+          <span class="chip">Tool</span>
+          <span>
+            <h3>Research Digest</h3>
+            <p class="dek">Ask your AI assistant what you have read about retrieval and it answers from your own arXiv library. One command to connect, no API key, source is public.</p>
+          </span>
+          <span class="arrow">&rarr;</span>
+        </a>
       </div>
     </div>
   </section>
@@ -409,8 +425,8 @@
         </div>
         <div class="resume-meta">
           <span class="kicker">R&eacute;sum&eacute;</span>
-          <h3>David Neish &mdash; the one-page version</h3>
-          <p class="one-liner" style="margin-bottom:0">Five years at Mastercard, four shipped AI products, one page. Everything above, minus the animation.</p>
+          <h3>David Neish</h3>
+          <p class="one-liner" style="margin-bottom:0">Five years at Mastercard, four shipped AI products, one page.</p>
         </div>
         <div class="resume-actions">
           <a class="btn btn-primary" href="assets/resume/david-neish-resume.pdf" target="_blank" rel="noopener">View r&eacute;sum&eacute; &rarr;</a>
