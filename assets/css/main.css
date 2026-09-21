@@ -352,6 +352,20 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   margin-top: 0.25rem;
 }
 
+/* a proof row that shows the commands you would actually type, instead of
+   numbers. The command is the headline; the line under it says what it does. */
+.proof-row.proof-cmds { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.proof-row.proof-cmds .stat .n {
+  font-size: 0.8rem;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+}
+.proof-row.proof-cmds .stat .l {
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  margin-top: 0.45rem;
+}
+
 /* tech line */
 .stack-line {
   font-family: var(--font-mono);
@@ -1092,6 +1106,7 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   .site-nav { gap: var(--s-2); }
   .site-nav a.nav-cta { padding: 0.3rem 0.6rem; }
   .proof-row { grid-template-columns: 1fr 1fr; }
+  .proof-row.proof-cmds { grid-template-columns: 1fr; }
 }
 
 /* skill row on a case study — the same vocabulary the /work filter uses, so a
