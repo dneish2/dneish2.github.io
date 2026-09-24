@@ -211,6 +211,50 @@
 
       <p>The 4B answered in a quarter of the time the 27B took, on the same sentence and the same card, and it is the default here for that reason rather than because it is the largest thing available. The <a href="../../writing/passage-measured.html">quality measurement</a> reached the same conclusion from the other direction.</p>
 
+      <h2>How it runs</h2>
+
+      <p>The interface is rendered on the server, and each open tab keeps its session in memory over a live WebSocket connection. Cloud Run assumes the opposite: short requests that any copy of the app can answer. Two settings close that gap. The request timeout is 60 minutes, because on Cloud Run the socket counts as the request. Session affinity sends a reconnect back to the instance that holds your session.</p>
+
+      <figure>
+        <div class="bench-scroll">
+          <svg viewBox="0 0 620 196" style="width:100%;min-width:560px;height:auto;display:block" role="img" aria-label="Passage deployment: a browser holds a live WebSocket to one Cloud Run container, which calls a hosted model; GitHub Actions runs the tests, builds the image and deploys it on every push to main">
+            <g font-family="Consolas,monospace" font-size="10.5">
+              <rect x="4" y="30" width="110" height="52" rx="6" fill="none" stroke="rgba(240,246,252,0.24)"/>
+              <text x="59" y="52" text-anchor="middle" fill="#e6edf3" font-size="11">BROWSER</text>
+              <text x="59" y="68" text-anchor="middle" fill="#8b949e">one tab</text>
+
+              <line x1="114" y1="50" x2="182" y2="50" stroke="#B86370" stroke-width="1.5"/>
+              <path d="M176 46 L182 50 L176 54" fill="none" stroke="#B86370" stroke-width="1.5"/>
+              <line x1="120" y1="64" x2="188" y2="64" stroke="#B86370" stroke-width="1.5"/>
+              <path d="M126 60 L120 64 L126 68" fill="none" stroke="#B86370" stroke-width="1.5"/>
+              <text x="151" y="40" text-anchor="middle" fill="#8b949e" font-size="9.5">websocket</text>
+
+              <rect x="188" y="14" width="232" height="84" rx="6" fill="none" stroke="#B86370"/>
+              <text x="304" y="36" text-anchor="middle" fill="#B86370" font-size="11">CLOUD RUN &middot; one container</text>
+              <text x="304" y="54" text-anchor="middle" fill="#8b949e">NiceGUI, session held in memory</text>
+              <text x="304" y="70" text-anchor="middle" fill="#8b949e">60 min timeout &middot; session affinity</text>
+              <text x="304" y="86" text-anchor="middle" fill="#8b949e">scales to zero between visits</text>
+
+              <line x1="420" y1="56" x2="488" y2="56" stroke="rgba(240,246,252,0.36)" stroke-width="1.5"/>
+              <path d="M482 52 L488 56 L482 60" fill="none" stroke="rgba(240,246,252,0.36)" stroke-width="1.5"/>
+
+              <rect x="488" y="30" width="128" height="52" rx="6" fill="none" stroke="rgba(240,246,252,0.24)"/>
+              <text x="552" y="52" text-anchor="middle" fill="#e6edf3" font-size="11">HOSTED MODEL</text>
+              <text x="552" y="68" text-anchor="middle" fill="#8b949e">spend ceiling</text>
+
+              <rect x="188" y="136" width="232" height="44" rx="6" fill="none" stroke="rgba(240,246,252,0.24)"/>
+              <text x="304" y="155" text-anchor="middle" fill="#e6edf3" font-size="11">GITHUB ACTIONS</text>
+              <text x="304" y="171" text-anchor="middle" fill="#8b949e">tests &rarr; image &rarr; deploy, on push to main</text>
+              <path d="M304 136 L304 100" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="3 4"/>
+              <path d="M300 106 L304 100 L308 106" fill="none" stroke="#8b949e" stroke-width="1"/>
+            </g>
+          </svg>
+        </div>
+        <figcaption><b>The hosted copy scales to zero.</b> The first visit after a quiet stretch waits a few seconds while a container starts, and sessions left idle end with it. The deploy has no GPU, so it translates with a hosted model. The local-first path in the screenshots above runs on your own machine.</figcaption>
+      </figure>
+
+      <p><a href="https://translation-app-wtpq62h5wa-uc.a.run.app/" rel="noopener">Open the hosted copy &rarr;</a></p>
+
       <h2>What it deliberately does not do</h2>
 
       <ul class="notdo">

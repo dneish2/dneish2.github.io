@@ -268,7 +268,7 @@
         <div class="foot">
           <span class="key"><span class="swatch"></span> owned container</span>
           <span class="key"><span class="swatch ext"></span> external dependency</span>
-          <span class="deploy">deploy: GitHub Actions &rarr; Cloud Run (prod + private sandbox)</span>
+          <span class="deploy">deploy: GitHub Actions &rarr; Cloud Run (prod + sandbox)</span>
         </div>
 
       </div>
@@ -339,11 +339,11 @@
       </details>
 
       <details class="row">
-        <summary><span class="src">SearXNG</span><span class="what">self-hosted metasearch</span><span class="cost">$0 marginal</span><span class="st local">degraded in prod</span></summary>
+        <summary><span class="src">SearXNG</span><span class="what">self-hosted metasearch</span><span class="cost">$0 marginal</span><span class="st local">dev only</span></summary>
         <div class="adr"><dl>
           <dt>Context</dt><dd>I wanted a search floor with no API key, so development and the free tier never hard-depend on a vendor.</dd>
           <dt>Decision</dt><dd>Self-host SearXNG: a Podman container on my workstation, a Cloud Run service in production.</dd>
-          <dt>Consequences</dt><dd>On my desk it works. In production it starves: Google and Bing block requests from datacenter IP ranges, so the deployed instance returns a trickle. It stays as the dev default and the last rung, and its production failure is the direct reason the two paid rungs below exist. One config trap cost real debugging time: JSON output is off by default, and a stock container answers 403 in a way that looks exactly like &ldquo;no news today.&rdquo;</dd>
+          <dt>Consequences</dt><dd>On my desk it works. In production it starves: Google and Bing block requests from datacenter IP ranges, so the deployed instance returns a trickle. It stayed as the dev default and the last rung, and its production failure is the direct reason the two paid rungs below exist. The production service has since been removed, so SearXNG now runs in development only. One config trap cost real debugging time: JSON output is off by default, and a stock container answers 403 in a way that looks exactly like &ldquo;no news today.&rdquo;</dd>
         </dl></div>
       </details>
 
@@ -422,18 +422,18 @@
       <p>The statistical claim this bought: in the mega-caps, options price earnings moves about right (36% outside implied, consistent with fair pricing). In the broader 100-name universe, stocks closed outside the implied band 48% of the time. Pooled 45.8%, 95% CI 42.7&ndash;49.0. The tiers matter more than the pooled number, and the method (closing straddle mid &times; 0.85) ships with the claim.</p>
 
       <h2><span class="num">3.</span> Two environments, different hardware on purpose</h2>
-      <p>Development had to cost nothing per iteration and work offline. Production had to survive spiky, mostly idle traffic without a standing bill. Those are different problems, so the environments differ deliberately, and every gap between them has to be visible in the UI rather than papered over.</p>
+      <p>Development had to cost nothing per iteration and work offline. Production had to handle spiky, mostly idle traffic without the first visitor waiting on a cold start. Those are different problems, so the environments differ deliberately, and every gap between them has to be visible in the UI rather than papered over.</p>
 
       <div class="envs-scroll">
       <table class="envs">
         <thead><tr><th></th><th>Development (workstation)</th><th>Production (GCP)</th></tr></thead>
         <tbody>
-          <tr><td>Compute</td><td>Python 3.13 venv, Windows</td><td>Cloud Run containers, scale to zero</td></tr>
+          <tr><td>Compute</td><td>Python 3.13 venv, Windows</td><td>Cloud Run, one warm instance (2 vCPU, 2 GiB) that scales out to three; the sandbox scales to zero</td></tr>
           <tr><td>Local model</td><td>Ollama qwen2.5 7B on the GPU</td><td>none; API tiers with a deterministic fallback</td></tr>
-          <tr><td>Search floor</td><td>SearXNG in Podman</td><td>SearXNG on Cloud Run, degraded (&sect;2)</td></tr>
+          <tr><td>Search floor</td><td>SearXNG in Podman</td><td>none; datacenter IPs are blocked (&sect;2), so the paid rungs are the floor</td></tr>
           <tr><td>Database</td><td colspan="2">one shared Supabase project, so dev exercises the same RLS policies and cache tables prod depends on</td></tr>
           <tr><td>Secrets</td><td>.env, gitignored</td><td>GCP Secret Manager, referenced by the deploy</td></tr>
-          <tr><td>Deploy</td><td>run locally</td><td>GitHub Actions &rarr; prod + a private sandbox off the develop branch</td></tr>
+          <tr><td>Deploy</td><td>run locally</td><td>GitHub Actions &rarr; prod + a sandbox off the develop branch, keyless through Workload Identity Federation</td></tr>
         </tbody>
       </table>
       </div>
