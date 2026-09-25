@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Starting Passage &mdash; David Neish</title>
+  <meta name="description" content="Waking the hosted copy of Passage. It scales to zero between visits, so the first request after a quiet stretch waits about fifteen seconds." />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#0d1117" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23B86370' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23B86370'/%3E%3C/svg%3E" />
+  <!--
+    WHY THIS PAGE EXISTS
+
+    Passage runs on Cloud Run with no minimum instance, so it shuts down when nobody is using it.
+    Measured 2026-09-24 over four cold starts twenty minutes apart: 15.7, 13.6, 12.6 and 3.6 seconds
+    to the first byte. Linking straight at the app meant a visitor stared at a blank white tab for
+    about fifteen seconds with nothing saying it was working, which reads as broken rather than as
+    slow, and most people leave.
+
+    So the link points here first. This page says what is happening, counts, and forwards the moment
+    the app answers. It also does the waking: each ping is a real request, which is what starts the
+    container. Warm, it forwards almost immediately.
+  -->
+  <style>
+    :root {
+      --bg:        #0d1117;
+      --bg-raised: #161b22;
+      --ink:       #e6edf3;
+      --ink-muted: #8b949e;
+      --line:      rgba(240, 246, 252, 0.12);
+      --accent:    #B86370;
+      --accent-hi: #D08A94;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font: 16px/1.6 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: grid; place-items: center; padding: 24px 16px;
+    }
+    .card {
+      width: 100%; max-width: 480px; background: var(--bg-raised);
+      border: 1px solid var(--line); border-radius: 12px; padding: 32px 28px;
+    }
+    h1 { margin: 0 0 12px; font-size: 22px; line-height: 1.25; letter-spacing: -0.01em; font-weight: 650; }
+    p { margin: 0 0 14px; color: var(--ink-muted); font-size: 15px; }
+    p:last-of-type { margin-bottom: 0; }
+    .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
+    /* The progress bar is deliberately NOT a percentage. We do not know how far along a container
+       start is, and a bar that claims to is a lie that gets found out at the fifteen-second mark.
+       It sweeps, which says "working" without claiming to know when. */
+    .track { height: 4px; border-radius: 2px; background: rgba(240,246,252,0.08); overflow: hidden; margin: 22px 0 16px; }
+    .track i { display: block; height: 100%; width: 38%; border-radius: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-hi), transparent);
+      animation: sweep 1.5s ease-in-out infinite; }
+    @keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+    @media (prefers-reduced-motion: reduce) { .track i { animation: none; width: 100%; opacity: .5; } }
+    .elapsed { color: var(--ink-muted); font-size: 13px; }
+    .elapsed b { color: var(--ink); font-weight: 600; }
+    a { color: var(--accent-hi); }
+    a:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 3px; }
+    .back { display: inline-block; margin-top: 20px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Starting Passage</h1>
+    <p>The hosted copy shuts down when nobody is using it, so the first visit after a quiet stretch
+       waits about 15 seconds while a container starts. This page sends you through the moment it
+       answers.</p>
+    <div class="track" role="presentation"><i></i></div>
+    <p class="elapsed" role="status" aria-live="polite">Waiting <b class="mono" id="elapsed">0s</b></p>
+    <p class="mono" id="fallback" style="display:none"><a id="direct" href="https://translation-app-wtpq62h5wa-uc.a.run.app/">Open it directly &rarr;</a></p>
+    <a class="back" href="../">&larr; Back to the Passage write-up</a>
+  </main>
+
+  <script>
+  (function () {
+    var APP = 'https://translation-app-wtpq62h5wa-uc.a.run.app/';
+    var started = Date.now();
+    var done = false;
+    var elapsedEl = document.getElementById('elapsed');
+
+    document.getElementById('direct').href = APP;
+
+    function go() {
+      if (done) return;
+      done = true;
+      // replace, not assign: the back button should return to the write-up, not to this page,
+      // which would immediately forward again and trap the visitor.
+      location.replace(APP);
+    }
+
+    // no-cors gives an opaque response we cannot read, and that is fine: the only question is
+    // whether anything answered at all. The request itself is what wakes the container.
+    function ping() {
+      if (done) return;
+      fetch(APP, { mode: 'no-cors', cache: 'no-store' }).then(go).catch(function () { /* still starting */ });
+    }
+
+    setInterval(function () {
+      elapsedEl.textContent = Math.round((Date.now() - started) / 1000) + 's';
+    }, 1000);
+
+    ping();
+    setInterval(ping, 1500);
+
+    // A floor under the worst case. If the ping can never resolve for a reason that has nothing to
+    // do with the app being asleep, nobody should be stuck on an interstitial: go anyway, and let
+    // the app's own load show whatever is actually wrong.
+    setTimeout(go, 30000);
+    // And an escape hatch on screen before that, so the choice is the visitor's.
+    setTimeout(function () {
+      if (!done) document.getElementById('fallback').style.display = '';
+    }, 12000);
+  })();
+  </script>
+</body>
+</html>
