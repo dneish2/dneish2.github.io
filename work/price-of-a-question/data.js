@@ -11,7 +11,7 @@
    Nothing on the page hand-types a glyph. The marker is rendered from `kind`,
    so a number cannot claim to be measured unless it says so here.
 
-   Last reconciled against finplatform @ 2026-08-05.
+   Last reconciled against finplatform @ 2026-09-24.
    ============================================================================= */
 (function (global) {
   'use strict';
@@ -27,7 +27,7 @@
   PQ.meta = {
     title: 'The Price of a Question',
     subject: 'finplatform',
-    reconciled: '2026-08-05',
+    reconciled: '2026-09-24',
     repo: 'finplatform',
     // The one date the whole cost model pivots on.
     sonnetIntroEnds: '2026-08-31'
@@ -66,15 +66,15 @@
       short: 'Claude Sonnet 5',
       model: 'claude-sonnet-5',
       credits: m(5, 'credits', 'auth/credits.py:87'),
-      perCall: m(0.011, 'usd', 'llm/tiers.py:61', 'intro pricing; re-measure before 2026-08-31'),
+      perCall: m(0.011, 'usd', 'llm/tiers.py:61', 'code still bills the intro rate as of 2026-09-24, past the 2026-08-31 cliff it flagged — re-check before quoting'),
       capability: 'strong'
     },
     {
       id: 'T3D', name: 'T3_DEEP_AGENT', label: 'Deep agent',
       short: 'A multi-call research run, not one call',
-      model: 'open_deep_research',
+      model: 'open_deep_research (bridge, off by default → falls back to Sonnet)',
       credits: m(10, 'credits', 'auth/credits.py:88'),
-      perCall: m(0.40, 'usd', 'llm/tiers.py:62'),
+      perCall: m(0.40, 'usd', 'llm/tiers.py:62', 'the credit weight is live; the open_deep_research repo itself is not vendored in this workspace, so every call today actually serves the router-T3 (Sonnet) fallback'),
       capability: 'strong'
     }
   ];
@@ -751,6 +751,12 @@
       body: 'credits.py opens with a docstring advertising 20 credits a month for Pro and unlimited for Options. The enforced table two hundred lines below says 40 and 300.',
       lesson: 'The number a user actually gets was right the whole time. Only the prose describing it was wrong, which is the argument for putting invariants in code rather than in documentation.',
       src: 'auth/credits.py:9 vs :122-135'
+    },
+    {
+      title: 'A public README overstated a rung that is off in production',
+      body: 'The architecture diagram showed news search going Tavily → SearXNG, as if the self-hosted floor were part of the live path. It never has been in production — the code disables it by environment, and the diagram just never caught up.',
+      lesson: 'A diagram is a claim like any other. It goes stale the same way a hardcoded number does, and nobody runs a test against a picture.',
+      src: 'README.md (fixed 2026-09-24) vs research/search.py:122-137'
     }
   ];
 
@@ -759,9 +765,8 @@
      ========================================================================= */
   PQ.openGates = [
     { title: 'The production T1 provider', body: 'Cloud Run has no GPU, so today every free-tier action is a Haiku call. vLLM on owned hardware, deterministic-only, or Haiku-for-everyone is an undecided launch gate, not a settled answer.' },
-    { title: 'The Serper key', body: 'Rung two of the search ladder is wired, capped, tested, and keyless.' },
     { title: 'Prompt caching', body: 'Cache reads run at about a tenth of input cost. It is documented, unimplemented, and worth 20 to 40 percent of the input bill.' },
-    { title: 'The 2026-08-31 price cliff', body: 'Sonnet 5 intro pricing ends. The same call goes from about $0.011 to about $0.0165. The escape hatch is one environment variable.' }
+    { title: 'The 2026-08-31 price cliff, revisited', body: 'The date passed and the code still bills the intro rate ($0.011/call). Either Anthropic has not raised it yet or the escape-hatch env var was never flipped — worth checking again before quoting either number as current.' }
   ];
 
   global.PQ = PQ;

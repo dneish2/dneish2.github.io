@@ -58,11 +58,13 @@ every page in this repo, not just this one.
 
 Known moving parts:
 
-- **Sonnet 5 intro pricing ends 2026-08-31.** The same call goes from about $0.011 to about
-  $0.0165. The Sonnet card counts down to it.
+- **The 2026-08-31 Sonnet 5 intro-pricing cliff has passed, and the code still bills $0.011/call**
+  (`llm/tiers.py:61`) rather than the ~$0.0165 the comment there predicted. Re-check before quoting
+  either figure as current.
 - **The production T1 provider is an open decision.** Today it is Haiku, because Cloud Run
   has no GPU.
-- **`--memory 2Gi` was recommended and not applied** as of 2026-08-04.
+- **`--memory 2Gi` was recommended and not applied**: `deploy-prod.yml` still deploys at `1Gi`
+  (`DEPLOY.md:213`), and the app is still being OOM-killed at it, as of 2026-09-24.
 - **Prompt caching is unimplemented**, worth 20 to 40 percent of the input bill.
 
-Last reconciled against finplatform on 2026-08-05.
+Last reconciled against finplatform on 2026-09-24.

@@ -394,7 +394,7 @@
       </div></div>
 
       <p class="figtitle">Figure 3 &middot; one dataset, bought once: the earnings tape</p>
-      <p>The ledger above covers live reads. Bought data works differently: it is measured once, receipted, committed, and re-derived for free forever. This is the pipeline behind the earnings anatomy, 961 measured earnings events across 121 tickers on licensed tape, lifetime spend $0.91.</p>
+      <p>The ledger above covers live reads. Bought data works differently: it is measured once, receipted, committed, and re-derived for free forever. This is the pipeline behind the earnings anatomy: 2,869 measured earnings events across 366 tickers on licensed tape, lifetime spend $2.49.</p>
 
       <div class="rail">
         <div class="node"><div class="dot"></div><div class="body">
@@ -419,7 +419,7 @@
         </div></div>
       </div>
 
-      <p>The statistical claim this bought: in the mega-caps, options price earnings moves about right (36% outside implied, consistent with fair pricing). In the broader 100-name universe, stocks closed outside the implied band 48% of the time. Pooled 45.8%, 95% CI 42.7&ndash;49.0. The tiers matter more than the pooled number, and the method (closing straddle mid &times; 0.85) ships with the claim.</p>
+      <p>The statistical claim this bought, corrected 2026-08-13 against the right null: across 21 large-cap names, the average earnings move delivered 75.7% of what the options market charged for it (169 prints); across the broader 345-name universe it delivered 88.0% (1,803 prints). Counting outside-the-range instead, 36.1% of the large-cap prints (61 of 169) and 43.9% of the broader set (791 of 1,803) closed outside the range priced beforehand &mdash; both below the roughly 49.8% a fairly-priced, normally-distributed band would put outside, so realized moves came in smaller than the options market charged for, not &ldquo;about right.&rdquo; The pooled rate (852 of 1,972, 43.2%) exists in the data but is deliberately never published alone: averaging two different populations is the Simpson&rsquo;s-paradox trap the tiers exist to avoid. The method (closing straddle mid &times; 0.85) ships with the claim.</p>
 
       <h2><span class="num">3.</span> Two environments, different hardware on purpose</h2>
       <p>Development had to cost nothing per iteration and work offline. Production had to handle spiky, mostly idle traffic without the first visitor waiting on a cold start. Those are different problems, so the environments differ deliberately, and every gap between them has to be visible in the UI rather than papered over.</p>
@@ -428,7 +428,7 @@
       <table class="envs">
         <thead><tr><th></th><th>Development (workstation)</th><th>Production (GCP)</th></tr></thead>
         <tbody>
-          <tr><td>Compute</td><td>Python 3.13 venv, Windows</td><td>Cloud Run, one warm instance (2 vCPU, 2 GiB) that scales out to three; the sandbox scales to zero</td></tr>
+          <tr><td>Compute</td><td>Python 3.13 venv, Windows</td><td>Cloud Run, one warm instance (2 vCPU, 1 GiB &mdash; a 2 GiB bump is recommended but not yet applied, and the instance is still getting OOM-killed at 1 GiB) that scales out to three; the sandbox scales to zero</td></tr>
           <tr><td>Local model</td><td>Ollama qwen2.5 7B on the GPU</td><td>none; API tiers with a deterministic fallback</td></tr>
           <tr><td>Search floor</td><td>SearXNG in Podman</td><td>none; datacenter IPs are blocked (&sect;2), so the paid rungs are the floor</td></tr>
           <tr><td>Database</td><td colspan="2">one shared Supabase project, so dev exercises the same RLS policies and cache tables prod depends on</td></tr>
