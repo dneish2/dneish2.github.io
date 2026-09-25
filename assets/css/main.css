@@ -1129,3 +1129,9 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
 }
 .skills a:hover { color: var(--accent); border-color: var(--accent); }
 .skills a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* The skills strip is 0.655rem (10.5px), which reads on a desktop and is under the readable floor
+   on a phone. It sits on every case study page, so it is fixed once here. */
+@media (max-width: 640px) {
+  .skills a { font-size: 12px; }
+}

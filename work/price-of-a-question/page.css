@@ -920,3 +920,65 @@ html.js .pq [data-reveal].in { opacity: 1; transform: none; }
   .pq .card { transition: none; }
   .pq .step { opacity: 1; transform: none; }
 }
+
+
+/* The simulator's condition checkboxes. These carried their styling inline, which meant the phone
+   floor below could not reach them: an inline declaration beats any stylesheet rule. */
+.pq .sim-cond { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono);
+  font-size: .7rem; color: var(--ink-muted); text-transform: none; letter-spacing: 0; }
+/* ============================================================================
+   THE 12px FLOOR, on phones.
+
+   A cross-device check counted 550 pieces of visible text under 12px on this page at 390px wide,
+   down to 9px. The dense rem scale is deliberate and stays on a desktop, where the screen is close
+   and wide; at arm's length on a phone a 9px caption is not dense, it is unreadable.
+
+   The selector list is generated from this file: every rule that declares a font-size under 12px,
+   so it is exact rather than a guess, and it will not shrink anything that was already bigger.
+   The two `svg.chart` rules are deliberately NOT here: that text sits inside a fixed viewBox and
+   scales with the drawing, so raising it would push labels out of the chart rather than make them
+   easier to read.
+   ============================================================================ */
+@media (max-width: 640px) {
+  .pq .why,
+  .pq .src,
+  .rail-ledger .rl-cap,
+  .rail-ledger .rl-sub,
+  .rail-ledger a,
+  .rail-ledger a .amt,
+  .rail-mobile,
+  .pq .twoprice .side-cap,
+  .pq .twoprice .breakdown,
+  .pq table.tl th,
+  .pq table.tl .t-surface,
+  .pq table.tl .t-note,
+  .pq .tier-chip,
+  .pq .seat-rates .sr-l,
+  .pq .suit-head h3,
+  .pq .suit-head .hint,
+  .pq .c-sub,
+  .pq .c-stats li,
+  .pq .c-stats .k,
+  .pq .c-flip,
+  .pq .c-list li,
+  .pq .c-list li::before,
+  .pq .c-head,
+  .pq .cliff,
+  .pq .station .st-cost,
+  .pq .station .st-cost .ms,
+  .pq .sim-head .t,
+  .pq .preset, .pq .ctl-btn,
+  .pq .ctl > label, .pq .ctl > .lb,
+  .pq .ctl-val,
+  .pq .step,
+  .pq .step .i,
+  .pq .tn-price,
+  .pq .gate,
+  .pq .unlock,
+  .pq .kpi .k,
+  .pq .kpi .s,
+  .pq .chart-title,
+  .pq .chart-key,
+  .pq .closer .ck,
+  .pq .sim-cond { font-size: 12px; }
+}
