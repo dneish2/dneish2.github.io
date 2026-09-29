@@ -29,6 +29,33 @@
     onScroll();
   }
 
+  // Demo reels: the markup is a plain <video controls>, so it works without JS.
+  // Here the native controls give way to a poster play button until someone
+  // asks for the video, and only one reel plays at a time.
+  var reels = document.querySelectorAll('.demo-reel video');
+  reels.forEach(function (video) {
+    var frame = video.parentElement;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'play';
+    btn.setAttribute('aria-label', 'Play: ' + (video.dataset.title || 'demo') + ', ' + (video.dataset.length || '') + ', narrated');
+    btn.innerHTML =
+      '<span class="play-disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg></span>' +
+      '<span class="play-label"><b></b><span></span></span>';
+    btn.querySelector('b').textContent = video.dataset.title || 'Watch the demo';
+    btn.querySelector('.play-label span').textContent = 'Watch · ' + (video.dataset.length || '') + ' · sound on';
+    video.controls = false;
+    frame.appendChild(btn);
+    btn.addEventListener('click', function () {
+      video.controls = true;
+      btn.remove();
+      video.play();
+    });
+    video.addEventListener('play', function () {
+      reels.forEach(function (other) { if (other !== video) other.pause(); });
+    });
+  });
+
   // Footer year.
   var year = document.querySelector('[data-year]');
   if (year) year.textContent = String(new Date().getFullYear());

@@ -731,6 +731,93 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
 }
 .diagram-panel svg { width: 100%; height: auto; display: block; }
 
+/* demo reel — a narrated product demo. Plain <video controls> without JS;
+   main.js swaps the native controls for a poster play button until clicked. */
+.demo-reel { margin: var(--s-4) 0 var(--s-4); }
+.demo-reel .frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-inset);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 30px 60px -32px rgba(0, 0, 0, 0.9);
+}
+.demo-reel video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--bg-inset);
+}
+.demo-reel .play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: var(--s-2);
+  padding: var(--s-3);
+  border: 0;
+  background: linear-gradient(to top, rgba(14, 13, 11, 0.92), rgba(14, 13, 11, 0.55) 22%, rgba(14, 13, 11, 0) 50%);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  letter-spacing: 0.06em;
+  text-align: left;
+  cursor: pointer;
+}
+.demo-reel .play-disc {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--proj-accent, var(--accent));
+  color: var(--bg);
+  box-shadow: 0 0 0 6px rgba(14, 13, 11, 0.45);
+  transition: transform 180ms ease;
+}
+.demo-reel .play-disc svg { width: 22px; height: 22px; margin-left: 4px; }
+.demo-reel .play:hover .play-disc,
+.demo-reel .play:focus-visible .play-disc { transform: scale(1.07); }
+.demo-reel .play:focus-visible { outline: 2px solid var(--proj-accent, var(--accent)); outline-offset: -2px; }
+.demo-reel .play-label { display: flex; flex-direction: column; gap: 2px; padding-bottom: 6px; }
+.demo-reel .play-label b { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; letter-spacing: 0; }
+.demo-reel figcaption { margin-top: var(--s-2); }
+.demo-reel .reel-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s-1) var(--s-2);
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--proj-accent, var(--accent));
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.demo-reel .reel-bar b { color: var(--ink); font-weight: 500; }
+.demo-reel .reel-note { margin: var(--s-1) 0 0; color: var(--ink-muted); max-width: var(--measure); }
+.demo-reel details { margin-top: var(--s-1); font-size: var(--text-small); color: var(--ink-muted); }
+.demo-reel summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--proj-accent, var(--accent));
+}
+.demo-reel details p { max-width: var(--measure); margin: var(--s-1) 0 0; }
+@media (max-width: 640px) {
+  .demo-reel .play { padding: var(--s-2); }
+  .demo-reel .play-disc { width: 52px; height: 52px; }
+  .demo-reel .play-label b { font-size: 1.05rem; }
+}
+
 /* field guide (Prompting-101) */
 .field-guide {
   border-top: 1px solid var(--line-soft);

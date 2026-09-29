@@ -1,0 +1,33 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.459
+Ask a chatbot about a stock, and you can't tell where the answer came from.
+
+2
+00:00:08.427 --> 00:00:13.035
+Here, the analyst sits on every page, and knows which stock you're looking at.
+
+3
+00:00:13.285 --> 00:00:15.760
+Ask it what Nvidia's biggest risk is.
+
+4
+00:00:19.674 --> 00:00:21.999
+The answer cites its sources by number.
+
+5
+00:00:22.249 --> 00:00:26.857
+When a question needs it, it also reads the company's own ten-K filing.
+
+6
+00:00:27.365 --> 00:00:33.509
+Underneath are the receipts: the data it used, the filing and its date, and every numbered source.
+
+7
+00:00:33.759 --> 00:00:37.791
+And a line naming the model that answered. This one was Haiku.
+
+8
+00:00:38.302 --> 00:00:41.097
+finplatform. Answers that show their work.
