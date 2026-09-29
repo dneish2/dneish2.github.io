@@ -55,6 +55,15 @@
     .adr dt { font-family: var(--font-mono); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); padding-top: 4px; }
     .adr dd { margin: 0; color: var(--ink-muted); }
     @media (max-width: 620px) { .adr dl { grid-template-columns: 1fr; gap: 2px 0; } .adr dd { margin-bottom: 8px; } }
+    /* Phones: stack ledger rows instead of sideways scrolling. */
+    @media (max-width: 620px) {
+      .ledger-min { min-width: 0; }
+      .ledger-head { display: none; }
+      details.row summary { grid-template-columns: 1fr auto; row-gap: 3px; }
+      details.row summary .st { grid-column: 2; grid-row: 1; }
+      details.row summary .what { grid-column: 1 / -1; white-space: normal; }
+      details.row summary .cost { grid-column: 1 / -1; text-align: left; }
+    }
 
     .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; margin: 1.4rem 0; }
     @media (max-width: 760px) { .twocol { grid-template-columns: 1fr; } }
@@ -199,7 +208,6 @@
       </figure>
 
       <p class="figtitle">Figure 1 &middot; system context</p>
-      <p>Parts list. A solid border means I run it and can change it. A dashed border means it is an external contract I live with. Each tier calls only the tier below it. That split is why the data ladder in &sect;2 exists.</p>
 
       <div class="ctx">
 
@@ -208,12 +216,12 @@
           <div class="boxes">
             <div class="box">
               <span class="n">Web app</span>
-              <span class="tech">React 18 &middot; TypeScript &middot; Vite &middot; TanStack Query</span>
+              <span class="tech"><a href="https://react.dev" rel="noopener">React 18</a> &middot; <a href="https://www.typescriptlang.org" rel="noopener">TypeScript</a> &middot; <a href="https://vite.dev" rel="noopener">Vite</a> &middot; <a href="https://tanstack.com/query/latest" rel="noopener">TanStack Query</a></span>
               <p class="r">A single-page app where every surface renders the same Report contract (&sect;4). There is no second shape for the browser to special-case.</p>
             </div>
             <div class="box">
               <span class="n">Auth &amp; accounts</span>
-              <span class="tech">Supabase Auth &middot; ES256 JWT via JWKS</span>
+              <span class="tech"><a href="https://supabase.com/docs/guides/auth" rel="noopener">Supabase Auth</a> &middot; ES256 JWT via JWKS</span>
               <p class="r">Tokens are verified server-side on every request against the published key set. The client is never the thing that decides who you are.</p>
             </div>
           </div>
@@ -231,7 +239,7 @@
             </div>
             <div class="box">
               <span class="n">Model router</span>
-              <span class="tech">Ollama qwen2.5 7B &middot; Anthropic Haiku / Sonnet</span>
+              <span class="tech"><a href="https://ollama.com" rel="noopener">Ollama</a> qwen2.5 7B &middot; <a href="https://docs.anthropic.com/en/docs/about-claude/models" rel="noopener">Anthropic Haiku / Sonnet</a></span>
               <p class="r">Task-tiered, capped per request by the user&rsquo;s pick. The local model is the zero-key fallback, so a missing API key degrades the answer instead of breaking the page.</p>
             </div>
           </div>
@@ -244,7 +252,7 @@
           <div class="boxes">
             <div class="box">
               <span class="n">Postgres</span>
-              <span class="tech">Supabase &middot; RLS on every owned table</span>
+              <span class="tech"><a href="https://supabase.com/docs" rel="noopener">Supabase</a> &middot; RLS on every owned table</span>
               <p class="r">Reports, annotations, shares, credits, and the caches that are shared across users on purpose.</p>
             </div>
             <div class="box">
@@ -254,7 +262,7 @@
             </div>
             <div class="box">
               <span class="n">Secrets</span>
-              <span class="tech">GCP Secret Manager</span>
+              <span class="tech"><a href="https://cloud.google.com/security/products/secret-manager" rel="noopener">GCP Secret Manager</a></span>
               <p class="r">API keys are never in an image or an env file in production. The sandbox and prod read different secrets under the same names.</p>
             </div>
           </div>
@@ -266,24 +274,24 @@
           <p class="tier-label">External dependencies</p>
           <div class="boxes deps">
             <div class="box ext">
-              <span class="n">yfinance</span>
+              <span class="n"><a href="https://github.com/ranaroussi/yfinance" rel="noopener">yfinance</a></span>
               <span class="tech">market data</span>
               <p class="r">Free, roughly 15 minutes delayed, and it throttles. Every price on the site traces back here.</p>
             </div>
             <div class="box ext">
-              <span class="n">SEC EDGAR</span>
+              <span class="n"><a href="https://www.sec.gov/edgar" rel="noopener">SEC EDGAR</a></span>
               <span class="tech">filings</span>
               <p class="r">Free and authoritative. The only source that can settle what a company actually said.</p>
             </div>
             <div class="box ext">
-              <span class="n">Tavily / Serper</span>
+              <span class="n"><a href="https://tavily.com" rel="noopener">Tavily</a> / <a href="https://serper.dev" rel="noopener">Serper</a></span>
               <span class="tech">paid web search</span>
-              <p class="r">Rungs 1 and 2 of the ladder, reached only under the day&rsquo;s spend cap.</p>
+              <p class="r">Rungs 1 ($0.008) and 2 ($0.0003) of the ladder, reached only under the day&rsquo;s spend cap.</p>
             </div>
             <div class="box ext">
-              <span class="n">SearXNG</span>
+              <span class="n"><a href="https://docs.searxng.org" rel="noopener">SearXNG</a></span>
               <span class="tech">self-hosted search</span>
-              <p class="r">The floor. Free and mine, so the ladder always has a bottom rung that cannot bill me.</p>
+              <p class="r">The floor in dev. Free and mine, so local work never needs a vendor key.</p>
             </div>
           </div>
         </div>
@@ -302,7 +310,7 @@
       <div class="rail">
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Browser <em>&middot; React SPA</em></span>
-          <div class="d">TanStack Query asks for the brief. Example: the July 28 page sends <code>cap: haiku</code> along as a header, so the server knows the most it may spend.</div>
+          <div class="d"><a href="https://tanstack.com/query/latest" rel="noopener">TanStack Query</a> asks for the brief. Example: the July 28 page sends <code>cap: haiku</code> as a header, so the server knows the most it may spend.</div>
           <div class="edge">https &middot; json</div>
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
@@ -312,7 +320,7 @@
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Cache <em>&middot; memory, then shared Postgres</em></span>
-          <div class="d">First reader misses both tiers and keeps walking. The answer is written back to both, so the next reader gets it stamped <code>as_of 09:32</code> with zero provider calls.</div>
+          <div class="d">First reader misses both tiers and keeps walking. The answer is written back to both for a 2h TTL, so the next reader gets it stamped <code>as_of 09:32</code> with zero provider calls.</div>
           <div class="edge">miss on first read</div>
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
@@ -323,7 +331,7 @@
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Model router <em>&middot; task-tiered</em></span>
-          <div class="d">Briefs go to Haiku, heavy synthesis to Sonnet, capped by your pick. That morning: Haiku in 2,141 ms over eight rows. Headlines enter marked untrusted. No rows, no call.</div>
+          <div class="d">Briefs go to <a href="https://docs.anthropic.com/en/docs/about-claude/models" rel="noopener">Haiku</a> (2 credits), heavy synthesis to Sonnet (5), capped by your pick. That morning: Haiku in 2,141 ms over eight rows. Headlines enter marked untrusted. No rows, no call.</div>
           <div class="edge">model text</div>
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
@@ -333,12 +341,12 @@
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Report envelope <em>&middot; &sect;4</em></span>
-          <div class="d">One shape back to the browser: kind, as_of, status, data, plus provenance with model, credits, and eight clickable sources. Try it below — it copies.</div>
+          <div class="d">One shape back to the browser: kind, as_of, status, data, plus provenance with model, credits, and eight clickable sources.</div>
         </div></div>
       </div>
 
       <h2><span class="num">2.</span> The data ledger</h2>
-      <p>I built the ledger first and the models from it. What the data costs, where it comes from, and the tables that make the cost visible. Each row below expands into why I chose it.</p>
+      <p>What the data costs, where it comes from, and the tables that make the cost visible. Each row below expands into why I chose it.</p>
 
       <div class="twocol">
         <div>
@@ -464,18 +472,18 @@
         </div></div>
       </div>
 
-      <p>The statistical claim this bought, corrected 2026-08-13 against the right null: across 21 large-cap names, the average earnings move delivered 75.7% of what the options market charged for it (169 prints); across the broader 345-name universe it delivered 88.0% (1,801 prints). Counting outside-the-range instead, 36.1% of the large-cap prints (61 of 169) and 43.9% of the broader set (790 of 1,801) closed outside the range priced beforehand &mdash; both below the roughly 49.8% a fairly-priced, normally-distributed band would put outside, so realized moves came in smaller than the options market charged for, not &ldquo;about right.&rdquo; The pooled rate (851 of 1,970, 43.2%) exists in the data but is deliberately never published alone: averaging two different populations is the Simpson&rsquo;s-paradox trap the tiers exist to avoid. The method (closing straddle mid &times; 0.85) ships with the claim.</p>
+      <p>What that bought: 2,867 measured earnings prints across 366 tickers. Large-cap moves (169 prints) averaged 75.7% of what the options market priced. The broader set (1,801 prints) averaged 88.0%. The two sets are never averaged together. Method: closing straddle mid &times; 0.85.</p>
 
       <h2><span class="num">3.</span> Two environments, different hardware on purpose</h2>
-      <p>I built dev to cost $0 per iteration and run offline. I run prod to stay warm through spiky, mostly-idle traffic. When they differ, the UI says so — <code>as_of</code> stamps, not silent gaps.</p>
+      <p>I built dev to cost $0 per iteration and run offline. I run prod to stay warm through spiky, mostly-idle traffic. When they differ, the UI says so: <code>as_of</code> stamps, not silent gaps.</p>
 
       <div class="envs-scroll">
       <table class="envs">
         <thead><tr><th></th><th>Development (workstation)</th><th>Production (GCP us-central1)</th></tr></thead>
         <tbody>
-          <tr><td>Compute</td><td>Python 3.13 venv on Windows, local port</td><td>Cloud Run service, 2 vCPU / 1 GiB per instance. Prod keeps 1 warm and scales to 3; sandbox scales to 0. At 1 GiB it OOM-kills under snapshot warms — 2 GiB is recommended, not yet applied.</td></tr>
-          <tr><td>Local model</td><td>Ollama qwen2.5 7B on my GPU, keyless</td><td>None — Cloud Run has no GPU at any memory size. API tiers only, with a deterministic T0 fallback so a missing key degrades instead of breaking.</td></tr>
-          <tr><td>Search floor</td><td>SearXNG in Podman, free floor</td><td>None — datacenter IPs are blocked (&sect;2), so the paid rungs are the floor and SearXNG stays dev-only.</td></tr>
+          <tr><td>Compute</td><td>Python 3.13 venv on Windows, local port</td><td>Cloud Run service, 2 vCPU / 1 GiB per instance. Prod keeps 1 warm and scales to 3; sandbox scales to 0. At 1 GiB it OOM-kills under snapshot warms. 2 GiB is recommended, not yet applied.</td></tr>
+          <tr><td>Local model</td><td>Ollama qwen2.5 7B on my GPU, keyless</td><td>None. Cloud Run has no GPU at any memory size. API tiers only, with a deterministic T0 fallback so a missing key degrades instead of breaking.</td></tr>
+          <tr><td>Search floor</td><td>SearXNG in Podman, free floor</td><td>None. Datacenter IPs are blocked (&sect;2), so the paid rungs are the floor and SearXNG stays dev-only.</td></tr>
           <tr><td>Database</td><td colspan="2">One shared Supabase Postgres. Same row-level-security policies and cache tables in dev and prod, so dev exercises what prod depends on.</td></tr>
           <tr><td>Secrets</td><td>.env file, gitignored</td><td>GCP Secret Manager. Prod and sandbox read different secrets under the same names; keys never live in the image.</td></tr>
           <tr><td>Deploy</td><td>run locally</td><td>GitHub Actions, no stored keys. Push to <code>main</code> ships prod; push to <code>develop</code> ships the sandbox. Login uses Workload Identity Federation, so GitHub mints a short-lived token GCP trusts.</td></tr>
@@ -484,7 +492,7 @@
       </div>
 
       <h2><span class="num">4.</span> The report contract</h2>
-      <p>I return one envelope from every endpoint, from a news brief to a research dossier. Here it is filled in from the July 28 brief traced in &sect;7, then the shape. Copy it — your client can branch on <code>status</code> and nothing else.</p>
+      <p>I return one envelope from every endpoint, from a news brief to a research dossier. Here it is filled in from the July 28 brief traced in &sect;7, then the shape. Copy it: your client can branch on <code>status</code> and nothing else.</p>
 
       <div class="twocol">
         <div>
@@ -533,7 +541,7 @@
   };
 }</pre>
           <div class="adr"><dl>
-            <dt>Before</dt><dd>About twenty endpoints had grown five shapes for &ldquo;sources&rdquo; — including a bare integer on four of them — and four names for &ldquo;when is this from.&rdquo; A count you cannot click is not a citation.</dd>
+            <dt>Before</dt><dd>About twenty endpoints had grown five shapes for &ldquo;sources&rdquo;, including a bare integer on four of them, and four names for &ldquo;when is this from.&rdquo; A count you cannot click is not a citation.</dd>
             <dt>Now</dt><dd>One envelope. A failed report is still a report: same keys, <code>status: "unavailable"</code>, reason written for a person.</dd>
             <dt>Payoff</dt><dd>The client never branches on shape, saved reports freeze and share, and cost is legible: Haiku costs little, deep research costs ~10&times; more, stated before you spend.</dd>
           </dl></div>
@@ -547,7 +555,7 @@
       <table class="envs">
         <thead><tr><th>Invariant</th><th>What it means</th><th>Where it lives</th></tr></thead>
         <tbody>
-          <tr><td>No fabrication</td><td>Every claim traces to a row in hand. No rows, no call — the router abstains.</td><td>compose-answer path, grounding check</td></tr>
+          <tr><td>No fabrication</td><td>Every claim traces to a row in hand. No rows, no call. The router abstains.</td><td>compose-answer path, grounding check</td></tr>
           <tr><td>No injected instructions</td><td>Headlines enter the prompt marked untrusted; model never obeys them.</td><td>prompt wrapper + post-call scrub</td></tr>
           <tr><td>Honest caveats</td><td>Thin data ships as <code>partial</code> with notes, not as confidence.</td><td>Report envelope</td></tr>
           <tr><td>Clean prose</td><td>No markdown in prose, no banned phrasing. Stripped in code either way.</td><td>post-call enforce</td></tr>
@@ -557,16 +565,11 @@
 
       <p>The eval runs offline in CI against that single compose-answer path, which is what makes the rules enforceable instead of aspirational: there is exactly one place where model text becomes what you read.</p>
 
-      <h2><span class="num">6.</span> Risk note: why there is no buy signal</h2>
-      <div class="risk-note">
-        <p><b>I tested sixteen swing-trade configurations against real data and found no durable edge, so I deleted the signal engine.</b> Shipping a predictor would have been dishonest and risky — the failure mode is a user sizing a position off a backtest.</p>
-        <p>What I kept is the Options Lab clarity panel below: what the market already prices (expected move), what you need (required move), chance of profit, and the flags working against you — time decay, earnings before expiry — under a red banner when several factors lean the wrong way.</p>
+      <h2><span class="num">6.</span> What the terminal shows</h2>
+      <p>Stocks, options, news, and earnings share the same data layer: 13,102 searchable tickers with live chains, filings from EDGAR, and the 2,867-print earnings tape from &sect;2. Open it and ask in plain English.</p>
+      <div class="cta-row" data-reveal>
+        <a class="btn btn-primary" href="https://fin-app-893163953443.us-central1.run.app/" rel="noopener">Open finplatform &rarr;</a>
       </div>
-
-      <figure class="figure">
-        <img src="assets/pf_options.png" alt="The Options Lab clarity panel for an AAPL call: expected move, required move, chance of profit, and a flag list including time decay and earnings before expiry, with a red banner reading several factors work against this setup." loading="lazy" />
-        <figcaption>A long AAPL call. The red banner is the point: several factors work against this setup.</figcaption>
-      </figure>
 
       <h2><span class="num">7.</span> One morning brief, end to end</h2>
       <p>Receipt for July 28: the market brief that shipped, with its sources open.</p>
@@ -577,10 +580,10 @@
       </figure>
 
       <div class="trace">
-        <div class="turn"><span class="who">09:31 &middot; retrieve — $0.0018</span><p>Six fixed queries warm the market pool. Rung 1 was exhausted, so rung 2 served all six, then cached. Next reader: $0.</p></div>
-        <div class="turn"><span class="who">09:31 &middot; filter and rank — 8 rows</span><p>Indexes, symbol pages, and stale dates drop out. Relevance multiplies the blend, so an off-topic page can't outrank an on-topic one.</p></div>
-        <div class="turn"><span class="who">09:32 &middot; synthesize — Haiku, 2,141 ms</span><p>Haiku writes the take over the eight rows. Headlines in as untrusted text; markdown and banned phrasing stripped in code.</p></div>
-        <div class="turn"><span class="who">09:32 &middot; render — under a cent</span><p>Ships as the &sect;4 Report: model named, credits shown, eight sources one click away with publisher, date, contribution.</p></div>
+        <div class="turn"><span class="who">09:31 &middot; retrieve &middot; $0.0018</span><p>Six fixed queries warm the market pool. Rung 1 was exhausted, so rung 2 served all six, then cached. Next reader: $0.</p></div>
+        <div class="turn"><span class="who">09:31 &middot; filter and rank &middot; 8 rows</span><p>Indexes, symbol pages, and stale dates drop out. Relevance multiplies the blend, so an off-topic page can't outrank an on-topic one.</p></div>
+        <div class="turn"><span class="who">09:32 &middot; synthesize &middot; Haiku, 2,141 ms</span><p>Haiku writes the take over the eight rows. Headlines in as untrusted text; markdown and banned phrasing stripped in code.</p></div>
+        <div class="turn"><span class="who">09:32 &middot; render &middot; under a cent</span><p>Ships as the &sect;4 Report: model named, credits shown, eight sources one click away with publisher, date, contribution.</p></div>
       </div>
 
       <div class="recap"><b>The whole system in one artifact:</b> paid data enters through a budgeted ladder, a shared cache makes it cheap, a routed model synthesizes it, code enforces the invariants, and provenance rides to the pixel you can click.</div>
