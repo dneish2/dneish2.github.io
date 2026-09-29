@@ -94,38 +94,58 @@
        Owned containers carry a solid border, external ones a dashed one, so the
        trust boundary is readable without consulting the legend. */
     .ctx { margin: 1.6rem 0 2rem; }
-    .ctx .tier { margin-bottom: 4px; }
-    .ctx .tier-label { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .12em;
-      text-transform: uppercase; color: var(--ink-muted); margin: 0 0 .5rem; }
-    .ctx .boxes { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+    .ctx .tier { margin-bottom: 6px; }
+    .ctx .tier-label { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--accent); margin: 0 0 .6rem; }
+    .ctx .boxes { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
     /* The four providers are peers on one ladder, so they read better as one row
        than as three-plus-an-orphan. */
     .ctx .boxes.deps { grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); }
-    .ctx .box { border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--bg-raised);
-      padding: 11px 13px 12px; min-width: 0; }
-    .ctx .box.ext { border-style: dashed; border-color: var(--line-soft); background: none; }
+    .ctx .box { border: 1.5px solid var(--line-strong); border-radius: var(--radius); background: var(--bg-raised);
+      padding: 13px 15px 14px; min-width: 0; }
+    .ctx .box.ext { border-style: dashed; border-width: 1.5px; border-color: var(--ink-muted); background: none; }
     .ctx .box .n { font-family: var(--font-mono); font-size: .82rem; color: var(--ink); display: block; }
     .ctx .box.ext .n { color: var(--ink-muted); }
     .ctx .box .tech { font-family: var(--font-mono); font-size: .66rem; color: var(--accent); display: block;
       margin-top: 2px; line-height: 1.5; }
     .ctx .box.ext .tech { color: var(--ink-muted); }
     .ctx .box .r { font-size: .8rem; color: var(--ink-muted); margin: .45rem 0 0; line-height: 1.5; }
-    .ctx .link { font-family: var(--font-mono); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase;
-      color: var(--ink-muted); margin: .7rem 0 .8rem; }
+    .ctx .link { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em;
+      color: var(--ink); margin: .8rem 0 .9rem; }
     .ctx .link::before { content: '\2193\00a0\00a0'; color: var(--accent); }
-    .ctx .foot { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; margin-top: 1rem;
-      padding-top: .8rem; border-top: 1px solid var(--line-soft);
-      font-family: var(--font-mono); font-size: .66rem; color: var(--ink-muted); }
-    .ctx .key { display: inline-flex; align-items: center; gap: 7px; }
-    .ctx .swatch { width: 15px; height: 10px; border: 1px solid var(--line-strong); border-radius: 2px;
-      background: var(--bg-raised); display: inline-block; }
-    .ctx .swatch.ext { border-style: dashed; border-color: var(--line-soft); background: none; }
+    .ctx .foot { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; margin-top: 1.2rem;
+      padding: .9rem 1rem; border: 1px solid var(--line-soft); border-left: 2px solid var(--accent);
+      border-radius: var(--radius); background: var(--bg-raised);
+      font-family: var(--font-mono); font-size: .76rem; color: var(--ink); }
+    .ctx .key { display: inline-flex; align-items: center; gap: 9px; }
+    .ctx .swatch { width: 22px; height: 14px; border: 1.5px solid var(--line-strong); border-radius: 3px;
+      background: var(--bg-inset); display: inline-block; }
+    .ctx .swatch.ext { border-style: dashed; border-color: var(--ink-muted); background: none; }
     .ctx .deploy { color: var(--ink); }
 
     .trace { border-left: 2px solid var(--accent); padding: 2px 0 2px 20px; margin: 1.6rem 0; max-width: 64ch; }
     .trace .turn { margin-bottom: 1rem; }
     .trace .who { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); }
     .trace p { margin: .3rem 0 0; font-size: .92rem; color: var(--ink-muted); }
+
+    /* Executive strip: authority numbers first, safety nets later. */
+    .exec-strip { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 1.2rem 0 0;
+      padding: .8rem 0; border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft);
+      font-family: var(--font-mono); font-size: .74rem; color: var(--ink-muted); }
+    .exec-strip b { color: var(--accent); font-weight: 600; margin-right: 6px; }
+    .risk-note { border: 1px solid var(--line-soft); border-left: 2px solid var(--accent);
+      border-radius: var(--radius); padding: 1rem 1.2rem; margin: 1.4rem 0; max-width: 72ch;
+      background: var(--bg-raised); }
+    .risk-note p { margin: 0 0 .6rem; font-size: .9rem; color: var(--ink-muted); max-width: 68ch; }
+    .risk-note p:last-child { margin-bottom: 0; }
+    .risk-note b { color: var(--ink); }
+    .recap { border-left: 2px solid var(--accent); background: var(--bg-raised);
+      border-radius: 0 var(--radius) var(--radius) 0; padding: 1rem 1.2rem; margin: 1.6rem 0;
+      max-width: 68ch; font-size: 1rem; color: var(--ink); line-height: 1.6; }
+    .copybtn { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .06em;
+      border: 1px solid var(--line-soft); border-radius: var(--radius-chip); background: none;
+      color: var(--ink-muted); padding: 4px 10px; cursor: pointer; margin: 0 0 .6rem; }
+    .copybtn:hover { color: var(--accent); border-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -150,7 +170,13 @@
     <header class="article-head">
       <span class="kicker">How finplatform is built</span>
       <h1>finplatform: a reference architecture</h1>
-      <p class="dek">One terminal, five consolidated apps, a router that spans a local GPU to Claude. This walks the system the way I would in a design review: what the data costs, the one contract every surface returns, and the full trace of a single output.</p>
+      <p class="dek">Five finance tools became one terminal. The morning brief costs under a cent, 2,867 earnings prints were measured once on $2.49 of licensed tape, and every surface returns the same Report shape.</p>
+      <div class="exec-strip" aria-label="Executive summary">
+        <span><b>5&rarr;1</b> apps merged</span>
+        <span><b>&lt;$0.01</b> per brief on screen</span>
+        <span><b>2,867</b> prints &middot; <b>$2.49</b> tape</span>
+        <span><b>1</b> Report contract</span>
+      </div>
       <div class="byline">
         <span>David Neish</span>
       </div>
@@ -160,23 +186,20 @@
         <a href="../work/index.html#s=retrieval">Retrieval &amp; ranking</a>
         <a href="../work/index.html#s=data-pipelines">Data pipelines</a>
       </p>
-      <p style="font-family: var(--font-mono); font-size: .74rem; color: var(--ink-muted); border-left: 2px solid var(--accent); padding: .5rem 0 .5rem 1rem; margin: 1.4rem 0 0; max-width: 62ch; line-height: 1.6;">
-        There is an interactive companion to this piece: <a href="../work/price-of-a-question/index.html">The Price of a Question</a> prices every desk task against what the machine actually spends, and includes a working router simulator and unit-economics model.
-      </p>
     </header>
 
     <article class="article-body">
 
       <h2><span class="num">1.</span> One terminal beats five demos</h2>
-      <p>Infera, RoboAdvisor, Earnings-Digest, Morsel, and proTerminal each proved a capability; none was a product. Consolidating them forced one data layer, one design system, and one opinion about what a research answer owes its reader. The result runs as a React SPA over a Python backend on Cloud Run, with Supabase holding accounts, credits, reports, and the shared caches.</p>
+      <p>I built five finance tools that each proved one thing: a screener, an options helper, an earnings digest, a research assistant, a terminal shell. None of them was a product you could stay inside. finplatform merges them into one terminal with one data layer, one design system, and one answer format. It runs as a React SPA over a Python backend on Cloud Run, with Supabase holding accounts, credits, reports, and the shared caches.</p>
 
       <figure class="figure">
         <img src="assets/pf_stock.png" alt="The finplatform stock page: NVDA candlestick chart with 50 and 200 day moving averages, earnings markers on the price history, and key insights below." loading="lazy" />
-        <figcaption>The stock surface. Every candle is a real trading day; the E markers are earnings dates with the move that followed. No downsampling, no smoothing.</figcaption>
+        <figcaption>The stock surface. Every candle is a real trading day; the E markers are earnings dates with the move that followed.</figcaption>
       </figure>
 
       <p class="figtitle">Figure 1 &middot; system context</p>
-      <p>Before the request walk, the parts list. Four tiers, each calling only the tier below it, and a hard line between what I run and what I depend on. Everything inside a solid border I can change on a Tuesday. Everything dashed is a contract I have to live with, which is why the data ladder in &sect;2 exists at all.</p>
+      <p>Parts list. A solid border means I run it and can change it. A dashed border means it is an external contract I live with. Each tier calls only the tier below it. That split is why the data ladder in &sect;2 exists.</p>
 
       <div class="ctx">
 
@@ -266,56 +289,78 @@
         </div>
 
         <div class="foot">
-          <span class="key"><span class="swatch"></span> owned container</span>
-          <span class="key"><span class="swatch ext"></span> external dependency</span>
-          <span class="deploy">deploy: GitHub Actions &rarr; Cloud Run (prod + sandbox)</span>
+          <span class="key"><span class="swatch"></span> I run this</span>
+          <span class="key"><span class="swatch ext"></span> external contract</span>
+          <span class="deploy">deploy: GitHub Actions &rarr; Cloud Run (prod warm + sandbox scale-to-zero)</span>
         </div>
 
       </div>
 
       <p class="figtitle">Figure 2 &middot; the life of a request</p>
-      <p>Every read on the site walks the same path. The order is the architecture: cheap and honest checks first, paid work last, and nothing reaches the reader without provenance.</p>
+      <p>Follow one real read: <code>GET /api/news/brief</code> on the July 28 morning brief. Cheap, honest checks run first, paid work runs last, and the reader gets provenance with the answer.</p>
 
       <div class="rail">
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Browser <em>&middot; React SPA</em></span>
-          <div class="d">TanStack Query issues the read; the user&rsquo;s model cap rides along as a header.</div>
+          <div class="d">TanStack Query asks for the brief. Example: the July 28 page sends <code>cap: haiku</code> along as a header, so the server knows the most it may spend.</div>
           <div class="edge">https &middot; json</div>
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Throttle <em>&middot; per-IP, shared bucket</em></span>
-          <div class="d">Every model-touching GET shares one 20-per-60s budget with the metered POSTs. Over budget answers 429 with a retry hint, before anything costs money.</div>
+          <div class="d">One 20-per-60s budget covers reads and metered writes together. Over budget gets a 429 plus a retry hint. That morning: under budget, $0 spent.</div>
           <div class="edge">under budget</div>
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Cache <em>&middot; memory, then shared Postgres</em></span>
-          <div class="d">A hit ends the walk here and the page says &ldquo;as of 14:02.&rdquo; A miss continues down, and whatever comes back is written through both tiers for everyone.</div>
-          <div class="edge">miss</div>
+          <div class="d">First reader misses both tiers and keeps walking. The answer is written back to both, so the next reader gets it stamped <code>as_of 09:32</code> with zero provider calls.</div>
+          <div class="edge">miss on first read</div>
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Data ladder <em>&middot; budgeted, ranked</em></span>
-          <div class="d">Free sources first, paid rungs only when needed and only under the day&rsquo;s spend cap. A quota response benches the provider instead of retrying into it.</div>
+          <div class="d">Free first, paid only under the day's cap. That morning rung 1 was quota-exhausted, so rung 2 served all six queries for $0.0018 total.</div>
           <div class="fork"><span>yfinance <b>$0</b></span><span>EDGAR <b>$0</b></span><span>Tavily <b>rung 1</b></span><span>Serper <b>rung 2</b></span><span>SearXNG <b>floor</b></span></div>
           <div class="edge">rows in hand</div>
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Model router <em>&middot; task-tiered</em></span>
-          <div class="d">Classification goes to the local 7B, briefs to Haiku, heavy synthesis to Sonnet, capped by the user&rsquo;s pick. Retrieved text enters the prompt marked untrusted. No rows, no call: the router abstains rather than let a model answer from priors.</div>
+          <div class="d">Briefs go to Haiku, heavy synthesis to Sonnet, capped by your pick. That morning: Haiku in 2,141 ms over eight rows. Headlines enter marked untrusted. No rows, no call.</div>
           <div class="edge">model text</div>
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Invariants <em>&middot; enforced in code</em></span>
-          <div class="d">Markdown stripped, banned phrasing scrubbed, grounding checked, whichever model answered. The prompt asks; this layer makes it so.</div>
+          <div class="d">Same checks no matter who answered: markdown stripped, banned phrasing scrubbed, grounding confirmed. The prompt asks; this layer guarantees.</div>
           <div class="edge">clean text</div>
         </div></div>
         <div class="node"><div class="dot"></div><div class="body">
           <span class="t">Report envelope <em>&middot; &sect;4</em></span>
-          <div class="d">kind, as_of, status, data, provenance: model named, credits charged, sources attached. This is the only shape the browser ever renders.</div>
+          <div class="d">One shape back to the browser: kind, as_of, status, data, plus provenance with model, credits, and eight clickable sources. Try it below — it copies.</div>
         </div></div>
       </div>
 
       <h2><span class="num">2.</span> The data ledger</h2>
-      <p>Before any AI, the honest question is what the data costs and where it comes from. This is the actual ledger. Each row expands into the decision record behind it: the context, the call I made, and what that call cost or saved in practice.</p>
+      <p>I built the ledger first and the models from it. What the data costs, where it comes from, and the tables that make the cost visible. Each row below expands into why I chose it.</p>
+
+      <div class="twocol">
+        <div>
+          <p class="cap">Data model &middot; what I store</p>
+          <pre><span class="k">Report</span> {
+  kind, as_of, status  <span class="c"># complete | partial | unavailable</span>
+  data                <span class="c"># typed per kind</span>
+  provenance { model, tier, credits, elapsed_ms }
+}
+<span class="k">Source</span> { url, title, domain, published_at }
+<span class="k">CacheEntry</span> { query_hash, payload, as_of, ttl }
+<span class="k">CreditCharge</span> { user, tier, credits, usd }</pre>
+        </div>
+        <div>
+          <p class="cap">Read it like this</p>
+          <div class="adr"><dl>
+            <dt>Ledger</dt><dd>What each provider costs per call and what breaks when it is gone.</dd>
+            <dt>Models</dt><dd>Where that cost lands: cache rows amortize it, provenance rows receipt it.</dd>
+            <dt>Rule</dt><dd>One user's paid search serves every user until the TTL. Spend scales with distinct stories, not readers.</dd>
+          </dl></div>
+        </div>
+      </div>
 
       <div class="ledger-scroll"><div class="ledger-min">
       <div class="ledger-head"><span>Source</span><span>Carries</span><span>Unit cost</span><span>Status</span></div>
@@ -422,29 +467,30 @@
       <p>The statistical claim this bought, corrected 2026-08-13 against the right null: across 21 large-cap names, the average earnings move delivered 75.7% of what the options market charged for it (169 prints); across the broader 345-name universe it delivered 88.0% (1,801 prints). Counting outside-the-range instead, 36.1% of the large-cap prints (61 of 169) and 43.9% of the broader set (790 of 1,801) closed outside the range priced beforehand &mdash; both below the roughly 49.8% a fairly-priced, normally-distributed band would put outside, so realized moves came in smaller than the options market charged for, not &ldquo;about right.&rdquo; The pooled rate (851 of 1,970, 43.2%) exists in the data but is deliberately never published alone: averaging two different populations is the Simpson&rsquo;s-paradox trap the tiers exist to avoid. The method (closing straddle mid &times; 0.85) ships with the claim.</p>
 
       <h2><span class="num">3.</span> Two environments, different hardware on purpose</h2>
-      <p>Development had to cost nothing per iteration and work offline. Production had to handle spiky, mostly idle traffic without the first visitor waiting on a cold start. Those are different problems, so the environments differ deliberately, and every gap between them has to be visible in the UI rather than papered over.</p>
+      <p>I built dev to cost $0 per iteration and run offline. I run prod to stay warm through spiky, mostly-idle traffic. When they differ, the UI says so — <code>as_of</code> stamps, not silent gaps.</p>
 
       <div class="envs-scroll">
       <table class="envs">
-        <thead><tr><th></th><th>Development (workstation)</th><th>Production (GCP)</th></tr></thead>
+        <thead><tr><th></th><th>Development (workstation)</th><th>Production (GCP us-central1)</th></tr></thead>
         <tbody>
-          <tr><td>Compute</td><td>Python 3.13 venv, Windows</td><td>Cloud Run, one warm instance (2 vCPU, 1 GiB &mdash; a 2 GiB bump is recommended but not yet applied, and the instance is still getting OOM-killed at 1 GiB) that scales out to three; the sandbox scales to zero</td></tr>
-          <tr><td>Local model</td><td>Ollama qwen2.5 7B on the GPU</td><td>none; API tiers with a deterministic fallback</td></tr>
-          <tr><td>Search floor</td><td>SearXNG in Podman</td><td>none; datacenter IPs are blocked (&sect;2), so the paid rungs are the floor</td></tr>
-          <tr><td>Database</td><td colspan="2">one shared Supabase project, so dev exercises the same RLS policies and cache tables prod depends on</td></tr>
-          <tr><td>Secrets</td><td>.env, gitignored</td><td>GCP Secret Manager, referenced by the deploy</td></tr>
-          <tr><td>Deploy</td><td>run locally</td><td>GitHub Actions &rarr; prod + a sandbox off the develop branch, keyless through Workload Identity Federation</td></tr>
+          <tr><td>Compute</td><td>Python 3.13 venv on Windows, local port</td><td>Cloud Run service, 2 vCPU / 1 GiB per instance. Prod keeps 1 warm and scales to 3; sandbox scales to 0. At 1 GiB it OOM-kills under snapshot warms — 2 GiB is recommended, not yet applied.</td></tr>
+          <tr><td>Local model</td><td>Ollama qwen2.5 7B on my GPU, keyless</td><td>None — Cloud Run has no GPU at any memory size. API tiers only, with a deterministic T0 fallback so a missing key degrades instead of breaking.</td></tr>
+          <tr><td>Search floor</td><td>SearXNG in Podman, free floor</td><td>None — datacenter IPs are blocked (&sect;2), so the paid rungs are the floor and SearXNG stays dev-only.</td></tr>
+          <tr><td>Database</td><td colspan="2">One shared Supabase Postgres. Same row-level-security policies and cache tables in dev and prod, so dev exercises what prod depends on.</td></tr>
+          <tr><td>Secrets</td><td>.env file, gitignored</td><td>GCP Secret Manager. Prod and sandbox read different secrets under the same names; keys never live in the image.</td></tr>
+          <tr><td>Deploy</td><td>run locally</td><td>GitHub Actions, no stored keys. Push to <code>main</code> ships prod; push to <code>develop</code> ships the sandbox. Login uses Workload Identity Federation, so GitHub mints a short-lived token GCP trusts.</td></tr>
         </tbody>
       </table>
       </div>
 
       <h2><span class="num">4.</span> The report contract</h2>
-      <p>Every artifact the API returns, from a news brief to a research dossier, uses one envelope. Here is a real instance first, from the morning brief traced in section 7, then the shape.</p>
+      <p>I return one envelope from every endpoint, from a news brief to a research dossier. Here it is filled in from the July 28 brief traced in &sect;7, then the shape. Copy it — your client can branch on <code>status</code> and nothing else.</p>
 
       <div class="twocol">
         <div>
-          <p class="cap">Instance &middot; /api/news/brief</p>
-          <pre>{
+          <p class="cap">Instance &middot; GET /api/news/brief</p>
+          <button class="copybtn" type="button" data-copy="report-instance">Copy JSON</button>
+          <pre id="report-instance">{
   <span class="k">"kind"</span>: <span class="s">"news_brief"</span>,
   <span class="k">"as_of"</span>: <span class="s">"2026-07-28T21:33:41Z"</span>,
   <span class="k">"status"</span>: <span class="s">"complete"</span>,
@@ -459,55 +505,71 @@
   <span class="k">"provenance"</span>: {
     <span class="k">"model"</span>: <span class="s">"claude-haiku-4-5"</span>,
     <span class="k">"tier"</span>: <span class="s">"T2_MID"</span>,
+    <span class="k">"credits"</span>: <span class="s">2</span>,
     <span class="k">"elapsed_ms"</span>: <span class="s">2141</span>,
     <span class="k">"sources"</span>: [
-      { <span class="k">"domain"</span>: <span class="s">"finance.yahoo.com"</span>,
+      { <span class="k">"url"</span>: <span class="s">"https://finance.yahoo.com/…"</span>,
+        <span class="k">"domain"</span>: <span class="s">"finance.yahoo.com"</span>,
         <span class="k">"title"</span>: <span class="s">"Nasdaq pares losses
          as chip stocks sell off"</span>,
         <span class="k">"published_at"</span>: <span class="s">"2026-07-28"</span> },
-      <span class="c">&hellip; 7 more</span>
+      <span class="c">&hellip; 7 more, each with url + date</span>
     ]
   }
 }</pre>
         </div>
         <div>
-          <p class="cap">Shape &middot; every artifact</p>
-          <pre><span class="k">Report</span> {
-  kind, as_of
-  status      <span class="c"># complete | partial
-              # | unavailable</span>
-  notes[]     <span class="c"># why, when partial</span>
-  data        <span class="c"># typed per kind</span>
-  provenance {
-    model, tier, credits, elapsed_ms
-    sources[] { url, title,
-                domain, published_at }
-  }
+          <p class="cap">Shape &middot; TypeScript</p>
+          <pre><span class="k">interface</span> <span class="s">Report</span>&lt;T&gt; {
+  kind: <span class="s">string</span>; as_of: <span class="s">string</span>;
+  status: <span class="s">"complete" | "partial" | "unavailable"</span>;
+  notes?: <span class="s">string[]</span>;  <span class="c">// why, when partial</span>
+  data: T;                 <span class="c">// typed per kind</span>
+  provenance: {
+    model: <span class="s">string</span>; tier: <span class="s">string</span>;
+    credits: <span class="s">number</span>; elapsed_ms: <span class="s">number</span>;
+    sources: { url: <span class="s">string</span>; title: <span class="s">string</span>;
+      domain: <span class="s">string</span>; published_at: <span class="s">string</span> }[];
+  };
 }</pre>
           <div class="adr"><dl>
-            <dt>Context</dt><dd>Before this, about twenty endpoints had grown five shapes for &ldquo;sources&rdquo; (including a bare integer on four of them) and four names for &ldquo;when is this from.&rdquo; An integer source count is the one version of a citation a reader cannot click or check.</dd>
-            <dt>Decision</dt><dd>One envelope. A report that fails is still a report: same keys, <code>status: "unavailable"</code>, the reason written for a person.</dd>
-            <dt>Consequences</dt><dd>The client never branches on shape, empty pages explain themselves, and a saved report can be frozen and shared because it is self-contained. Credits in provenance make cost legible per artifact: a cheap model costs little, a deep research run costs ten times more, and the interface says so before you spend.</dd>
+            <dt>Before</dt><dd>About twenty endpoints had grown five shapes for &ldquo;sources&rdquo; — including a bare integer on four of them — and four names for &ldquo;when is this from.&rdquo; A count you cannot click is not a citation.</dd>
+            <dt>Now</dt><dd>One envelope. A failed report is still a report: same keys, <code>status: "unavailable"</code>, reason written for a person.</dd>
+            <dt>Payoff</dt><dd>The client never branches on shape, saved reports freeze and share, and cost is legible: Haiku costs little, deep research costs ~10&times; more, stated before you spend.</dd>
           </dl></div>
         </div>
       </div>
 
       <h2><span class="num">5.</span> The behavior eval: four invariants</h2>
-      <p>LLMs lie confidently, so every answer is held to four invariants. No fabrication. No obeying instructions injected through retrieved text. Honest caveats. Abstain when the data isn&rsquo;t there. The eval runs offline in CI against a single compose-answer path, which is what makes the invariants enforceable rather than aspirational: there is exactly one place where model output becomes user-facing text.</p>
-      <p>The rule underneath it came from the local 7B and generalized to every model: a prompt is a request, not a mechanism. Anything that must be true of the output, no markdown in prose, no banned phrasing, grounding present, gets checked or enforced in code after the call. The prompt asks nicely; the code makes it so.</p>
+      <p>I learned this from the local 7B and now apply it to every model: the prompt asks, the code guarantees. Anything that must be true of the output gets checked after the call, because retrieved text can carry instructions that were never meant for you.</p>
 
-      <h2><span class="num">6.</span> Shipping &ldquo;no edge&rdquo; as a feature</h2>
-      <p>I built a swing-trade signal engine for this platform and tested it hard: sixteen configurations against real data. The verdict was no real edge. finplatform says that to your face, and the options surface was rebuilt around that honesty. Instead of predictions, it shows what the market already prices: the expected move, the move you need, the chance of profit, and the flags working against you.</p>
+      <div class="envs-scroll">
+      <table class="envs">
+        <thead><tr><th>Invariant</th><th>What it means</th><th>Where it lives</th></tr></thead>
+        <tbody>
+          <tr><td>No fabrication</td><td>Every claim traces to a row in hand. No rows, no call — the router abstains.</td><td>compose-answer path, grounding check</td></tr>
+          <tr><td>No injected instructions</td><td>Headlines enter the prompt marked untrusted; model never obeys them.</td><td>prompt wrapper + post-call scrub</td></tr>
+          <tr><td>Honest caveats</td><td>Thin data ships as <code>partial</code> with notes, not as confidence.</td><td>Report envelope</td></tr>
+          <tr><td>Clean prose</td><td>No markdown in prose, no banned phrasing. Stripped in code either way.</td><td>post-call enforce</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p>The eval runs offline in CI against that single compose-answer path, which is what makes the rules enforceable instead of aspirational: there is exactly one place where model text becomes what you read.</p>
+
+      <h2><span class="num">6.</span> Risk note: why there is no buy signal</h2>
+      <div class="risk-note">
+        <p><b>I tested sixteen swing-trade configurations against real data and found no durable edge, so I deleted the signal engine.</b> Shipping a predictor would have been dishonest and risky — the failure mode is a user sizing a position off a backtest.</p>
+        <p>What I kept is the Options Lab clarity panel below: what the market already prices (expected move), what you need (required move), chance of profit, and the flags working against you — time decay, earnings before expiry — under a red banner when several factors lean the wrong way.</p>
+      </div>
 
       <figure class="figure">
         <img src="assets/pf_options.png" alt="The Options Lab clarity panel for an AAPL call: expected move, required move, chance of profit, and a flag list including time decay and earnings before expiry, with a red banner reading several factors work against this setup." loading="lazy" />
-        <figcaption>The clarity panel on a long AAPL call. The red banner is the product doing its job: several factors work against this setup, weigh the flags.</figcaption>
+        <figcaption>A long AAPL call. The red banner is the point: several factors work against this setup.</figcaption>
       </figure>
 
-      <p>I&rsquo;d rather ship the truth than a demo that flatters you. A research tool owes you the truth even when the truth is &ldquo;don&rsquo;t.&rdquo;</p>
-
       <h2><span class="num">7.</span> One morning brief, end to end</h2>
-      <p>The clearest way to show the system is to trace one thing it made. This shipped on July 28: the market brief, with its receipts open.</p>
+      <p>Receipt for July 28: the market brief that shipped, with its sources open.</p>
 
       <figure class="figure">
         <img src="assets/newsq_sources.png" alt="The finplatform news page: a synthesized market brief with the sources panel expanded, showing eight dated articles with publishers, each listing what it contributed to the take." loading="lazy" />
@@ -515,13 +577,13 @@
       </figure>
 
       <div class="trace">
-        <div class="turn"><span class="who">09:31 &middot; retrieve</span><p>Six fixed entity queries warm the market pool through the ladder in &sect;2. Rung 1 was quota-exhausted that morning, so rung 2 served all six: $0.0018 total, then cached. The next reader triggers zero provider calls.</p></div>
-        <div class="turn"><span class="who">09:31 &middot; filter and rank</span><p>Section indexes, symbol pages, and anything dated outside the week are dropped before ranking. Relevance multiplies the score blend, so a fresh, reputable, off-topic page cannot outrank an on-topic one. Eight rows survive.</p></div>
-        <div class="turn"><span class="who">09:32 &middot; synthesize</span><p>Haiku writes the take over the eight rows. Headlines enter the prompt marked untrusted; markdown and banned phrasing are stripped in code after the call.</p></div>
-        <div class="turn"><span class="who">09:32 &middot; render</span><p>It ships as the Report instance in &sect;4: model named, eight sources one click away with publisher, date, and contribution. Total model and data cost on screen: under a cent.</p></div>
+        <div class="turn"><span class="who">09:31 &middot; retrieve — $0.0018</span><p>Six fixed queries warm the market pool. Rung 1 was exhausted, so rung 2 served all six, then cached. Next reader: $0.</p></div>
+        <div class="turn"><span class="who">09:31 &middot; filter and rank — 8 rows</span><p>Indexes, symbol pages, and stale dates drop out. Relevance multiplies the blend, so an off-topic page can't outrank an on-topic one.</p></div>
+        <div class="turn"><span class="who">09:32 &middot; synthesize — Haiku, 2,141 ms</span><p>Haiku writes the take over the eight rows. Headlines in as untrusted text; markdown and banned phrasing stripped in code.</p></div>
+        <div class="turn"><span class="who">09:32 &middot; render — under a cent</span><p>Ships as the &sect;4 Report: model named, credits shown, eight sources one click away with publisher, date, contribution.</p></div>
       </div>
 
-      <p>That is the whole architecture in one artifact: paid data entering through a budgeted ladder, a shared cache making it cheap, a routed model synthesizing it, invariants enforced in code, and provenance carried all the way to the pixel a reader can click.</p>
+      <div class="recap"><b>The whole system in one artifact:</b> paid data enters through a budgeted ladder, a shared cache makes it cheap, a routed model synthesizes it, code enforces the invariants, and provenance rides to the pixel you can click.</div>
 
       <nav class="article-nav">
         <a href="passage-measured.html">&larr; How a 4B model beat a 27B</a>
@@ -547,5 +609,24 @@
 <!-- /SITE-FOOTER -->
 
 <script src="../assets/js/main.js" defer></script>
+<script>
+(function () {
+  var btn = document.querySelector('[data-copy="report-instance"]');
+  if (!btn) return;
+  btn.addEventListener('click', function () {
+    var el = document.getElementById('report-instance');
+    var text = el ? el.innerText : '';
+    function done() { btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy JSON'; }, 1600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, done);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta); done();
+    }
+  });
+})();
+</script>
 </body>
 </html>
