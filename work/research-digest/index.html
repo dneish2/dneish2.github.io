@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Research Digest &mdash; David Neish</title>
-  <meta name="description" content="A personal arXiv library with an MCP interface, so Claude Code and Copilot CLI can search the papers you actually keep instead of the open web. Install, commands, and the prompts it answers." />
+  <meta name="description" content="Research Digest: your own arXiv library. You and your coding agent search the same papers, and every result says why it ranked. Install, commands, and the questions it answers." />
   <link rel="canonical" href="https://dneish2.github.io/work/research-digest/" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Research Digest — a paper library your AI agent can read" />
-  <meta property="og:description" content="Every result explains its own ranking, in the browser and over MCP. The arXiv papers you keep, one call from your agent." />
+  <meta property="og:description" content="Your own arXiv library. You and your coding agent search the same papers, and every result says why it ranked." />
   <meta name="theme-color" content="#0d1117" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%2358a6ff' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%2358a6ff'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="../../assets/css/main.css" />
@@ -166,9 +166,9 @@
 <main>
   <div class="container cs">
     <header class="article-head">
-      <span class="kicker">Research Digest, an MCP tool</span>
-      <h1>The arXiv papers you keep, one call from your agent.</h1>
-      <p class="dek">I built a personal arXiv library your coding agent can search. One command connects Claude Code, and every result shows why it ranked, so you can check the reasoning, not just the score.</p>
+      <span class="kicker">Research Digest, a personal research library</span>
+      <h1>Your own arXiv library. You and your agent search the same papers.</h1>
+      <p class="dek">arXiv publishes thousands of papers a week. I built Research Digest to keep the ones in my subjects on my own machine and find them again: from a browser, from the terminal, or by asking Claude Code what I have read about something. Every result says why it ranked where it did, so you can check the reasoning, not just the score.</p>
       <div class="byline"><span>David Neish</span></div>
       <p class="skills">
         <a href="../index.html#s=retrieval">Retrieval &amp; ranking</a>
@@ -182,14 +182,26 @@
 
     <article class="article-body">
 
-      <figure class="hero-figure">
-        <img src="../../assets/img/research-digest/search.jpg" alt="Research Digest search: each result leads with what the paper did, above its concept tags." loading="eager" />
-        <figcaption><b>What I built.</b> Ask what you have on retrieval and it answers from the papers you kept, with the reason attached. <code>claude mcp add research-digest -- research-digest mcp</code>, then ask in plain English.</figcaption>
+      <figure class="demo-reel" style="--proj-accent: var(--c-research)">
+        <div class="frame">
+          <video controls preload="none" playsinline
+                 poster="../../assets/video/research-digest-tour-poster.jpg"
+                 data-title="A tour of the library" data-length="0:38"
+                 aria-label="Research Digest demo: searching a library of 26,001 papers, opening one, asking in plain English, and connecting a coding agent">
+            <source src="../../assets/video/research-digest-tour.mp4" type="video/mp4" />
+            <track kind="captions" src="../../assets/video/research-digest-tour.vtt" srclang="en" label="English" />
+            <a href="../../assets/video/research-digest-tour.mp4">Download the Research Digest demo (MP4)</a>
+          </video>
+        </div>
+        <figcaption>
+          <div class="reel-bar"><span><b>A tour of the library</b> &middot; 0:38 &middot; narrated</span><span>Captioned &middot; 26,001 papers, on this machine</span></div>
+          <p class="reel-note">Search, and every result says why it ranked. Open one for its nearest papers. Ask in plain English and a local model reads the question. Then connect Claude Code and it searches the same library.</p>
+        </figcaption>
       </figure>
       <div class="hero-strip" aria-label="Executive summary">
         <span><b>1 cmd</b> to connect</span>
-        <span><b>8</b> MCP tools</span>
-        <span><b>0.769</b> P@5, frozen corpus</span>
+        <span><b>12</b> MCP tools</span>
+        <span><b>0.761</b> P@5, frozen corpus</span>
         <span><b>$0</b> · no key</span>
       </div>
 
@@ -219,7 +231,7 @@
              data-detail="The part your agent talks to. One JSON object per line in and out, no SDK, so Claude Code, Codex and Copilot CLI all connect with a couple of lines of config. The browser UI and your agent read this same layer &mdash; neither is privileged.">
           <span class="pl-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
           <b>Agent</b>
-          <span class="pl-stat">MCP &middot; 8 tools &middot; stdio</span>
+          <span class="pl-stat">MCP &middot; 12 tools &middot; stdio</span>
         </div>
       </div>
       <p class="pl-detail" id="pl-detail">Hover or tab to a stage for detail.</p>
@@ -234,27 +246,29 @@
 
       <p>Claude Code takes one command:</p>
 
-      <pre>$ <span class="hl">claude mcp add research-digest -- research-digest mcp</span></pre>
+      <pre>$ <span class="hl">claude mcp add research-digest -- python -m research_digest_mcp mcp</span></pre>
+
+      <p>It is <code>python -m research_digest_mcp</code> rather than the shorter <code>research-digest</code> command on purpose: your agent starts the server itself, often with a different <code>PATH</code> than your terminal, and the short command can fail there even when it works when you type it.</p>
 
       <p>Codex reads <code>~/.codex/config.toml</code>:</p>
 
       <pre>[<span class="hl">mcp_servers.research-digest</span>]
-command = <span class="s">"research-digest"</span>
-args = [<span class="s">"mcp"</span>]</pre>
+command = <span class="s">"python"</span>
+args = [<span class="s">"-m"</span>, <span class="s">"research_digest_mcp"</span>, <span class="s">"mcp"</span>]</pre>
 
       <p>Copilot CLI reads <code>~/.copilot/mcp-config.json</code>:</p>
 
       <pre>{
   <span class="s">"mcpServers"</span>: {
     <span class="s">"research-digest"</span>: {
-      <span class="s">"command"</span>: <span class="s">"research-digest"</span>,
-      <span class="s">"args"</span>: [<span class="s">"mcp"</span>],
+      <span class="s">"command"</span>: <span class="s">"python"</span>,
+      <span class="s">"args"</span>: [<span class="s">"-m"</span>, <span class="s">"research_digest_mcp"</span>, <span class="s">"mcp"</span>],
       <span class="s">"tools"</span>: [<span class="s">"*"</span>]
     }
   }
 }</pre>
 
-      <p>Any other MCP client takes the same two fields: run <code>research-digest</code> with the argument <code>mcp</code>.</p>
+      <p>Any other MCP client takes the same two fields: a command, and the arguments that run <code>python -m research_digest_mcp mcp</code>. Not sure which Python your agent will find? <code>python -m research_digest_mcp doctor</code> prints these lines with the exact interpreter filled in.</p>
 
       <p>Then you talk to it in normal language:</p>
 
@@ -266,9 +280,9 @@ args = [<span class="s">"mcp"</span>]</pre>
         <div class="prompt">What have I saved on multi-agent systems?</div>
       </div>
 
-      <p>Those map to the eight tools: <code>search_papers</code>, <code>get_similar</code>, <code>get_saved</code>, <code>suggest_reading</code>, <code>save_paper</code>, <code>get_digest</code>, <code>get_trends</code> and <code>library_status</code>. The server is plain JSON-RPC over stdin and stdout, no SDK, so you can drive it from a shell when something looks wrong:</p>
+      <p>Those land on <code>search_papers</code>, <code>get_similar</code>, <code>save_paper</code>, <code>get_digest</code> and <code>get_saved</code>, five of the twelve tools the <a href="https://github.com/dneish2/research-digest-mcp#the-tools" rel="noopener">README lists</a>. The server is plain JSON-RPC over stdin and stdout, no SDK, so you can drive it from a shell when something looks wrong:</p>
 
-      <pre>$ <span class="hl">echo</span> <span class="s">'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</span> | research-digest mcp</pre>
+      <pre>$ <span class="hl">echo</span> <span class="s">'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</span> | python -m research_digest_mcp mcp</pre>
 
       <h2>What it looks like</h2>
 
@@ -313,7 +327,7 @@ tool use (phrase); +0.30 for spanning 3 topics; +0.18 for being
         <table>
           <thead><tr><th>Ranker</th><th>26 pinned phrases<br />precision@5</th><th>8 judged queries<br />precision@5</th></tr></thead>
           <tbody>
-            <tr><td><b>This ranker</b></td><td><b>0.769</b></td><td><b>0.80</b></td></tr>
+            <tr><td><b>This ranker</b></td><td><b>0.761</b></td><td><b>0.80</b></td></tr>
             <tr><td>Sort by date</td><td>0.031</td><td>0.23</td></tr>
             <tr><td>Random</td><td>0.000</td><td>0.12</td></tr>
           </tbody>
@@ -323,7 +337,7 @@ tool use (phrase); +0.30 for spanning 3 topics; +0.18 for being
 
       <div class="card lead">
         <p><strong>The measurement caught a regression I had already shipped.</strong> The judged eval found one query, <code>chain of thought faithfulness</code>, scoring zero &mdash; because &ldquo;of&rdquo; was not on the list of words that count for less, so it scored as a <em>distinctive</em> word and matched nearly every paper. I added a stopword list and shipped it.</p>
-        <p>Nobody checked it against the other eval. It cost <strong>0.708 &rarr; 0.531</strong> &mdash; those two figures are on the phrase set in use at the time, which is why they sit below the 0.769 above. Filtering ran before the exact-phrase bonus was assembled, so &ldquo;chain of thought&rdquo; became the phrase &ldquo;chain thought&rdquo;, which appears in no paper, and every query with a function word inside it silently lost the bonus. All 11 affected phrases fell; none of the other 15 moved. Building the phrase from the raw query restores 0.708 with the stopword fix kept.</p>
+        <p>Nobody checked it against the other eval. It cost <strong>0.708 &rarr; 0.531</strong> &mdash; those two figures are on the phrase set in use at the time, which is why they sit below the 0.761 above. Filtering ran before the exact-phrase bonus was assembled, so &ldquo;chain of thought&rdquo; became the phrase &ldquo;chain thought&rdquo;, which appears in no paper, and every query with a function word inside it silently lost the bonus. All 11 affected phrases fell; none of the other 15 moved. Building the phrase from the raw query restores 0.708 with the stopword fix kept.</p>
       </div>
 
       <p>A fix motivated by one eval and never checked against the other is a coin flip, and this one landed wrong, in a build with a green test suite &mdash; because the tests encoded the bug that motivated the fix, and nothing encoded its cost.</p>
@@ -370,32 +384,32 @@ tool use (phrase); +0.30 for spanning 3 topics; +0.18 for being
             <tr><td>Finds paraphrase</td><td>no: "RL" won't find "reward optimisation"</td><td>yes</td></tr>
           </tbody>
         </table>
-        <figcaption>I ship the default because a daily feed shares vocabulary. If you want semantics, <code>pip install -e ".[embeddings]"</code> and <code>--engine minilm</code>.</figcaption>
+        <figcaption>I ship the default because a daily feed shares vocabulary. If you want semantics, the similarity extra (below) and <code>--engine minilm</code>.</figcaption>
       </figure>
 
       <p>One thing worth knowing if you use it: TF-IDF is fitted to your corpus, so adding papers changes the vector space. <code>research-digest embed</code> therefore rebuilds the whole index rather than appending, and the store records which fit produced each row. If it ever finds two, it refuses to compare them and tells you to re-embed instead of quietly returning nonsense.</p>
 
       <h2>Getting it running</h2>
 
-      <pre>$ <span class="hl">git clone</span> https://github.com/dneish2/research-digest-mcp
-$ <span class="hl">cd</span> research-digest-mcp
-$ <span class="hl">pip install -e .</span>
+      <pre>$ <span class="hl">pip install</span> git+https://github.com/dneish2/research-digest-mcp
 
-<span class="c"># pull today's papers, then check what you have</span>
+<span class="c"># pull recent papers in your subjects, then check what you have</span>
 $ <span class="hl">research-digest fetch</span>
-<span class="c">Fetched 56, 56 new. Library now holds 56 papers.</span>
+<span class="c">Fetched 249, 249 new. Library now holds 249 papers.</span>
 $ <span class="hl">research-digest status</span>
 
 <span class="c"># already have a library elsewhere? load it in one shot</span>
 $ <span class="hl">research-digest import</span> ~/old-library/archive.json
 
 <span class="c"># optional: similarity search needs numpy and scikit-learn</span>
-$ <span class="hl">pip install -e</span> <span class="s">".[embeddings]"</span>
+$ <span class="hl">pip install</span> <span class="s">"research-digest-mcp[embeddings] @ git+https://github.com/dneish2/research-digest-mcp"</span>
 $ <span class="hl">research-digest embed</span>
 
 <span class="c"># browse it, or wire it to your agent</span>
 $ <span class="hl">research-digest web</span>
-$ <span class="hl">claude mcp add research-digest -- research-digest mcp</span></pre>
+$ <span class="hl">claude mcp add research-digest -- python -m research_digest_mcp mcp</span></pre>
+
+      <p>No clone needed. If your shell says <code>research-digest</code> is not recognized, the install worked and pip&rsquo;s scripts folder is just not on your <code>PATH</code>: every command also runs as <code>python -m research_digest_mcp &lt;command&gt;</code>, and <code>python -m research_digest_mcp doctor</code> says which it is.</p>
 
       <p><code>fetch</code> is safe to run daily and only adds papers you have not seen. Put it on a cron job or a scheduled task if you want it to run itself. Everything lives in <code>~/.research-digest</code>, or wherever you point <code>RESEARCH_DIGEST_HOME</code>. There is no account and no API key. No lockfile either; any installer works, including <a href="https://docs.astral.sh/uv/" rel="noopener">uv</a> if that's what you reach for.</p>
 
