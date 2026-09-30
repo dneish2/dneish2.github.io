@@ -314,9 +314,30 @@
 
       <!-- 03 &middot; Research Digest -->
       <article class="showcase" id="research-digest" style="--proj-accent: var(--c-research)">
-        <span class="kicker" data-reveal><span class="idx">03</span> Agent tooling</span>
-        <h2 data-reveal>Research Digest. Your agent reads your library, not the web.</h2>
-        <p class="one-liner" data-reveal>A personal arXiv library your coding agent can search. Ask what you have on retrieval and it answers from the papers you kept.</p>
+        <span class="kicker" data-reveal><span class="idx">03</span> Research library</span>
+        <h2 data-reveal>Research Digest. Your own arXiv library, shared with your agent.</h2>
+        <p class="one-liner" data-reveal>arXiv publishes thousands of papers a week. Keep the ones in your subjects on your own machine, then find them again from a browser, the terminal, or by asking your coding agent.</p>
+
+        <figure class="demo-reel" data-reveal>
+          <div class="frame">
+            <video controls preload="none" playsinline
+                   poster="assets/video/research-digest-tour-poster.jpg"
+                   data-title="A tour of the library" data-length="0:38"
+                   aria-label="Research Digest demo: searching a library of 26,001 papers, opening one, asking in plain English, and connecting a coding agent">
+              <source src="assets/video/research-digest-tour.mp4" type="video/mp4" />
+              <track kind="captions" src="assets/video/research-digest-tour.vtt" srclang="en" label="English" />
+              <a href="assets/video/research-digest-tour.mp4">Download the Research Digest demo (MP4, 5 MB)</a>
+            </video>
+          </div>
+          <figcaption>
+            <div class="reel-bar"><span><b>A tour of the library</b> &middot; 0:38 &middot; narrated</span><span>Captioned &middot; 26,001 papers, on this machine</span></div>
+            <p class="reel-note">Search, and every result says why it ranked. Open one for its nearest papers. Ask in plain English and a local model reads the question. Then Claude Code searches the same library.</p>
+            <details>
+              <summary>Transcript</summary>
+              <p>arXiv puts out thousands of papers a week. Nobody reads them all. Research Digest keeps the ones you care about, right on your own machine. Every result says why it ranked where it did. Open one, and you get what it&rsquo;s about, and the closest papers you already have. Or just ask. A model on this machine turns your question into the search. And your coding agent reads the same library, instead of the open web. Research Digest. Your library, not the internet.</p>
+            </details>
+          </figcaption>
+        </figure>
 
         <div class="proof-row proof-cmds" data-reveal>
           <div class="stat"><span class="n">pip install git+https://github.com/dneish2/research-digest-mcp</span><span class="l">Install it. No account, no API key, source is public.</span></div>
@@ -325,7 +346,7 @@
         </div>
 
         <div data-reveal>
-          <p>Run it from the terminal, or connect it to your coding agent over MCP so the agent searches the same library you do.</p>
+          <p>Connect it to Claude Code, Codex or Copilot over MCP and the agent searches the same library you do, so &ldquo;what have I read about evaluation harnesses?&rdquo; gets answered from your papers instead of the open web.</p>
           <p>Every result shows why it ranked where it did, so you can check the reasoning instead of just trusting a score.</p>
         </div>
 
