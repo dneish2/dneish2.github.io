@@ -64,13 +64,17 @@
       <header class="act-head">
         <span class="kicker">finplatform, an interactive case study</span>
         <h1 style="font-family: var(--font-display); font-size: var(--text-hero); line-height: 1.03; letter-spacing: -0.02em; margin: 0 0 1rem;">The Price of a&nbsp;Question</h1>
-        <p class="dek">A finance desk is a machine for turning questions into answers, and every answer has a price. I built one that answers a slice of those questions for fractions of a cent. This is what the slice costs, why it takes five different models to serve it, and what has to stay true for the price to hold.</p>
+        <p class="dek">I built a desk slice that answers for fractions of a cent. This is what it costs, why five models serve it, and what has to stay true for the price to hold.</p>
         <p class="skills">
           <a href="../index.html#s=llm-routing">LLM routing &amp; cost</a>
           <a href="../index.html#s=evaluation">Evaluation &amp; measurement</a>
           <a href="../index.html#s=systems-architecture">Systems architecture</a>
         </p>
       </header>
+
+      <div class="aside" data-reveal style="--i:1">
+        <b>30-second version.</b> Deep note: $0.019 measured (1 search + 1 Sonnet call, 12s). Morning brief: under a cent. Break-even at 3–6 Pro subscribers; search capped at $7.92/mo. Play with the router below: every number shows its file or its math.
+      </div>
 
       <div class="req" data-reveal>GET /api/research?t=MU&amp;depth=deep</div>
 
@@ -102,10 +106,10 @@
       <header class="act-head">
         <span class="kicker">The task ledger</span>
         <h2>Price the task, not the person</h2>
-        <p class="dek">Nobody is replaced by a table. But desk work decomposes into tasks, tasks take time, and time on a desk has a rate. That makes every row here comparable, as long as the arithmetic is on the page.</p>
+        <p class="dek">Desk work splits into tasks, tasks take time, and time on a desk has a rate. Every row here shows its arithmetic.</p>
       </header>
 
-      <p data-reveal>The human column is an estimate and it is built the same way every time. Take a public base-comp band, load it for the things a seat actually costs beyond salary, and divide by a year that reflects how a desk really runs.</p>
+      <p data-reveal>The human column is an estimate, built the same way every time. Take a public base-comp band, load it 1.35x for what a seat costs beyond salary, and divide by a 2,600-hour desk year.</p>
 
       <div class="deriv" data-reveal style="--i:1">
         <div class="row"><span>base comp band, equity research associate</span><span>$130k to $160k</span></div>
@@ -119,7 +123,7 @@
 
       <div class="seat-rates" id="seatRates" data-reveal style="--i:3"></div>
 
-      <p data-reveal style="--i:4">The machine column is not an estimate. Each row charges a fixed number of credits, and the credit weight is set by the model that actually ran, so the price tracks the real cost rather than a flat guess.</p>
+      <p data-reveal style="--i:4">The machine column is measured. Each row charges fixed credits set by the model that actually ran, so the price tracks real cost, not a flat guess.</p>
 
       <div class="tl-scroll" data-reveal style="--i:5">
         <table class="tl">
@@ -148,10 +152,10 @@
       <header class="act-head">
         <span class="kicker">The deck</span>
         <h2>Five models, six machines, six feeds</h2>
-        <p class="dek">Every card here has a back, and the back is the interesting side. A spec sheet that only lists what something can do is marketing. The reason these choices are defensible is that the limits were measured too.</p>
+        <p class="dek">Every card has a back, and the back is the point. What each choice can do is marketing. What it cannot do was measured.</p>
       </header>
 
-      <p data-reveal>Feature code in finplatform never names a model. It names a <em>task</em>, and two tables decide the rest: what tier a task wants, and which model currently serves that tier. Swapping a model is a string edit in one file. That is what makes the cards below interchangeable rather than load-bearing.</p>
+      <p data-reveal>Feature code in finplatform never names a model. It names a <em>task</em>, and two tables decide the rest: what tier a task wants, and which model serves it. Swapping models is a one-file string edit.</p>
 
       <div class="suit-head" data-reveal style="--i:1">
         <h3>Models</h3><span class="line"></span><span class="hint">click a card to flip it</span>
@@ -179,7 +183,7 @@
 
       <div class="belt" id="belt" data-reveal></div>
 
-      <p data-reveal>Five of seven stations are free, and they are the ones that keep the other two from running away. The throttle stops a read from costing more than a write. The cache means a repeated question is answered without spending again. The retrieval budget caps how much context a call can carry, which caps the input bill before a single token is generated.</p>
+      <p data-reveal>Five of seven stations are free, and they keep the other two from running away. The throttle stops a read costing more than a write. The cache answers repeats for free. The retrieval budget caps context before a single token is generated.</p>
 
       <p data-reveal style="--i:1"><strong>The router is the station worth opening.</strong> It makes six decisions in a fixed order, and the order is the whole design: what the task wants, what the plan allows, what the day's budget allows, whether the answer already exists, what to do when a provider fails, and what to tell the user if the result is not what they asked for.</p>
 
@@ -242,12 +246,12 @@
       <header class="act-head">
         <span class="kicker">The tree</span>
         <h2>What a plan actually buys</h2>
-        <p class="dek">Five roles, and between each one a gate that exists in code rather than in a pricing page. A ceiling on which models you can reach, a monthly credit budget, and a daily dollar clamp that bounds the worst case.</p>
+        <p class="dek">Five roles. Between each, a gate that lives in code: a model ceiling, a monthly credit budget, and a daily dollar clamp.</p>
       </header>
 
       <div class="tree" id="tree" data-reveal></div>
 
-      <p data-reveal>The paywall does not just buy a bigger model. On prose tasks the router appends a depth directive keyed to the tier that actually served the request, so the free tier gets the core read, Pro gets one or two forward-looking signals, and Analyst gets historical precedent and scenario sensitivities. Same scaffold, escalating substance. That is a deliberate choice about what a subscription should feel like, and it is enforced by the same table that picks the model.</p>
+      <p data-reveal>The paywall buys more than a bigger model. On prose tasks the router appends a depth directive for the tier that served: free gets the core read, Pro adds forward-looking signals, Analyst adds precedent and scenarios. Same scaffold, escalating substance.</p>
 
       <div class="aside" data-reveal>
         <b>A small thing that says a lot.</b> The file that defines all of this opens with a docstring advertising 20 credits a month for Pro and unlimited for Options. The enforced table two hundred lines below says 40 and 300. The number a user actually receives was right the entire time. Only the prose describing it drifted, which is the argument for putting invariants in code instead of in documentation.
