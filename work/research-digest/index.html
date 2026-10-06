@@ -241,7 +241,7 @@
       <div class="card lead">
         <p><strong>REST APIs serve apps. MCP serves agents.</strong></p>
         <p>The library already has a browser interface. The reason to also speak MCP is that it removes a context switch. You are in Claude Code working on something, you want to know what you have read about evaluation harnesses, and you ask. The agent calls <code>search_papers</code> behind the scenes and answers from your shelf.</p>
-        <p>Without it you stop, open a tab, search, skim, and come back having lost your place. That is the whole pitch.</p>
+        <p>Without it you stop, open a tab, search, skim, and come back having lost your place.</p>
       </div>
 
       <p>Claude Code takes one command:</p>
@@ -288,17 +288,17 @@ args = [<span class="s">"-m"</span>, <span class="s">"research_digest_mcp"</span
 
       <figure>
         <img src="../../assets/img/research-digest/search.jpg" alt="The Research Digest search view. Each result card leads with a plain sentence describing what the paper did, above its concept tags." loading="lazy" />
-        <figcaption><b>Search.</b> Every card leads with what the paper actually did, pulled out of the abstract by looking for the sentence that announces the contribution, no model involved. The score used to lead instead, and the first version of this page showed a result whose entire description was <code>0.580 matched agent (distinctive word)&hellip; +0.16 for being 6 days old</code>. That is the derivation of a number standing in for the thing a reader needs. It is still one click away, and still exact.</figcaption>
+        <figcaption><b>Search.</b> Every card leads with what the paper did, pulled out of the abstract by finding the sentence that announces the contribution. No model involved. The score used to lead instead, which meant a card's whole description could read <code>0.580 matched agent (distinctive word)&hellip;</code> &mdash; arithmetic standing in for the thing you actually wanted to know. It is still one click away and still exact.</figcaption>
       </figure>
 
       <figure>
         <img src="../../assets/img/research-digest/similar.jpg" alt="A paper opened in the detail panel, showing its full abstract and its nearest neighbours by embedding similarity, each with a similarity score and a small gauge." loading="lazy" />
-        <figcaption><b>Find similar.</b> Open any paper and the whole record comes with it, the full abstract and the nearest neighbours in a single request, prefetched on hover, so it reads as a browsing gesture rather than a search you have to commit to. The score sits at the bottom as <code>match 1.00 &middot; why?</code>, and it is the score the list you arrived from actually ranked by. It used to quietly show a different one.</figcaption>
+        <figcaption><b>Find similar.</b> Open any paper and the whole record comes with it &mdash; full abstract and nearest neighbours in one request, prefetched on hover, so it reads as browsing rather than a search you have to commit to. The score at the bottom is the one the list you arrived from actually ranked by; it used to show a different one.</figcaption>
       </figure>
 
       <figure>
         <img src="../../assets/img/research-digest/trends.jpg" alt="The trends view reporting no_data, explaining that too few papers were fetched this week to compare against last week." loading="lazy" />
-        <figcaption><b>Trends,</b> caught being honest. Week over week on concepts in your own feed. If you have not fetched recently it says so, rather than reporting the gap as every topic collapsing. The version I ported from showed <code>-100%</code> across the board, which was measuring my uptime, not the field.</figcaption>
+        <figcaption><b>Trends.</b> Week over week on concepts in your own feed. If you have not fetched recently it says so, instead of reporting the gap as every topic collapsing. The version I ported from showed <code>-100%</code> across the board, which was measuring my uptime rather than the field.</figcaption>
       </figure>
 
       <h2>Why every result explains itself</h2>
@@ -312,16 +312,12 @@ tool use (phrase); +0.30 for spanning 3 topics; +0.18 for being
 
       <div class="card lead">
         <p>The point is not the line in the browser. <strong>The same string goes out through MCP</strong>, so when the agent answers "what do I have on retrieval" it can also say why those and not the others.</p>
-        <p>A ranking you cannot interrogate is one you end up either trusting or ignoring, and neither is much use when you are deciding what to read. In the interface itself that arithmetic is one click away behind a <code>why?</code> link, not the first thing you see. The first thing you see is a plain sentence about the paper.</p>
+        <p>In the interface that arithmetic sits one click away behind a <code>why?</code> link. What you see first is a plain sentence about the paper. And when nothing matched at all, it says so outright rather than showing a low score you have to interpret.</p>
       </div>
 
-      <p>The case worth printing is the one where nothing matched. Then it says <code>No topic matched. It ranks on recency alone.</code> A score on its own reads as a judgement about the paper. That sentence is the difference between a weak match and no match at all, and the number will not tell you which one you are looking at.</p>
+      <h2>Whether the ranking works</h2>
 
-      <h2>Whether any of it works</h2>
-
-      <p>&ldquo;Explainable keyword scoring is good enough for a personal library&rdquo; is a claim, and claims want measuring. Two evals, deliberately built to fail in opposite directions.</p>
-
-      <p>The first mines 26 queries out of the library itself &mdash; any two-to-four word phrase appearing verbatim in 3 to 40 papers &mdash; and takes &ldquo;contains the exact phrase&rdquo; as ground truth. No judgement, no model, fixed seed, so it reproduces exactly. The second asks eight real questions, pools the top five from three rankers, strips every trace of which ranker produced what, and judges all 115 papers blind on a 0&ndash;3 scale against their full abstracts.</p>
+      <p>Two evals, built to fail in opposite directions. The first mines 26 queries out of the library itself &mdash; any two-to-four word phrase appearing verbatim in 3 to 40 papers &mdash; and takes "contains the exact phrase" as ground truth: no model, fixed seed, reproduces exactly. The second asks eight real questions, pools the top five from three rankers, strips every trace of which ranker produced what, and judges all 115 papers blind against their full abstracts.</p>
 
       <figure class="table-figure">
         <table>
@@ -332,19 +328,12 @@ tool use (phrase); +0.30 for spanning 3 topics; +0.18 for being
             <tr><td>Random</td><td>0.000</td><td>0.12</td></tr>
           </tbody>
         </table>
-        <figcaption>Better than the two baselines anyone would actually reach for. That is the whole of what these numbers establish. The left column runs in CI on every push, against a frozen corpus committed to the repository.</figcaption>
+        <figcaption>Better than the two baselines anyone would reach for first, which is all these numbers establish. The left column runs in CI on every push, against a frozen corpus committed to the repository.</figcaption>
       </figure>
 
-      <div class="card lead">
-        <p><strong>The measurement caught a regression I had already shipped.</strong> The judged eval found one query, <code>chain of thought faithfulness</code>, scoring zero &mdash; because &ldquo;of&rdquo; was not on the list of words that count for less, so it scored as a <em>distinctive</em> word and matched nearly every paper. I added a stopword list and shipped it.</p>
-        <p>Nobody checked it against the other eval. It cost <strong>0.708 &rarr; 0.531</strong> &mdash; those two figures are on the phrase set in use at the time, which is why they sit below the 0.761 above. Filtering ran before the exact-phrase bonus was assembled, so &ldquo;chain of thought&rdquo; became the phrase &ldquo;chain thought&rdquo;, which appears in no paper, and every query with a function word inside it silently lost the bonus. All 11 affected phrases fell; none of the other 15 moved. Building the phrase from the raw query restores 0.708 with the stopword fix kept.</p>
-      </div>
+      <p>The limits are worth stating: exact-phrase ground truth rewards a string matcher by construction, eight queries is not a benchmark, and there is no held-out set. The <a href="https://github.com/dneish2/research-digest-mcp/blob/main/docs/EVAL.md" rel="noopener">full write-up</a> ships the harness and all 115 judgments so the numbers are checkable rather than quotable.</p>
 
-      <p>A fix motivated by one eval and never checked against the other is a coin flip, and this one landed wrong, in a build with a green test suite &mdash; because the tests encoded the bug that motivated the fix, and nothing encoded its cost.</p>
-
-      <p>The most useful result is the query that still scores zero. Of 1,373 papers, ten mention chain-of-thought and eighteen mention faithfulness; <b>zero mention both</b>. The one paper the judge rated relevant across the entire pool shares not a single word with the query &mdash; not &ldquo;chain&rdquo;, not &ldquo;thought&rdquo;, not &ldquo;faithful&rdquo;. A string matcher cannot reach it, which is exactly the failure this approach is supposed to have. Worth adding: the embedding store already built over this library does not reach it either, so &ldquo;just use embeddings&rdquo; is a hypothesis here, not an answer.</p>
-
-      <p>What none of this proves, stated plainly because it is the first thing I would ask: exact-phrase ground truth rewards a string matcher by construction, eight queries is not a benchmark, the judged numbers are one model&rsquo;s opinion rendered once, and there is no held-out set &mdash; every figure above comes from the data that motivated the fixes. The <a href="https://github.com/dneish2/research-digest-mcp/blob/main/docs/EVAL.md" rel="noopener">full write-up</a> leads with that list, and ships the harness and all 115 judgments so the numbers are checkable rather than quotable.</p>
+      <p>One query still scores zero, and it is the useful one. Of 1,373 papers, ten mention chain-of-thought and eighteen mention faithfulness; <b>zero mention both</b>. The single paper a judge rated relevant shares no words at all with the query. A string matcher cannot reach it &mdash; and neither can the embedding store built over the same library, so "just use embeddings" is a hypothesis here rather than a fix.</p>
 
       <h2>Why a side panel and not a modal</h2>
 
@@ -409,8 +398,6 @@ $ <span class="hl">research-digest embed</span>
 $ <span class="hl">research-digest web</span>
 $ <span class="hl">claude mcp add research-digest -- python -m research_digest_mcp mcp</span></pre>
 
-      <p>No clone needed. If your shell says <code>research-digest</code> is not recognized, the install worked and pip&rsquo;s scripts folder is just not on your <code>PATH</code>: every command also runs as <code>python -m research_digest_mcp &lt;command&gt;</code>, and <code>python -m research_digest_mcp doctor</code> says which it is.</p>
-
       <p><code>fetch</code> is safe to run daily and only adds papers you have not seen. Put it on a cron job or a scheduled task if you want it to run itself. Everything lives in <code>~/.research-digest</code>, or wherever you point <code>RESEARCH_DIGEST_HOME</code>. There is no account and no API key. No lockfile either; any installer works, including <a href="https://docs.astral.sh/uv/" rel="noopener">uv</a> if that's what you reach for.</p>
 
       <p>Pick the categories and topics you care about:</p>
@@ -420,9 +407,9 @@ $ <span class="hl">research-digest config --add-topic</span> <span class="s">"wo
 
       <h2>What it does not do</h2>
 
-      <p>It reads arXiv, not Semantic Scholar or your PDF folder. It does not summarise papers for you with a model, because the agent you connected it to already does that better and you can ask it to. What it does instead is extract the sentence the abstract already uses to state its own contribution, which needs no model at all. And the similarity is vocabulary-based by default, so it is a good way to find the neighbours of a paper and a poor way to find the paper you cannot remember the words for.</p>
+      <p>It reads arXiv, not Semantic Scholar or your PDF folder. It does not summarise papers with a model; it pulls out the sentence the abstract already uses to state its own contribution, which needs no model at all. Summarising is a job for the agent you connected it to. And the similarity is vocabulary-based by default, so it is good at finding a paper's neighbours and poor at finding the paper you cannot remember the words for.</p>
 
-      <p>What it is good at is the thing it was built for: you have read a few hundred papers, you half-remember one, and you would like the assistant you are already talking to be able to go and get it.</p>
+      <p>What it is built for is the other case: you have read a few hundred papers, you half-remember one, and you want the assistant you are already talking to to go and get it.</p>
 
       <nav class="article-nav">
         <a href="../deal-lens/index.html">&larr; Deal Lens</a>

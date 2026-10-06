@@ -13,7 +13,7 @@ Prose companion: [`writing/finplatform-architecture.html`](../../writing/finplat
 | `index.html` | eight acts, the sticky ledger rail, all static copy |
 | `page.css` | page-local vocabulary only. Tokens come from `assets/css/main.css` |
 | `data.js` | **every number on the page**, each tagged with its provenance |
-| `app.js` | rail, reveals, card flips, the router simulator, the cost model, four charts |
+| `app.js` | rail, reveals, card flips, the router simulator, the cost model, three charts |
 | `verify.js` | numbers and toy-logic harness. `node verify.js` |
 | `sweep.cjs` | render sweep across three widths + reduced motion (needs Playwright) |
 
@@ -22,7 +22,7 @@ No build step, no dependencies. Open `index.html` directly, or serve the site ro
 
 ## The one rule
 
-`data.js` is the single source of truth. Both toys, all four charts, and every card read
+`data.js` is the single source of truth. Both toys, all three charts, and every card read
 from it. Each figure is a record:
 
 ```js

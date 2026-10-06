@@ -226,13 +226,6 @@
     var cls = 'card' + (c.dead ? ' dead' : '') + (c.chosen ? ' chosen' : '');
     var sub = c.subtitle || (c.tier ? D.tierById[c.tier].label : '') || '';
     var cliff = '';
-    if (c.priceCliff) {
-      var days = Math.round((new Date(c.priceCliff.date) - new Date()) / 86400000);
-      cliff = '<div class="cliff"><b>Intro pricing ends ' + esc(c.priceCliff.date) + '</b>'
-        + (days > 0 ? ' (' + days + ' days)' : ' (expired)')
-        + '<br>' + usd(c.priceCliff.before.value) + ' → ' + usd(c.priceCliff.after.value)
-        + ' per call.<br>' + esc(c.priceCliff.escapeHatch) + '</div>';
-    }
     return '<div class="card-slot">'
       + '<button class="' + cls + '" type="button" aria-pressed="false">'
       + '<div class="face front">'
@@ -663,9 +656,9 @@
 
   function renderCalcCtls() {
     var C_ = [
-      { id: 'member', label: 'Pro subscribers', min: 0, max: 400, step: 1, fmt: function (v) { return v + ' × $8'; } },
-      { id: 'analyst', label: 'Analyst subscribers', min: 0, max: 200, step: 1, fmt: function (v) { return v + ' × $14'; } },
-      { id: 'options', label: 'Options subscribers', min: 0, max: 120, step: 1, fmt: function (v) { return v + ' × $24'; } },
+      { id: 'member', label: 'Pro subscribers', min: 0, max: 400, step: 1, fmt: function (v) { return String(v); } },
+      { id: 'analyst', label: 'Analyst subscribers', min: 0, max: 200, step: 1, fmt: function (v) { return String(v); } },
+      { id: 'options', label: 'Options subscribers', min: 0, max: 120, step: 1, fmt: function (v) { return String(v); } },
       { id: 'freeRatio', label: 'Free users per paying', min: 0, max: 12, step: 1, fmt: function (v) { return v + '×'; } },
       { id: 'actionsPerDay', label: 'Actions per user per day', min: 0.1, max: 6, step: 0.1, fmt: function (v) { return v.toFixed(1); } },
       { id: 'cacheHit', label: 'Cache hit rate', min: 0, max: 80, step: 5, fmt: function (v) { return v + '%'; } }
@@ -873,23 +866,19 @@
 
   function paintBill() {
     var cur = economicsAt(scaleCounts(1));
-    var be = findBreakEven();
     railState.monthly = cur.cogs;
 
-    var margin = cur.revenue > 0 ? (cur.profit / cur.revenue) : null;
     $('#calcKpis').innerHTML = [
-      { k: 'Monthly revenue', v: money(cur.revenue), s: money(cur.fees) + ' to Stripe', cls: '' },
       { k: 'Monthly cost', v: money(cur.cogs), s: money(cur.model) + ' models · ' + money(cur.search) + ' search', cls: 'accent' },
-      { k: 'Margin', v: margin === null ? '—' : Math.round(margin * 100) + '%', s: money(cur.profit) + ' a month', cls: cur.profit >= 0 ? 'good' : 'bad' },
-      { k: 'Break-even', v: be ? be + '' : '—', s: be ? 'paying subscribers at this mix' : 'not reachable at this mix', cls: '' },
-      { k: 'Cost per subscriber', v: cur.subs ? usd(cur.cogs / cur.subs) : '—', s: 'falls as it grows', cls: '' }
+      { k: 'Cost per subscriber', v: cur.subs ? usd(cur.cogs / cur.subs) : '—', s: 'falls as it grows', cls: '' },
+      { k: 'Search spend', v: money(cur.search), s: 'hard capped at ' + money(D.econ.searchCapMonthly.value), cls: '' },
+      { k: 'People served', v: Math.round(cur.users).toLocaleString(), s: cur.subs.toLocaleString() + ' paying, the rest free', cls: '' }
     ].map(function (k) {
       return '<div class="kpi ' + k.cls + '"><div class="k">' + esc(k.k) + '</div>'
         + '<div class="v">' + esc(k.v) + '</div><div class="s">' + esc(k.s) + '</div></div>';
     }).join('');
 
     $('#chartComposition').innerHTML = chartComposition();
-    $('#chartMargin').innerHTML = chartMargin();
     $('#chartPerUser').innerHTML = chartPerUser();
     var rb = $('#railBill'); if (rb) rb.textContent = money(cur.cogs) + '/mo';
     paintRail();
