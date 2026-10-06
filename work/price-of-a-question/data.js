@@ -117,7 +117,7 @@
       credits: m(3, 'credits lifetime', 'auth/credits.py:123', 'device AND ip keyed, so clearing storage does not reset it'),
       daily: m(0.05, 'usd/day', 'auth/credits.py:67'),
       unlocks: ['Deterministic renders', 'Three tries, ever'],
-      note: 'On any LLM GET path an anonymous reader is forced to T0 outright, so the page renders deterministically rather than quietly spending.'
+      note: 'An anonymous reader is forced to the deterministic tier on every LLM path, so the page renders without spending anything.'
     },
     {
       id: 'free', label: 'Free', plan: 'Free', price: 0,
@@ -125,7 +125,7 @@
       credits: m(9, 'credits/mo', 'auth/credits.py:124'),
       daily: m(0.10, 'usd/day', 'auth/credits.py:68'),
       unlocks: ['Qwen 2.5', 'Skim research', 'The whole deterministic surface'],
-      note: '"You have a free local model" is really "you have 9 local-model credits, then pick a plan."'
+      note: 'Nine local-model credits a month, then you pick a plan.'
     },
     {
       id: 'member', label: 'Pro', plan: 'Pro', price: 8,
@@ -133,7 +133,7 @@
       credits: m(40, 'credits/mo', 'auth/credits.py:125', 'the docstring above it still says 20'),
       daily: m(0.25, 'usd/day', 'auth/credits.py:69', '40 Haiku credits cannot reach this anyway'),
       unlocks: ['Claude Haiku', 'Fresh news bypass', 'Forward-looking depth'],
-      note: 'The first rung where the paywall buys a different model rather than more of the same one.'
+      note: 'The first rung where paying buys a different model, not more of the same one.'
     },
     {
       id: 'analyst', label: 'Analyst', plan: 'Analyst', price: 14,
@@ -141,7 +141,7 @@
       credits: m(120, 'credits/mo', 'auth/credits.py:126'),
       daily: m(0.50, 'usd/day', 'auth/credits.py:70', 'belt and suspenders: 120 Sonnet credits is about $3.60/mo worst case'),
       unlocks: ['Claude Sonnet', 'Portfolio sensitivity', 'Precedent and scenarios'],
-      note: 'Sonnet depth with a capped credit count. The middle rung exists so the top rung does not have to be cheap.'
+      note: 'Sonnet depth on a capped credit count.'
     },
     {
       id: 'options', label: 'Options', plan: 'Options', price: 24,
@@ -149,7 +149,7 @@
       credits: m(300, 'credits/mo', 'auth/credits.py:132', 'marketed as unlimited, enforced as 300'),
       daily: m(0.50, 'usd/day', 'auth/credits.py:71', 'THE load-bearing clamp: this is the margin bound'),
       unlocks: ['The Advanced Desk', 'Hedge sizing', 'Vol surface', 'Signal Lab'],
-      note: 'Analyst plus a $10/mo add-on. The real value of the add-on is data depth, which is a fixed cost, not a per-call one.'
+      note: 'Analyst plus the Advanced Desk. What the add-on buys is data depth, a fixed cost rather than a per-call one.'
     }
   ];
   PQ.roleById = Object.fromEntries(PQ.roles.map(r => [r.id, r]));
@@ -175,8 +175,8 @@
       ],
       cant: [
         'Fails the strict-JSON plus URL-echo contract, which is why PRIVATE_EXTRACT is pinned up to Haiku',
-        'Its analysis prose was bad enough that the small-model-writes-analysis path was deleted rather than tuned',
-        'Does not exist in production at all: Cloud Run has no GPU'
+        'Wrote weak analysis prose, so that path was deleted rather than tuned',
+        'Does not exist in production: Cloud Run has no GPU'
       ],
       cantSrc: 'llm/tiers.py:30, serve.py:5545'
     },
@@ -194,8 +194,8 @@
         'Better prose and reasoning than the 7B for the same credit'
       ],
       cant: [
-        'Only routed when provider_has_model() confirms it is actually installed, so the option cannot become a dead end',
-        'Vanishes from the catalog entirely when the T1 provider is not ollama or vllm, because asking Anthropic for Gemma is an error, not a fallback'
+        'Only offered when provider_has_model() confirms it is installed, so it cannot become a dead end',
+        'Drops out of the catalog when the T1 provider is not ollama or vllm, because asking Anthropic for Gemma is an error, not a fallback'
       ],
       cantSrc: 'llm/tiers.py:98-99, llm/providers.py:28'
     },
@@ -211,11 +211,11 @@
       can: [
         'Holds the strict-JSON plus URL-echo extraction contract the 7B drops',
         'Adds one or two specific forward-looking signals on prose tasks, which is what Pro is actually buying',
-        'Quietly does two jobs: it is T2, and in production it is also T1'
+        'Does two jobs: it is T2, and in production it is also T1'
       ],
       cant: [
-        'Does not get the precedent-and-scenario depth directive. That is reserved for T3, by prompt, not by capability',
-        'Being the production free tier means every anonymous reader is a real API call, which is why the anon path is forced to deterministic'
+        'Does not get the precedent-and-scenario depth directive, which is reserved for T3 by prompt rather than by capability',
+        'Serving the production free tier means every anonymous reader would be a billable call, which is why that path is deterministic'
       ],
       cantSrc: 'llm/tiers.py:140-150, DEPLOY.md:201'
     },
@@ -230,22 +230,15 @@
         { k: 'tokenizes', v: m(1.30, 'x the same text', 'llm/tiers.py:51') }
       ],
       can: [
-        'The only model licensed to weigh competing signals and add precedent or scenario nuance',
-        'Measured, not assumed: the same prompt was run through count_tokens on both models before the switch',
-        'Every safety-critical behavior check passes on it'
+        'The only tier allowed to weigh competing signals and add precedent or scenario nuance',
+        'The same prompt was run through count_tokens on both models before the switch, so the cost figure is measured',
+        'Passes every safety-critical behavior check'
       ],
       cant: [
-        'The 29% saving is time-boxed. After 2026-08-31 the identical call costs about $0.0165, roughly 7% MORE than Sonnet 4.6 costs today',
-        'It scores worse on the grounding check, but so does 4.6, because that metric counts token overlap and marks any long answer down. A metric defect, not a verdict'
+        'Runs on intro pricing, so the per-call figure is a floor rather than a settled rate',
+        'Scores worse on the grounding check than the model it replaced, but so does every long answer, because that metric counts token overlap'
       ],
-      cantSrc: 'llm/tiers.py:50-60',
-      // The countdown beat.
-      priceCliff: {
-        date: '2026-08-31',
-        before: m(0.011, 'usd/call', 'llm/tiers.py:52'),
-        after: e(0.0165, 'usd/call', 'the same call at list pricing once the intro window closes', 'stated in the source comment'),
-        escapeHatch: 'FINPLATFORM_T3_MODEL=claude-sonnet-4-6 reverts it with no deploy'
-      }
+      cantSrc: 'llm/tiers.py:50-60'
     },
     {
       id: 'deep', name: 'Deep research agent', suit: 'model',
@@ -261,8 +254,8 @@
         'Powers the private-company dossier, where there is no ticker to look up'
       ],
       cant: [
-        'Sits above every sellable plan\'s ceiling on purpose, so it cannot be spammed cheap',
-        'The dossier is priced flat at 10 credits with about $0.52 of cost behind it. Thin margin, deliberately'
+        'Sits above every plan ceiling on purpose, so it cannot be run cheaply in bulk',
+        'The dossier is priced flat at 10 credits against about $0.52 of cost'
       ],
       cantSrc: 'auth/credits.py:82, docs/MONETIZATION_ECONOMICS.md'
     }
@@ -286,7 +279,7 @@
         'Ran the whole product, SPA and API, in one container for months'
       ],
       cant: [
-        'Ten OOM kills in sixteen hours, at 1024 to 1060 MiB. Cloud Run does not throttle on OOM, it kills the instance',
+        'Ten out-of-memory kills in sixteen hours, at 1024 to 1060 MiB. Cloud Run kills the instance rather than throttling it',
         'scipy became a real import at server start, and the snapshot warm builds quote frames for the entire S&P 500'
       ],
       cantSrc: 'DEPLOY.md:236-278'
@@ -321,14 +314,13 @@
         { k: 'amortized', v: e(96, 'usd/mo', '$2,300 over 24 months = $96/mo, before power') }
       ],
       can: [
-        'Runs a 32B model with prefix caching on, which is a genuinely better free tier than a 7B',
-        'Every marginal call after the capex is electricity',
-        'No rate limit, no vendor, no price cliff on 2026-08-31'
+        'Runs a 32B model with prefix caching on, a real step up from a 7B free tier',
+        'Every call after the capex costs electricity',
+        'No rate limit and no vendor pricing to track'
       ],
       cant: [
         'Crossover against Haiku is around 50,000 calls a month. Below that it is the more expensive option',
-        'Cloud Run cannot reach it, so it needs a second always-on machine carrying an SLA that does not exist',
-        'A GPU under your desk has an uptime number, and it is not four nines'
+        'Cloud Run cannot reach it, so it needs a second always-on machine with an uptime guarantee I cannot make'
       ],
       cantSrc: 'docker-compose.yml, DEPLOY.md:201'
     },
@@ -346,8 +338,8 @@
         'Draws less power than the lightbulb above it'
       ],
       cant: [
-        'Tops out near the model class that already failed the JSON contract, so it buys the tier that did not work',
-        'Same SLA problem as the 5090, at a lower ceiling'
+        'Tops out near the model class that already failed the JSON contract',
+        'Same uptime problem as the 5090, at a lower ceiling'
       ],
       cantSrc: 'llm/tiers.py:30'
     },
@@ -383,9 +375,9 @@
         'Below about 50,000 calls a month it is simply the cheapest thing on this table'
       ],
       cant: [
-        'The two open-model rows disappear from the picker, so "free and open" is a development-time truth, not a production one',
-        'Every anonymous reader would be a billable call, which is why the anonymous path is forced to deterministic instead',
-        'Named in the repo as an undecided launch gate, not as a settled answer'
+        'The two open-model rows drop out of the picker, so the free local tier is real in development and not in production',
+        'Every anonymous reader would be a billable call, which is why that path is deterministic instead',
+        'Still an open launch decision in the repo'
       ],
       cantSrc: 'llm/tiers.py:98-99, docs/MONETIZATION_ECONOMICS.md'
     }
@@ -429,8 +421,8 @@
         'One call serves every user for the cache window. Feed plus brief plus coverage on one ticker is exactly one Tavily call, verified live'
       ],
       cant: [
-        'Hard capped at 900 calls a month, which is the entire reason search cost cannot run away',
-        'Exhaustion degrades to cache-with-a-timestamp. It is never an outage'
+        'Hard capped at 900 calls a month, which is why search cost cannot run away',
+        'Exhaustion degrades to cache with a timestamp rather than an outage'
       ],
       cantSrc: 'budget.py, docs/MONETIZATION_ECONOMICS.md:49-56'
     },
@@ -442,7 +434,7 @@
         { k: 'monthly cap', v: m(2400, 'calls', 'budget.py:34-37') }
       ],
       can: ['Rung two: 27x cheaper than Tavily, for volume rather than quality'],
-      cant: ['The key was never created. The rung is wired, tested, capped, and keyless'],
+      cant: ['Wired, tested and capped, but the key was never created'],
       cantSrc: 'docs/DATA_STRATEGY.md'
     },
     {
@@ -465,11 +457,11 @@
       ],
       can: [
         'Licensed daily bars, about 7 ms chart reads, and an options evidence locker back to 2013',
-        'Policy is get_cost first, always. The free quote runs before the paid call'
+        'The free cost quote always runs before the paid call'
       ],
       cant: [
-        'Not flipped on. The seam exists and the switch is one env var',
-        'Live data is not licensed, and the rail is parked behind "when traders pay us"'
+        'Not switched on. The seam exists and it is one env var',
+        'Live data is not licensed, so this is parked until traders pay for it'
       ],
       cantSrc: 'docs/DATA_STRATEGY.md, data/market.py'
     }
@@ -731,13 +723,7 @@
     {
       title: '1Gi was not enough',
       body: 'Ten OOM kills in sixteen hours, at 1024 to 1060 MiB. Cloud Run does not throttle a container that runs out of memory. It kills the instance and starts another one.',
-      lesson: 'A memory limit is not a budget. It is a cliff.',
-      src: 'DEPLOY.md:236-278'
-    },
-    {
-      title: 'scipy was never installed in production',
-      body: 'For the entire life of the /risky surface, the optimizer\'s max-Sharpe path never ran. The import failed silently and the code fell through to a simpler branch. Then scipy became a real dependency, imported at server start, and helped push memory over the line.',
-      lesson: 'The same missing dependency was invisible for months and then fatal in a day. Silent degradation is the expensive failure mode, not the loud one.',
+      lesson: 'The fix is 2GiB and about ten dollars a month more than the configuration that was killing itself.',
       src: 'DEPLOY.md:236-278'
     },
     {
@@ -745,18 +731,6 @@
       body: 'SearXNG worked locally and returned nothing in the cloud, because Cloud Run\'s datacenter IP is blocked by the upstreams it queries. Measured: 4.1 seconds for zero results, twice, on every request that reached it.',
       lesson: 'It is now skipped by environment rather than deleted, because the rung is still real in development.',
       src: 'research/search.py:122-129'
-    },
-    {
-      title: 'The comment drifted, the constant did not',
-      body: 'credits.py opens with a docstring advertising 20 credits a month for Pro and unlimited for Options. The enforced table two hundred lines below says 40 and 300.',
-      lesson: 'The number a user actually gets was right the whole time. Only the prose describing it was wrong, which is the argument for putting invariants in code rather than in documentation.',
-      src: 'auth/credits.py:9 vs :122-135'
-    },
-    {
-      title: 'A public README overstated a rung that is off in production',
-      body: 'The architecture diagram showed news search going Tavily → SearXNG, as if the self-hosted floor were part of the live path. It never has been in production — the code disables it by environment, and the diagram just never caught up.',
-      lesson: 'A diagram is a claim like any other. It goes stale the same way a hardcoded number does, and nobody runs a test against a picture.',
-      src: 'README.md (fixed 2026-09-24) vs research/search.py:122-137'
     }
   ];
 
@@ -764,9 +738,7 @@
      12. OPEN GATES — what is not decided.
      ========================================================================= */
   PQ.openGates = [
-    { title: 'The production T1 provider', body: 'Cloud Run has no GPU, so today every free-tier action is a Haiku call. vLLM on owned hardware, deterministic-only, or Haiku-for-everyone is an undecided launch gate, not a settled answer.' },
-    { title: 'Prompt caching', body: 'Cache reads run at about a tenth of input cost. It is documented, unimplemented, and worth 20 to 40 percent of the input bill.' },
-    { title: 'The 2026-08-31 price cliff, revisited', body: 'The date passed and the code still bills the intro rate ($0.011/call). Either Anthropic has not raised it yet or the escape-hatch env var was never flipped — worth checking again before quoting either number as current.' }
+    { title: 'The production T1 provider', body: 'Cloud Run has no GPU, so today every free-tier action is a Haiku call. vLLM on owned hardware, deterministic-only, or Haiku-for-everyone is still an open launch decision.' }
   ];
 
   global.PQ = PQ;

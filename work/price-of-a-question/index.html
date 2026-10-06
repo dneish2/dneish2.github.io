@@ -53,7 +53,7 @@
       <li><a href="#tree" data-act="tree"><span>The tree</span><span class="amt">5 gates</span></a></li>
       <li><a href="#bill" data-act="bill"><span>The bill</span><span class="amt" id="railBill">&mdash;</span></a></li>
       <li><a href="#rig" data-act="rig"><span>The rig</span><span class="amt" id="railRig">&mdash;</span></a></li>
-      <li><a href="#broke" data-act="broke"><span>What broke</span><span class="amt">4</span></a></li>
+      <li><a href="#broke" data-act="broke"><span>What broke</span><span class="amt">2</span></a></li>
     </ol>
   </nav>
 
@@ -73,7 +73,7 @@
       </header>
 
       <div class="aside" data-reveal style="--i:1">
-        <b>30-second version.</b> Deep note: $0.019 measured (1 search + 1 Sonnet call, 12s). Morning brief: under a cent. Break-even at 3–6 Pro subscribers; search capped at $7.92/mo. Play with the router below: every number shows its file or its math.
+        <b>30-second version.</b> A deep research note costs $0.019 measured: one search, one Sonnet call, twelve seconds. A morning brief costs under a cent. Search is hard capped at $7.92 a month. Every number below shows the file or the arithmetic behind it.
       </div>
 
       <div class="req" data-reveal>GET /api/research?t=MU&amp;depth=deep</div>
@@ -152,10 +152,10 @@
       <header class="act-head">
         <span class="kicker">The deck</span>
         <h2>Five models, six machines, six feeds</h2>
-        <p class="dek">Every card has a back, and the back is the point. What each choice can do is marketing. What it cannot do was measured.</p>
+        <p class="dek">Flip any card for what that choice cannot do. Those are the limits I hit, not the ones on a spec sheet.</p>
       </header>
 
-      <p data-reveal>Feature code in finplatform never names a model. It names a <em>task</em>, and two tables decide the rest: what tier a task wants, and which model serves it. Swapping models is a one-file string edit.</p>
+      <p data-reveal>Feature code never names a model. It names a <em>task</em>, and two tables decide the rest: what tier a task wants, and which model serves that tier. Swapping models is a one-file edit.</p>
 
       <div class="suit-head" data-reveal style="--i:1">
         <h3>Models</h3><span class="line"></span><span class="hint">click a card to flip it</span>
@@ -183,17 +183,17 @@
 
       <div class="belt" id="belt" data-reveal></div>
 
-      <p data-reveal>Five of seven stations are free, and they keep the other two from running away. The throttle stops a read costing more than a write. The cache answers repeats for free. The retrieval budget caps context before a single token is generated.</p>
+      <p data-reveal>Five of the seven stations cost nothing, and their job is to stop the other two running away. The throttle keeps a read from costing more than a write, the cache answers repeats for free, and the retrieval budget caps the context before any tokens are generated.</p>
 
-      <p data-reveal style="--i:1"><strong>The router is the station worth opening.</strong> It makes six decisions in a fixed order, and the order is the whole design: what the task wants, what the plan allows, what the day's budget allows, whether the answer already exists, what to do when a provider fails, and what to tell the user if the result is not what they asked for.</p>
+      <p data-reveal style="--i:1"><strong>The router is the station worth opening.</strong> It makes its decisions in a fixed order: what the task wants, what the plan allows, what is left in the day's budget, whether the answer is already cached, and what to do if the provider is down.</p>
 
       <div class="sim" data-reveal style="--i:2">
         <div class="sim-head">
           <span class="t">Router simulator</span>
           <span class="presets">
-            <button class="preset" type="button" data-preset="leak">Try to leak Qwen into Sonnet</button>
-            <button class="preset" type="button" data-preset="clamp">Spend $0.49 as Options</button>
-            <button class="preset" type="button" data-preset="down">Take the provider down</button>
+            <button class="preset" type="button" data-preset="leak">Pick the free model</button>
+            <button class="preset" type="button" data-preset="clamp">Near the daily cap</button>
+            <button class="preset" type="button" data-preset="down">Provider down</button>
           </span>
         </div>
         <div class="sim-body">
@@ -237,7 +237,7 @@
       </div>
 
       <div class="aside" data-reveal>
-        <b>The invariant worth the whole simulator:</b> picking the free model can never become a paid call. Fallback normally walks a tier down, but the local tier's fallback points <em>up</em> to Haiku, because in production there is no local model to fall back to. That upward step is capped the moment a user makes an explicit pick, so the convenience never turns into a bill the user did not choose.
+        <b>The rule the simulator exists to show:</b> picking the free model can never turn into a paid call. Fallback normally steps a tier down, but the local tier has nothing below it in production, so its fallback points up to Haiku. That upward step is blocked whenever the user picked a model themselves.
       </div>
     </section>
 
@@ -251,19 +251,15 @@
 
       <div class="tree" id="tree" data-reveal></div>
 
-      <p data-reveal>The paywall buys more than a bigger model. On prose tasks the router appends a depth directive for the tier that served: free gets the core read, Pro adds forward-looking signals, Analyst adds precedent and scenarios. Same scaffold, escalating substance.</p>
-
-      <div class="aside" data-reveal>
-        <b>A small thing that says a lot.</b> The file that defines all of this opens with a docstring advertising 20 credits a month for Pro and unlimited for Options. The enforced table two hundred lines below says 40 and 300. The number a user actually receives was right the entire time. Only the prose describing it drifted, which is the argument for putting invariants in code instead of in documentation.
-      </div>
+      <p data-reveal>The paywall buys more than a bigger model. On prose tasks the router appends a depth directive for whichever tier served: free gets the core read, Pro adds forward-looking signals, Analyst adds precedent and scenarios. Same scaffold, more substance.</p>
     </section>
 
     <!-- ═══ 05 · THE BILL ═══════════════════════════════════════════════════ -->
     <section class="act" id="bill">
       <header class="act-head">
         <span class="kicker">The bill</span>
-        <h2>Does the desk pay for itself</h2>
-        <p class="dek">This is the number the whole page drives toward. Move the sliders: the model runs on the real credit weights, the real per-call costs, and the real search caps.</p>
+        <h2>What it costs to serve</h2>
+        <p class="dek">Move the sliders. The model runs on the real credit weights, the real per-call costs, and the real search caps.</p>
       </header>
 
       <div class="calc" data-reveal>
@@ -279,35 +275,17 @@
               <span><i style="background:#A0524F"></i>Infrastructure</span>
             </div>
           </div>
-
-          <div class="chart-wrap" style="margin-top:1.8rem">
-            <div class="chart-title">Does it pay for itself</div>
-            <div id="chartMargin"></div>
-            <div class="chart-key">
-              <span><i style="background:#B8842B; height:3px; border-radius:2px"></i>Total cost</span>
-              <span><i style="background:#5D9B4A; height:3px; border-radius:2px"></i>Revenue</span>
-              <span style="opacity:.7">Revenue outruns cost by roughly 60x at the right edge, which is why these two need their own chart and a log axis.</span>
-            </div>
-          </div>
         </div>
       </div>
 
-      <p data-reveal><strong>The shape is the argument.</strong> Model cost is a straight line, because it scales with actions. Search cost bends and then flattens, because one search serves every user for the length of the cache window. Feed, brief, and coverage on the same ticker is exactly one paid search, verified live. Search spend tracks distinct questions per window, not how many people asked them, and it is hard capped anyway.</p>
+      <p data-reveal>Model cost is a straight line, because it scales with actions. Search cost bends and then flattens: one search serves every user for the length of the cache window, so spend tracks distinct questions rather than how many people asked them. Feed, brief, and coverage on the same ticker is one paid search, verified live.</p>
 
       <div class="chart-wrap" data-reveal style="--i:1">
         <div class="chart-title">Cost per subscriber, same model</div>
         <div id="chartPerUser"></div>
       </div>
 
-      <p data-reveal>So the per-subscriber cost falls as the product grows, which is the good version of this curve and the reason the break-even sits so low.</p>
-
-      <div class="aside" data-reveal>
-        <b>One plan can go negative, and the reason is more interesting than the number.</b> Options is sold as unlimited. Thirty large-model calls a day costs about <span class="n m" title="llm/tiers.py:61">$9.90</span> a month at the typical call size, which is fine against $24 of revenue. The same thirty calls carrying near the full retrieval ceiling costs about <button class="n e" type="button" aria-expanded="false" aria-controls="whyHeavy" data-why="whyHeavy">$27</button><span class="why" id="whyHeavy" role="note">30 calls a day &times; 30 days &times; roughly $0.030 for a prompt near the 30,000-character ceiling, which is about 3&times; the typical $0.011 call. This is the rate the economics notes reason with.</span>, which is not. Same user, same call count, opposite verdict.
-      </div>
-
-      <p data-reveal>That is why the clamp is denominated in dollars rather than in calls. A call limit would have to assume a prompt size; a dollar limit does not. Two mitigations ship: a daily spend cap that degrades the model rather than blocking the action, and a quota of 300 credits, roughly four times what a heavy user actually does.</p>
-
-      <p data-reveal>There is also money on the table that has not been picked up. Prompt caching reads at about a tenth of input cost, is documented in the economics notes, and is not implemented. That is 20 to 40 percent of the input bill sitting unharvested, and saying so is more useful than quietly rounding the margin up.</p>
+      <p data-reveal>So cost per subscriber falls as the product grows. The one thing that could break that is a heavy user on an uncapped plan, which is why the daily limit is set in dollars rather than in calls: a call limit has to assume a prompt size, and a prompt near the 30,000-character ceiling costs roughly three times a typical one. Hitting the cap degrades the model instead of blocking the action.</p>
     </section>
 
     <!-- ═══ 06 · THE RIG ════════════════════════════════════════════════════ -->
@@ -315,7 +293,7 @@
       <header class="act-head">
         <span class="kicker">The rig</span>
         <h2>The GPU is a development asset</h2>
-        <p class="dek">There is a 5090 in the room and a vLLM profile ready for it. Here is the arithmetic on whether it should ever serve production, plotted against the two alternatives and the thing production actually does.</p>
+        <p class="dek">There is a 5090 in the room and a vLLM profile ready for it. Here is the arithmetic on whether it should ever serve production.</p>
       </header>
 
       <div class="chart-wrap" data-reveal>
@@ -325,21 +303,17 @@
 
       <div class="kpis" id="rigKpis" data-reveal style="--i:1"></div>
 
-      <p data-reveal>Below the crossover, paying per call is simply cheaper, and the crossover is a long way from where this product sits. But the arithmetic is not even the strongest argument. <strong>Cloud Run has no GPU at any memory size.</strong> Serving a local model means a second always-on machine, on a home connection, carrying an availability guarantee that does not exist. The capex is the small problem. The uptime is the real one.</p>
+      <p data-reveal>Below the crossover, paying per call is cheaper, and the crossover sits a long way from where this product is. The arithmetic is not the deciding factor anyway. <strong>Cloud Run has no GPU at any memory size,</strong> so serving a local model means a second always-on machine on a home connection, carrying an availability guarantee I cannot make. The capex is the small problem.</p>
 
-      <p data-reveal>Which is why production runs the free tier on Haiku, and why the two open-model rows disappear from the model picker entirely when the local provider is not configured. Asking Anthropic for Gemma is an error, not a fallback, so the option is removed rather than left to fail. "Free and open" is a development-time truth on this project, and the honest version of the case study says so.</p>
-
-      <div class="aside" data-reveal>
-        <b>This is an open gate, not a settled answer.</b> The repo names the production T1 provider as an undecided launch decision. The arithmetic above says rent until roughly fifty thousand calls a month. What would change the call is not a cheaper card, it is having enough traffic that the always-on machine stops being idle most of the day.
-      </div>
+      <p data-reveal>So production runs the free tier on Haiku, and the two open-model rows drop out of the model picker when no local provider is configured — asking Anthropic for Gemma is an error, not a fallback. The free local tier is real in development and not in production, and what would change that is traffic, not a cheaper card.</p>
     </section>
 
     <!-- ═══ 07 · WHAT BROKE ═════════════════════════════════════════════════ -->
     <section class="act" id="broke">
       <header class="act-head">
         <span class="kicker">What broke</span>
-        <h2>Four failures worth keeping</h2>
-        <p class="dek">A case study that only lists what worked is a brochure. These are the ones that changed how the system is built.</p>
+        <h2>Two failures that changed the build</h2>
+        <p class="dek">Both were invisible until production, and both are now handled by a mechanism rather than a note.</p>
       </header>
 
       <div class="fails" id="fails" data-reveal></div>
@@ -349,13 +323,6 @@
         <h2>What is not decided</h2>
       </div>
       <ul class="gates" id="gates" data-reveal></ul>
-
-      <div class="closer" data-reveal>
-        <div class="ck">The question this page did not answer</div>
-        <p>This priced tasks. It did not price quality. The only quality-per-dollar findings here were discovered by necessity rather than by design: a 7B model that could not hold a JSON contract, a prose path deleted because small models wrote bad analysis, and a depth ladder that makes the paywall buy visibly more words rather than provably better ones.</p>
-        <p><b>What I would instrument next is the part a user can feel.</b> Not tokens per dollar, but whether the answer at the higher tier changed what someone did. That takes a different kind of measurement than any of the tables above: paired reads on the same question, and a way to ask whether the extra depth was worth the extra charge. It is a marketing and user-research problem wearing an engineering costume, and it is the honest next chapter.</p>
-        <p>The verdict on the part that <em>was</em> measured: break-even at <b>three to six Pro subscribers</b>, a cost curve that falls per user as it grows, and one plan whose margin depends on a clamp rather than on optimism.</p>
-      </div>
 
       <div class="cta-row" style="margin-top:2.5rem; display:flex; gap:12px; flex-wrap:wrap;">
         <a class="btn btn-ghost" href="../../writing/finplatform-architecture.html">Read the architecture companion</a>
