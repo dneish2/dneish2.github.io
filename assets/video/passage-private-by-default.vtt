@@ -1,0 +1,45 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:02.752
+Where does your text go when you translate it?
+
+2
+00:00:06.228 --> 00:00:09.343
+In Passage, it stays on your computer.
+
+3
+00:00:09.593 --> 00:00:13.134
+A small local model translates as you type.
+
+4
+00:00:13.384 --> 00:00:16.797
+The status line names the model that answered.
+
+5
+00:00:18.690 --> 00:00:22.850
+Type the same sentence again, and the answer is instant.
+
+6
+00:00:24.223 --> 00:00:27.082
+Engines shows where every word went.
+
+7
+00:00:27.332 --> 00:00:30.468
+One hundred percent of it stayed on this machine.
+
+8
+00:00:30.718 --> 00:00:35.155
+The repeat came from this session's cache, so nothing was sent at all.
+
+9
+00:00:35.655 --> 00:00:39.410
+It also waits for whole words before asking the model.
+
+10
+00:00:39.660 --> 00:00:44.588
+Over five typed sentences, that cut requests from fourteen to eight.
+
+11
+00:00:45.090 --> 00:00:48.823
+Passage. Private by default, and it shows its work.

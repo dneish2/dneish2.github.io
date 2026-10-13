@@ -128,6 +128,27 @@
 
       <p><a href="https://github.com/dneish2/LanguageTranslation" rel="noopener">Passage</a> translates text, documents, photos and speech, and it runs on whatever model is reachable: something local, your own endpoint, or a hosted one. Which meant I had to find out which model to actually use.</p>
 
+      <figure class="demo-reel" style="--proj-accent: var(--c-passage)">
+        <div class="frame">
+          <video controls preload="none" playsinline
+                 poster="../assets/video/passage-private-by-default-poster.jpg"
+                 data-title="Private by default" data-length="0:52"
+                 aria-label="Passage demo: translating on a local model, then the Engines page showing that all of the text stayed on this machine">
+            <source src="../assets/video/passage-private-by-default.mp4" type="video/mp4" />
+            <track kind="captions" src="../assets/video/passage-private-by-default.vtt" srclang="en" label="English" />
+            <a href="../assets/video/passage-private-by-default.mp4">Download the Passage demo (MP4, 2 MB)</a>
+          </video>
+        </div>
+        <figcaption>
+          <div class="reel-bar"><span><b>Private by default</b> &middot; 0:52 &middot; narrated</span><span>Captioned &middot; recorded on a local model</span></div>
+          <p class="reel-note">The choice this piece is about, made visible. Type a sentence and the status line names the model that answered. The Engines page then accounts for the text: the share that stayed on this machine, and a line saying the repeated sentence came from the session cache, so no model ran at all. The batching number at the end is the one in the <a href="https://github.com/dneish2/LanguageTranslation" rel="noopener">repo</a>: waiting for whole words before asking turned five typed sentences into eight requests instead of fourteen.</p>
+          <details>
+            <summary>Transcript</summary>
+            <p>Where does your text go when you translate it? In Passage, it stays on your computer. A small local model translates as you type. The status line names the model that answered. Type the same sentence again, and the answer is instant. Engines shows where every word went. One hundred percent of it stayed on this machine. The repeat came from this session&rsquo;s cache, so nothing was sent at all. It also waits for whole words before asking the model. Over five typed sentences, that cut requests from fourteen to eight. Passage. Private by default, and it shows its work.</p>
+          </details>
+        </figcaption>
+      </figure>
+
       <h2>1. The smallest model won</h2>
 
       <p>Every model got the same sentences to translate, and I already had a known-good translation of each one. The score below is how often a model's answer lined up with that known-good version. Higher is better, 1.0 would be perfect agreement, and nothing real gets close to that.</p>
