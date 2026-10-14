@@ -38,7 +38,7 @@
      ========================================================================= */
   PQ.tiers = [
     {
-      id: 'T0', name: 'T0_NONE', label: 'Deterministic',
+      id: 'T0', name: 'T0_NONE', display: 'No model ran', label: 'Deterministic',
       short: 'No model ran',
       model: 'none',
       credits: m(0, 'credits', 'auth/credits.py:84', 'genuinely free: no model ran'),
@@ -46,7 +46,7 @@
       capability: null
     },
     {
-      id: 'T1', name: 'T1_LOCAL', label: 'Local / open',
+      id: 'T1', name: 'T1_LOCAL', display: 'Qwen 2.5 7B', label: 'Local / open',
       short: 'Qwen 2.5 7B, or whatever FINPLATFORM_T1_MODEL points at',
       model: 'qwen2.5:7b',
       credits: m(1, 'credits', 'auth/credits.py:85', 'the local model is not free to the platform'),
@@ -54,7 +54,7 @@
       capability: 'small'
     },
     {
-      id: 'T2', name: 'T2_MID', label: 'Hosted small',
+      id: 'T2', name: 'T2_MID', display: 'Claude Haiku 4.5', label: 'Hosted small',
       short: 'Claude Haiku 4.5',
       model: 'claude-haiku-4-5-20251001',
       credits: m(2, 'credits', 'auth/credits.py:86'),
@@ -62,7 +62,7 @@
       capability: 'mid'
     },
     {
-      id: 'T3', name: 'T3_LARGE', label: 'Large synthesis',
+      id: 'T3', name: 'T3_LARGE', display: 'Claude Sonnet 5', label: 'Large synthesis',
       short: 'Claude Sonnet 5',
       model: 'claude-sonnet-5',
       credits: m(5, 'credits', 'auth/credits.py:87'),
@@ -70,7 +70,7 @@
       capability: 'strong'
     },
     {
-      id: 'T3D', name: 'T3_DEEP_AGENT', label: 'Deep agent',
+      id: 'T3D', name: 'T3_DEEP_AGENT', display: 'A multi-call research run', label: 'Deep agent',
       short: 'A multi-call research run, not one call',
       model: 'open_deep_research (bridge, off by default → falls back to Sonnet)',
       credits: m(10, 'credits', 'auth/credits.py:88'),
@@ -323,63 +323,6 @@
         'Cloud Run cannot reach it, so it needs a second always-on machine with an uptime guarantee I cannot make'
       ],
       cantSrc: 'docker-compose.yml, DEPLOY.md:201'
-    },
-    {
-      id: 'mac', name: 'Mac Mini M4', suit: 'hw',
-      subtitle: 'The quiet option',
-      stats: [
-        { k: 'capex', v: e(999, 'usd', 'mid-configuration street price') },
-        { k: 'power', v: e('5 to 65 W', '', 'published idle and load figures') },
-        { k: 'amortized', v: e(42, 'usd/mo', '$999 over 24 months = $42/mo, before power') },
-        { k: 'ceiling', v: e('7B to 14B', '', 'what unified memory comfortably serves at usable speed') }
-      ],
-      can: [
-        'Cheapest path to a real always-on local tier',
-        'Draws less power than the lightbulb above it'
-      ],
-      cant: [
-        'Tops out near the model class that already failed the JSON contract',
-        'Same uptime problem as the 5090, at a lower ceiling'
-      ],
-      cantSrc: 'llm/tiers.py:30'
-    },
-    {
-      id: 'h100', name: 'Rented H100', suit: 'hw',
-      subtitle: 'Someone else\'s problem',
-      stats: [
-        { k: 'rate', v: e(2.50, 'usd/gpu-hr', 'commodity band of roughly $2 to $3/hr; midpoint taken') },
-        { k: 'always on', v: e(1825, 'usd/mo', '$2.50/hr x 730 hours = $1,825/mo') },
-        { k: 'break-even', v: e(912500, 'haiku calls/mo', '$1,825 / $0.002 per call') }
-      ],
-      can: [
-        'Real capacity, on demand, with no capex and no box in the room'
-      ],
-      cant: [
-        'Always-on rental costs more per month than the entire projected revenue of the product',
-        'Only makes sense at nearly a million calls a month, which is two orders of magnitude past where this sits'
-      ],
-      cantSrc: 'derived against llm/tiers.py:46'
-    },
-    {
-      id: 'none', name: 'No hardware', suit: 'hw', chosen: true,
-      subtitle: 'What production actually does',
-      stats: [
-        { k: 'capex', v: m(0, 'usd', 'DEPLOY.md:201') },
-        { k: 'T1 provider', v: m('anthropic', '', 'DEPLOY.md:201') },
-        { k: 'T1 model', v: m('claude-haiku-4-5', '', 'DEPLOY.md:201') },
-        { k: 'cost / call', v: m(0.002, 'usd', 'llm/tiers.py:46') }
-      ],
-      can: [
-        'Zero capex, zero idle, and it scales to zero when nobody is reading',
-        'One vendor, one key, one failure mode, and an actual uptime guarantee',
-        'Below about 50,000 calls a month it is simply the cheapest thing on this table'
-      ],
-      cant: [
-        'The two open-model rows drop out of the picker, so the free local tier is real in development and not in production',
-        'Every anonymous reader would be a billable call, which is why that path is deterministic instead',
-        'Still an open launch decision in the repo'
-      ],
-      cantSrc: 'llm/tiers.py:98-99, docs/MONETIZATION_ECONOMICS.md'
     }
   ];
 
@@ -483,7 +426,8 @@
       { id: 'assoc', label: 'Equity research associate', base: [130, 160] },
       { id: 'risk', label: 'Risk manager', base: [150, 200] },
       { id: 'opts', label: 'Options strategist', base: [180, 250] },
-      { id: 'strat', label: 'Desk strategist', base: [200, 300] }
+      { id: 'strat', label: 'Desk strategist', base: [200, 300] },
+      { id: 'pm', label: 'Portfolio manager', base: [250, 400] }
     ]
   };
 
@@ -708,9 +652,7 @@
     perCall: m(0.002, 'usd', 'llm/tiers.py:46', 'Haiku, which is what production actually runs at T1'),
     options: [
       { id: 'none', label: 'Haiku for all', monthly: 0, note: 'What production does' },
-      { id: 'mac', label: 'Mac Mini M4', monthly: 42, note: '$999 over 24 months' },
-      { id: 'gpu5090', label: 'RTX 5090 + vLLM', monthly: 96, note: '$2,300 over 24 months' },
-      { id: 'h100', label: 'Rented H100', monthly: 1825, note: '$2.50/hr, always on' }
+      { id: 'gpu5090', label: 'RTX 5090 + vLLM', monthly: 96, note: '$2,300 over 24 months' }
     ],
     // A Pro subscriber at 40 credits/mo runs about 20 Haiku actions.
     callsPerProSubscriber: e(20, 'calls/mo', '40 credits at 2 credits per Haiku action')
@@ -737,9 +679,7 @@
   /* =========================================================================
      12. OPEN GATES — what is not decided.
      ========================================================================= */
-  PQ.openGates = [
-    { title: 'The production T1 provider', body: 'Cloud Run has no GPU, so today every free-tier action is a Haiku call. vLLM on owned hardware, deterministic-only, or Haiku-for-everyone is still an open launch decision.' }
-  ];
+  PQ.openGates = [];
 
   global.PQ = PQ;
 })(window);

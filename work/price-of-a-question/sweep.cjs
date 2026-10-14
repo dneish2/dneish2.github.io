@@ -13,7 +13,7 @@
        is reported separately, since a 2px .site-nav overflow is pre-existing
        and affects every page on the site)
      - every data-driven region actually filled
-     - four charts, each with an accessible name and no NaN geometry
+     - three charts, each with an accessible name and no NaN geometry
      - no card face clipped, at any width
      - the ledger rail swaps to the mobile strip at 1040px, and tracks scroll
      - card flips, both router presets, slider recomputation, zero subscribers
@@ -83,8 +83,8 @@ const VIEWPORTS = [
     // Every data-driven region actually filled.
     const filled = await page.evaluate(() => {
       const ids = ['seatRates', 'tlBody', 'deckModels', 'deckHardware', 'deckData', 'belt',
-        'simSteps', 'tree', 'calcCtls', 'calcKpis', 'chartComposition', 'chartMargin',
-        'chartPerUser', 'chartCrossover', 'rigKpis', 'fails', 'gates'];
+        'simSteps', 'tree', 'calcCtls', 'calcKpis', 'chartComposition',
+        'chartPerUser', 'fails'];
       return ids.filter(id => {
         const el = document.getElementById(id);
         return !el || el.children.length === 0;
@@ -97,7 +97,7 @@ const VIEWPORTS = [
         label: (s.getAttribute('aria-label') || '').length,
         nan: /NaN|Infinity/.test(s.outerHTML)
       })));
-    ok('four charts present', charts.length === 4, `found ${charts.length}`);
+    ok('three charts present', charts.length === 3, `found ${charts.length}`);
     ok('all charts have accessible names', charts.every(c => c.label > 40));
     ok('no NaN in rendered chart geometry', charts.every(c => !c.nan));
 
@@ -208,7 +208,7 @@ const VIEWPORTS = [
       // --- rail tracks scroll ---
       // main.css sets html{scroll-behavior:smooth}, so wait for the scroll to
       // actually settle rather than racing a 9,000px animation.
-      await page.evaluate(() => document.getElementById('rig').scrollIntoView());
+      await page.evaluate(() => document.getElementById('broke').scrollIntoView());
       await page.waitForFunction(() => {
         const y = window.scrollY;
         if (window.__lastY === y) return true;
@@ -220,7 +220,7 @@ const VIEWPORTS = [
         const a = document.querySelector('.rail-ledger a.on');
         return a ? a.getAttribute('data-act') : null;
       });
-      ok('ledger rail follows the scroll position', railOn === 'rig', String(railOn));
+      ok('ledger rail follows the scroll position', railOn === 'broke', String(railOn));
 
       // The unit flips from one question to one month at the calculator.
       const label = await page.textContent('#rlLabel');

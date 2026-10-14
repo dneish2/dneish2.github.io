@@ -213,16 +213,6 @@ console.log(`          bands at 1,000: infra $${bands.infra.toFixed(0)}, search 
 check('every cost band is a visible share (>2% of total) at full scale', smallest > 0.02, true);
 check('all three bands are positive', Object.values(bands).every(v => v > 0), true);
 
-// Crossover chart: the two highest lines must not collide at the right edge.
-const maxX = 500000, perCall = D.crossover.perCall.value;
-const payAt = maxX * perCall;
-const h100 = D.crossover.options.find(o => o.id === 'h100').monthly;
-const lo = Math.log10(1), hi = Math.log10(3000);
-const sep = Math.abs(Math.log10(payAt) - Math.log10(h100)) / (hi - lo);
-console.log(`          at 500k calls: pay-per-call $${payAt} vs H100 $${h100}, ${(sep * 100).toFixed(1)}% of plot height apart`);
-check('the two top crossover lines separate by >4% of plot height (labels will not collide)', sep > 0.04, true);
-check('the crossover point sits inside the plotted range',
-  (gpu.monthly / perCall) > 1000 && (gpu.monthly / perCall) < maxX, true);
 
 console.log('\n=== CHARTS: each builder renders without throwing ===');
 for (const [name, fn] of Object.entries(T.charts)) {

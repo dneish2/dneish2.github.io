@@ -67,6 +67,14 @@
       var t = entry.src + (entry.note ? ' · ' + entry.note : '');
       return '<span class="n m" title="' + esc(t) + '">' + esc(shown) + '</span>';
     }
+    // Inside a card the whole face is already a <button>, and a nested button is
+    // invalid HTML: the parser closes the card at it and every stat after the
+    // first estimate lands outside the card. There, show the arithmetic on hover.
+    if (opts.flat) {
+      var ft = (entry.why || '') + (entry.note ? ' (' + entry.note + ')' : '');
+      return '<span class="n e flat" title="' + esc(ft) + '">' + esc(shown) + '</span>';
+    }
+
     // An estimate you can open.
     var id = 'why' + (++whyId);
     return '<button class="n e" type="button" aria-expanded="false" aria-controls="' + id + '" data-why="' + id + '">'
@@ -233,7 +241,7 @@
       + '<div class="c-name">' + esc(c.name) + '</div>'
       + '<div class="c-sub">' + esc(sub) + '</div>'
       + '<ul class="c-stats">' + c.stats.map(function (s) {
-        return '<li><span class="k">' + esc(s.k) + '</span><span class="v">' + num(s.v) + '</span></li>';
+        return '<li><span class="k">' + esc(s.k) + '</span><span class="v">' + num(s.v, { flat: true }) + '</span></li>';
       }).join('') + '</ul>'
       + '<div class="c-flip"><span>What it cannot do</span><span aria-hidden="true">↻</span></div>'
       + '</div>'
@@ -368,7 +376,7 @@
     if (pick.id !== 'auto' && D.roleRank[o.role] < D.roleRank[pick.minRole]) {
       pickDropped = true;
       reason = 'gate';
-      steps.push({ i: '0', lbl: 'Access gate', out: pick.label + ' not in plan', cls: 'clamped' });
+      steps.push({ i: '0', lbl: 'Is that model in their plan?', out: 'no, ' + pick.label + ' sits above it', cls: 'clamped' });
       pick = PICKS[0];
     }
 
@@ -378,8 +386,8 @@
     var hardCap = !!pick.tier;
     steps.push({
       i: '1',
-      lbl: hardCap ? 'Explicit pick, <b>hard cap</b>' : 'Task default',
-      out: D.tierById[desired].name.replace(/_/g, ' '),
+      lbl: hardCap ? 'They picked a model, so that is the <b>ceiling</b>' : 'What this kind of work wants',
+      out: D.tierById[desired].label,
       cls: ''
     });
 
@@ -388,7 +396,7 @@
     var served = RANK[desired] > RANK[ceiling] ? ceiling : desired;
     var roleClamped = served !== desired;
     steps.push({
-      i: '2', lbl: 'Plan ceiling', out: D.tierById[ceiling].name.replace(/_/g, ' '),
+      i: '2', lbl: 'Highest their plan allows', out: D.tierById[ceiling].label,
       cls: roleClamped ? 'clamped' : 'noop'
     });
 
@@ -401,17 +409,17 @@
     }
     steps.push({
       i: '3',
-      lbl: 'Daily budget, ' + usd(o.spend, 2) + ' of ' + usd(budget, 2),
-      out: budgetClamped ? 'clamped to T1 LOCAL' : 'room to spend',
+      lbl: 'Spent today, ' + usd(o.spend, 2) + ' of ' + usd(budget, 2),
+      out: budgetClamped ? 'over budget, drop to the local model' : 'room to spend',
       cls: budgetClamped ? 'clamped' : 'noop'
     });
 
     // 4. Cache. A hit is free and stops here.
     if (o.cached) {
-      steps.push({ i: '4', lbl: 'Response cache, 1 hour TTL', out: 'HIT', cls: 'free' });
+      steps.push({ i: '4', lbl: 'Asked before in the last hour?', out: 'yes, answer it free', cls: 'free' });
       return { steps: steps, served: served, credits: 0, usd: 0, reason: null, cached: true };
     }
-    steps.push({ i: '4', lbl: 'Response cache, 1 hour TTL', out: 'miss', cls: 'noop' });
+    steps.push({ i: '4', lbl: 'Asked before in the last hour?', out: 'no', cls: 'noop' });
 
     // 5. Provider failure walks TIER_FALLBACK, with a `seen` set to break the
     //    T1 <-> T2 cycle, and the upward step capped by an explicit pick.
@@ -432,14 +440,14 @@
     }
     steps.push({
       i: '5',
-      lbl: o.down ? 'Provider down, walk the fallback' : 'Provider healthy',
-      out: o.down ? (walked.length ? walked.join(' → ') : 'no route') : 'no fallback needed',
+      lbl: o.down ? 'That model is down, so find another' : 'The model is up',
+      out: o.down ? (walked.length ? walked.map(function (w) { return D.tierById[w].label; }).join(' → ') : 'nothing left to try') : 'nothing to do',
       cls: o.down ? 'clamped' : 'noop'
     });
 
     // 6. Land.
     var tier = D.tierById[served];
-    steps.push({ i: '6', lbl: 'Served', out: tier.model, cls: '' });
+    steps.push({ i: '6', lbl: 'Answered by', out: tier.display, cls: '' });
     return {
       steps: steps, served: served, credits: tier.credits.value,
       usd: tier.perCall.value, reason: reason, cached: false
@@ -480,10 +488,10 @@
       }).join('');
 
       var tier = D.tierById[res.served];
-      $('#simServed').textContent = tier.label + ' · ' + tier.name.replace(/_/g, ' ');
+      $('#simServed').textContent = tier.label + ' · ' + tier.display;
       $('#simCharge').textContent = res.cached
-        ? '0 credits · cache hit · $0.000'
-        : res.credits + ' credit' + (res.credits === 1 ? '' : 's') + ' · ' + usd(res.usd);
+        ? '0 credits charged · answered from cache · $0.000 to serve'
+        : res.credits + ' credit' + (res.credits === 1 ? '' : 's') + ' charged · ' + usd(res.usd) + ' to serve';
 
       var rn = $('#simReason');
       if (res.reason && REASONS[res.reason]) { rn.textContent = REASONS[res.reason]; rn.hidden = false; }
@@ -671,7 +679,7 @@
       + '<div class="ctl"><label for="cc_t1">Free tier runs on</label>'
       + '<select id="cc_t1">'
       + '<option value="haiku">Haiku (what production does)</option>'
-      + '<option value="local">A local GPU</option>'
+      + '<option value="local">A local GPU, card not costed</option>'
       + '<option value="none">Nothing, deterministic only</option>'
       + '</select><span class="ctl-val" id="ccv_t1">$0.002 per call</span></div>';
 
@@ -687,7 +695,7 @@
     t1.addEventListener('change', function () {
       calc.t1 = t1.value;
       document.getElementById('ccv_t1').textContent =
-        calc.t1 === 'haiku' ? '$0.002 per call' : calc.t1 === 'local' ? 'no marginal cost, plus a box' : 'no model at all';
+        calc.t1 === 'haiku' ? '$0.002 per call' : calc.t1 === 'local' ? 'per-call cost only; the card is not in this model' : 'no model at all';
       paintBill();
     });
   }
@@ -884,74 +892,6 @@
     paintRail();
   }
 
-  /* ── 06 · the rig ─────────────────────────────────────────────────────── */
-  function chartCrossover() {
-    var W = 760, H = 300, L = 58, R = 90, T = 14, B = 34;
-    // Capped at 500k rather than 1M: at 1M the pay-per-call line lands within a
-    // few pixels of the H100 line and their right-edge labels collide.
-    var minX = 1000, maxX = 500000;
-    var X = makeLogX(minX, maxX, L, W - R);
-    var minY = 1, maxY = 3000;
-    var lY = Math.log10(minY), hY = Math.log10(maxY);
-    var Y = function (v) { return H - B - (Math.log10(Math.max(v, minY)) - lY) / (hY - lY) * (H - B - T); };
-    var per = D.crossover.perCall.value;
-    var cols = { none: C.model, mac: C.search, gpu5090: C.infra, h100: '#2FA57C' };
-
-    var s = svgEl(W, H, 'Log-log line chart of monthly cost against model calls served, comparing '
-      + 'paying Haiku per call with three owned or rented machines. Paying per call is the cheapest '
-      + 'option until roughly ' + Math.round((96 / per) / 1000) + ' thousand calls a month, which is '
-      + 'far beyond this product\'s volume.');
-    [1, 10, 100, 1000].forEach(function (v) {
-      var y = Y(v);
-      s.add('<line class="grid-line" x1="' + L + '" y1="' + y + '" x2="' + (W - R) + '" y2="' + y + '"/>');
-      s.add(txt(L - 8, y + 3, '$' + v.toLocaleString(), 'tick', 'end'));
-    });
-    [1000, 10000, 100000, 500000].forEach(function (v) {
-      s.add(txt(X(v), H - B + 16, (v / 1000) + 'k', 'tick', 'middle'));
-    });
-    s.add(txt((L + W - R) / 2, H - 4, 'model calls served per month (log scale)', 'tick', 'middle'));
-
-    D.crossover.options.forEach(function (o) {
-      var d = '', label = null;
-      for (var i = 0; i <= 60; i++) {
-        var calls = Math.pow(10, Math.log10(minX) + (i / 60) * (Math.log10(maxX) - Math.log10(minX)));
-        // Owned hardware costs its amortized monthly whatever it serves.
-        // Renting costs per call.
-        var cost = o.monthly > 0 ? o.monthly : calls * per;
-        d += (i ? 'L' : 'M') + X(calls) + ',' + Y(cost);
-        if (i === 60) label = Y(cost);
-      }
-      s.add(path(d, cols[o.id], 2.5));
-      s.add(txt(W - R + 6, label + 3, o.label, 'ann', 'start', cols[o.id]));
-    });
-
-    // The crossover that matters: owned 5090 against paying per call.
-    var gpu = D.crossover.options.filter(function (o) { return o.id === 'gpu5090'; })[0];
-    var xc = gpu.monthly / per;
-    var cx = X(xc);
-    s.add('<line class="ann-rule" x1="' + cx + '" y1="' + T + '" x2="' + cx + '" y2="' + (H - B) + '"/>');
-    s.add(txt(cx - 6, T + 12, 'crossover · ' + Math.round(xc / 1000) + 'k calls', 'ann', 'end'));
-    return s.out();
-  }
-
-  function renderRig() {
-    var gpu = D.crossover.options.filter(function (o) { return o.id === 'gpu5090'; })[0];
-    var per = D.crossover.perCall.value;
-    var xc = gpu.monthly / per;
-    var subs = xc / D.crossover.callsPerProSubscriber.value;
-    $('#chartCrossover').innerHTML = chartCrossover();
-    $('#rigKpis').innerHTML = [
-      { k: '5090, amortized', v: money(gpu.monthly) + '/mo', s: '$2,300 over 24 months', cls: '' },
-      { k: 'Haiku, per call', v: '$0.002', s: 'what production runs at T1', cls: 'accent' },
-      { k: 'Crossover', v: Math.round(xc / 1000) + 'k calls/mo', s: 'below this, renting wins', cls: '' },
-      { k: 'In subscribers', v: '~' + Math.round(subs).toLocaleString(), s: 'Pro accounts, at 20 calls each', cls: 'bad' }
-    ].map(function (k) {
-      return '<div class="kpi ' + k.cls + '"><div class="k">' + esc(k.k) + '</div>'
-        + '<div class="v">' + esc(k.v) + '</div><div class="s">' + esc(k.s) + '</div></div>';
-    }).join('');
-    var rr = $('#railRig'); if (rr) rr.textContent = Math.round(xc / 1000) + 'k calls';
-  }
-
   /* ── 07 · what broke ──────────────────────────────────────────────────── */
   function renderFailures() {
     $('#fails').innerHTML = D.failures.map(function (f) {
@@ -959,9 +899,6 @@
         + '<p>' + esc(f.body) + '</p>'
         + '<p class="lesson">' + esc(f.lesson) + '</p>'
         + '<span class="src">' + esc(f.src) + '</span></div>';
-    }).join('');
-    $('#gates').innerHTML = D.openGates.map(function (g) {
-      return '<li><div class="g-t">' + esc(g.title) + '</div><p class="g-b">' + esc(g.body) + '</p></li>';
     }).join('');
   }
 
@@ -976,7 +913,7 @@
     calc: calc, RANK: RANK, PICKS: PICKS,
     charts: {
       composition: chartComposition, margin: chartMargin,
-      perUser: chartPerUser, crossover: chartCrossover
+      perUser: chartPerUser
     }
   };
 
@@ -990,7 +927,6 @@
     renderTree();
     renderCalcCtls();
     paintBill();
-    renderRig();
     renderFailures();
     initReveals();
     initRail();

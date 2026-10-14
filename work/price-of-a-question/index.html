@@ -48,11 +48,10 @@
     <ol>
       <li><a href="#question" data-act="question"><span>The question</span><span class="amt">$0.019</span></a></li>
       <li><a href="#ledger" data-act="ledger"><span>The task ledger</span><span class="amt">12 tasks</span></a></li>
-      <li><a href="#deck" data-act="deck"><span>The deck</span><span class="amt">17 cards</span></a></li>
+      <li><a href="#deck" data-act="deck"><span>The deck</span><span class="amt">14 cards</span></a></li>
       <li><a href="#line" data-act="line"><span>The line</span><span class="amt">7 stations</span></a></li>
       <li><a href="#tree" data-act="tree"><span>The tree</span><span class="amt">5 gates</span></a></li>
       <li><a href="#bill" data-act="bill"><span>The bill</span><span class="amt" id="railBill">&mdash;</span></a></li>
-      <li><a href="#rig" data-act="rig"><span>The rig</span><span class="amt" id="railRig">&mdash;</span></a></li>
       <li><a href="#broke" data-act="broke"><span>What broke</span><span class="amt">2</span></a></li>
     </ol>
   </nav>
@@ -119,7 +118,7 @@
         <div class="row out"><span>fully loaded hourly</span><span>$68 to $83</span></div>
       </div>
 
-      <p data-reveal style="--i:2">Run that for every seat on the desk and you get the rates the ledger uses. Midpoints, so the table stays readable.</p>
+      <p data-reveal style="--i:2">Run that for every seat and you get the desk&rsquo;s rate card. The ledger below prices work against five of them; the sixth is the seat that reads what the desk produces rather than producing it. Midpoints throughout, so the table stays readable.</p>
 
       <div class="seat-rates" id="seatRates" data-reveal style="--i:3"></div>
 
@@ -172,7 +171,7 @@
     <section class="act" id="deck">
       <header class="act-head">
         <span class="kicker">The deck</span>
-        <h2>Five models, six machines, six feeds</h2>
+        <h2>Five models, three machines, six feeds</h2>
         <p class="dek">Flip any card for what that choice cannot do. Those are the limits I hit, not the ones on a spec sheet.</p>
       </header>
 
@@ -184,7 +183,7 @@
       <div class="deck" id="deckModels"></div>
 
       <div class="suit-head" data-reveal>
-        <h3>Machines</h3><span class="line"></span><span class="hint">one is chosen, one is dead</span>
+        <h3>Machines</h3><span class="line"></span><span class="hint">one died, one is the fix, one is the box in the room</span>
       </div>
       <div class="deck" id="deckHardware"></div>
 
@@ -212,9 +211,9 @@
         <div class="sim-head">
           <span class="t">Router simulator</span>
           <span class="presets">
-            <button class="preset" type="button" data-preset="leak">Pick the free model</button>
-            <button class="preset" type="button" data-preset="clamp">Near the daily cap</button>
-            <button class="preset" type="button" data-preset="down">Provider down</button>
+            <button class="preset" type="button" data-preset="leak">They picked the free model</button>
+            <button class="preset" type="button" data-preset="clamp">Almost out of budget</button>
+            <button class="preset" type="button" data-preset="down">The model is down</button>
           </span>
         </div>
         <div class="sim-body">
@@ -232,17 +231,17 @@
               <select id="simTask"></select>
             </div>
             <div class="ctl">
-              <label for="simSpend">Spent today</label>
+              <label for="simSpend">Already spent today</label>
               <input type="range" id="simSpend" min="0" max="0.5" step="0.01" value="0" />
               <span class="ctl-val" id="simSpendVal">$0.00</span>
             </div>
             <div class="ctl">
               <span class="lb">Conditions</span>
               <label class="sim-cond">
-                <input type="checkbox" id="simCache" /> answer is cached
+                <input type="checkbox" id="simCache" /> asked in the last hour
               </label>
               <label class="sim-cond" style="margin-top:6px;">
-                <input type="checkbox" id="simDown" /> provider is down
+                <input type="checkbox" id="simDown" /> the model is down
               </label>
             </div>
           </div>
@@ -258,7 +257,7 @@
       </div>
 
       <div class="aside" data-reveal>
-        <b>The rule the simulator exists to show:</b> picking the free model can never turn into a paid call. Fallback normally steps a tier down, but the local tier has nothing below it in production, so its fallback points up to Haiku. That upward step is blocked whenever the user picked a model themselves.
+        <b>Pick a model and that is the most you can be charged.</b> If it is down, the router goes looking for another one, and it will never answer by moving you up to something more expensive. It drops to the deterministic path instead, which costs nothing. That is the one rule worth testing, so it is the one the presets above are built to break.
       </div>
     </section>
 
@@ -309,25 +308,6 @@
       <p data-reveal>So cost per subscriber falls as the product grows. The one thing that could break that is a heavy user on an uncapped plan, which is why the daily limit is set in dollars rather than in calls: a call limit has to assume a prompt size, and a prompt near the 30,000-character ceiling costs roughly three times a typical one. Hitting the cap degrades the model instead of blocking the action.</p>
     </section>
 
-    <!-- ═══ 06 · THE RIG ════════════════════════════════════════════════════ -->
-    <section class="act" id="rig">
-      <header class="act-head">
-        <span class="kicker">The rig</span>
-        <h2>The GPU is a development asset</h2>
-        <p class="dek">There is a 5090 in the room and a vLLM profile ready for it. Here is the arithmetic on whether it should ever serve production.</p>
-      </header>
-
-      <div class="chart-wrap" data-reveal>
-        <div class="chart-title">Monthly cost against model calls served</div>
-        <div id="chartCrossover"></div>
-      </div>
-
-      <div class="kpis" id="rigKpis" data-reveal style="--i:1"></div>
-
-      <p data-reveal>Below the crossover, paying per call is cheaper, and the crossover sits a long way from where this product is. The arithmetic is not the deciding factor anyway. <strong>Cloud Run has no GPU at any memory size,</strong> so serving a local model means a second always-on machine on a home connection, carrying an availability guarantee I cannot make. The capex is the small problem.</p>
-
-      <p data-reveal>So production runs the free tier on Haiku, and the two open-model rows drop out of the model picker when no local provider is configured — asking Anthropic for Gemma is an error, not a fallback. The free local tier is real in development and not in production, and what would change that is traffic, not a cheaper card.</p>
-    </section>
 
     <!-- ═══ 07 · WHAT BROKE ═════════════════════════════════════════════════ -->
     <section class="act" id="broke">
@@ -338,12 +318,6 @@
       </header>
 
       <div class="fails" id="fails" data-reveal></div>
-
-      <div class="act-head" style="margin-top:3.5rem;">
-        <span class="kicker">Still open</span>
-        <h2>What is not decided</h2>
-      </div>
-      <ul class="gates" id="gates" data-reveal></ul>
 
       <div class="cta-row" style="margin-top:2.5rem; display:flex; gap:12px; flex-wrap:wrap;">
         <a class="btn btn-ghost" href="../../writing/finplatform-architecture.html">Read the architecture companion</a>

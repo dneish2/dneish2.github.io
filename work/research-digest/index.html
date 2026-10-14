@@ -280,7 +280,45 @@ args = [<span class="s">"-m"</span>, <span class="s">"research_digest_mcp"</span
         <div class="prompt">What have I saved on multi-agent systems?</div>
       </div>
 
-      <p>Those land on <code>search_papers</code>, <code>get_similar</code>, <code>save_paper</code>, <code>get_digest</code> and <code>get_saved</code>, five of the twelve tools the <a href="https://github.com/dneish2/research-digest-mcp#the-tools" rel="noopener">README lists</a>. The server is plain JSON-RPC over stdin and stdout, no SDK, so you can drive it from a shell when something looks wrong:</p>
+      <p>Those land on <code>search_papers</code>, <code>get_similar</code>, <code>save_paper</code>, <code>get_digest</code> and <code>get_saved</code>, five of the twelve tools the <a href="https://github.com/dneish2/research-digest-mcp#the-tools" rel="noopener">README lists</a>.</p>
+
+      <p>Here is the first of those asks, run against the library on 13 October 2026, trimmed to the fields that matter:</p>
+
+      <pre>$ <span class="hl">What papers do I have about retrieval?</span>
+  &rarr; search_papers(query=<span class="s">"retrieval"</span>, limit=3)
+
+{
+  <span class="s">"searched"</span>: 27734,   <span class="c">// the whole library</span>
+  <span class="s">"matched"</span>: 2117,    <span class="c">// every paper with at least one term</span>
+  <span class="s">"showing"</span>: 3,
+  <span class="s">"how"</span>: <span class="s">"Ranked by how much of your query matched (a distinctive
+          word counts more than a common one, the exact phrase counts
+          most) plus how often the terms appear and how recent the
+          paper is. Every result must match at least one term;
+          matching more of them ranks higher."</span>,
+  <span class="s">"results"</span>: [
+    {
+      <span class="s">"title"</span>: <span class="s">"PRIME: Pre-Retrieval Index Modeling Enhancement for
+                Structured Document Retrieval"</span>,
+      <span class="s">"url"</span>:   <a href="https://arxiv.org/abs/2610.13296v1" rel="noopener"><span class="s">"https://arxiv.org/abs/2610.13296v1"</span></a>,
+      <span class="s">"score"</span>: 0.8033,
+      <span class="s">"why"</span>:   <span class="s">"Mentions retrieval. Comes back to those words
+                repeatedly rather than in passing. Only 4 days old."</span>
+    },
+    {
+      <span class="s">"title"</span>: <span class="s">"Towards Explaining Query Expansion Performance in
+                Information Retrieval"</span>,
+      <span class="s">"url"</span>:   <a href="https://arxiv.org/abs/2610.09724v1" rel="noopener"><span class="s">"https://arxiv.org/abs/2610.09724v1"</span></a>,
+      <span class="s">"score"</span>: 0.78,
+      <span class="s">"why"</span>:   <span class="s">"Mentions retrieval. Comes back to those words
+                repeatedly rather than in passing. Only 6 days old."</span>
+    }
+  ]
+}</pre>
+
+      <p>Two things in that reply are the whole design. <code>how</code> and <code>why</code> are written by the ranking function itself, not by a model summarizing after the fact, which is why they can be trusted to describe what actually happened. And <code>searched</code> is the size of the library, not of a web index: 2,117 of these 27,734 papers mention the term, and the agent never left the machine to find them.</p>
+
+      <p>The server is plain JSON-RPC over stdin and stdout, no SDK, so you can drive it from a shell when something looks wrong:</p>
 
       <pre>$ <span class="hl">echo</span> <span class="s">'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</span> | python -m research_digest_mcp mcp</pre>
 
