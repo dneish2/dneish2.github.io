@@ -1,0 +1,38 @@
+/* Daylight — the resume palette, promoted from one section to the whole site.
+   Nothing here is invented: --cream, --cream-ink and --cream-accent are already
+   in main.css, used for the resume card. This makes them the canvas. */
+:root {
+  color-scheme: light;
+
+  --bg:        #F4EEE1;
+  --bg-rgb:    244, 238, 225;
+  --bg-raised: #FBF7EE;
+  --bg-inset:  #E8DFCB;
+
+  --ink:       #231F19;
+  --ink-muted: #6A6052;
+
+  --line:        rgba(35, 31, 25, 0.26);
+  --line-soft:   rgba(35, 31, 25, 0.13);
+  --line-strong: rgba(35, 31, 25, 0.42);
+
+  /* the amber has to darken on a light canvas or it stops being a signal */
+  --accent:    #9A5F12;
+  --accent-hi: #7A4A0C;
+  --ok:        #4C7A33;
+
+  --c-finplatform: #9A5F12;
+  --c-passage:     #93414F;
+  --c-prompting:   #4F6B42;
+  --c-realestate:  #3F5C7D;
+  --c-research:    #1A5FB4;
+
+  /* the resume keeps its own surface, so it still reads as a separate object:
+     on a light canvas it inverts to the dark card it used to sit against */
+  --cream:        #231F19;
+  --cream-raised: #2E2922;
+  --cream-ink:    #F4EEE1;
+  --cream-muted:  #B3AA99;
+  --cream-accent: #E3A83B;
+  --cream-accent-hi: #F2C46A;
+}

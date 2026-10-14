@@ -1,0 +1,35 @@
+/* Atrium — near-white and bright, the most inviting of the three light options.
+   Warm paper white rather than clinical white, blue for structure, amber kept
+   bright enough to stay cheerful rather than going brown. */
+:root {
+  color-scheme: light;
+
+  --bg:        #FCFAF6;
+  --bg-rgb:    252, 250, 246;
+  --bg-raised: #FFFFFF;
+  --bg-inset:  #F1ECE2;
+
+  --ink:       #1C1A17;
+  --ink-muted: #645C50;
+
+  --line:        rgba(28, 26, 23, 0.20);
+  --line-soft:   rgba(28, 26, 23, 0.10);
+  --line-strong: rgba(28, 26, 23, 0.36);
+
+  --accent:    #9C6008;
+  --accent-hi: #8E5604;
+  --ok:        #3F7A3A;
+
+  --c-finplatform: #9C6008;
+  --c-passage:     #A04455;
+  --c-prompting:   #4D7046;
+  --c-realestate:  #3A5E82;
+  --c-research:    #1F63BC;
+
+  --cream:        #1C1A17;
+  --cream-raised: #272420;
+  --cream-ink:    #FCFAF6;
+  --cream-muted:  #AEA698;
+  --cream-accent: #E3A83B;
+  --cream-accent-hi: #F2C46A;
+}

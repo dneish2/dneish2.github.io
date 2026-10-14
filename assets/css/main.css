@@ -11,6 +11,10 @@
 
   /* color — warm dark, single amber signal */
   --bg:        #0E0D0B;
+  /* the canvas colour as raw channels, for scrims and gradients that need an
+     alpha. A theme that changes --bg must change this too, or the sticky header
+     and the video scrim stay the colour of the old canvas. */
+  --bg-rgb:    14, 13, 11;
   --bg-raised: #171512;
   --bg-inset:  #0A0908;
   --ink:       #EDE8DE;
@@ -166,7 +170,7 @@ img { max-width: 100%; height: auto; display: block; }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(14, 13, 11, 0.82);
+  background: rgba(var(--bg-rgb), 0.82);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid transparent;
@@ -759,7 +763,7 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   gap: var(--s-2);
   padding: var(--s-3);
   border: 0;
-  background: linear-gradient(to top, rgba(14, 13, 11, 0.92), rgba(14, 13, 11, 0.55) 22%, rgba(14, 13, 11, 0) 50%);
+  background: linear-gradient(to top, rgba(var(--bg-rgb), 0.92), rgba(var(--bg-rgb), 0.55) 22%, rgba(var(--bg-rgb), 0) 50%);
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
   color: var(--ink);
   font-family: var(--font-mono);
@@ -777,7 +781,7 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   border-radius: 50%;
   background: var(--proj-accent, var(--accent));
   color: var(--bg);
-  box-shadow: 0 0 0 6px rgba(14, 13, 11, 0.45);
+  box-shadow: 0 0 0 6px rgba(var(--bg-rgb), 0.45);
   transition: transform 180ms ease;
 }
 .demo-reel .play-disc svg { width: 22px; height: 22px; margin-left: 4px; }

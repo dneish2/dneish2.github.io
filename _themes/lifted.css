@@ -1,0 +1,29 @@
+/* Lifted — still dark, but the squint removed. Worth looking at before you
+   commit to light, because it tests a different theory: that the problem was
+   never the darkness, it was near-black at #0E0D0B plus muted text at 6.9:1.
+   The canvas comes up, the muted ink comes up, the rules get stronger. */
+:root {
+  color-scheme: dark;
+
+  --bg:        #1A1815;
+  --bg-rgb:    26, 24, 21;
+  --bg-raised: #252219;
+  --bg-inset:  #141210;
+
+  --ink:       #F5F1E8;
+  --ink-muted: #C4BCAD;
+
+  --line:        rgba(245, 241, 232, 0.34);
+  --line-soft:   rgba(245, 241, 232, 0.20);
+  --line-strong: rgba(245, 241, 232, 0.46);
+
+  --accent:    #F0B850;
+  --accent-hi: #FFD489;
+  --ok:        #8FC178;
+
+  --c-finplatform: #F0B850;
+  --c-passage:     #CE7A86;
+  --c-prompting:   #9DB58E;
+  --c-realestate:  #8FA8C6;
+  --c-research:    #74B6FF;
+}

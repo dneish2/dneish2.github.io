@@ -1,0 +1,35 @@
+/* Blueprint — light and cool. Blue carries structure, amber stays the one
+   signal colour, so the two you already like split the work: blue says "this is
+   the system", amber says "look here". */
+:root {
+  color-scheme: light;
+
+  --bg:        #F2F5F9;
+  --bg-rgb:    242, 245, 249;
+  --bg-raised: #FFFFFF;
+  --bg-inset:  #E4EAF2;
+
+  --ink:       #15202E;
+  --ink-muted: #5A6B7F;
+
+  --line:        rgba(21, 32, 46, 0.22);
+  --line-soft:   rgba(21, 32, 46, 0.11);
+  --line-strong: rgba(21, 32, 46, 0.38);
+
+  --accent:    #1A5FB4;
+  --accent-hi: #11406F;
+  --ok:        #2F7A4F;
+
+  --c-finplatform: #B06A05;
+  --c-passage:     #9B3B52;
+  --c-prompting:   #46704F;
+  --c-realestate:  #34557A;
+  --c-research:    #1A5FB4;
+
+  --cream:        #15202E;
+  --cream-raised: #1E2C3D;
+  --cream-ink:    #EEF3F9;
+  --cream-muted:  #9FB0C2;
+  --cream-accent: #E3A83B;
+  --cream-accent-hi: #F2C46A;
+}

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Theme preview</title>
+<style>
+  :root {
+    --ui-bg: #16181d;
+    --ui-raised: #1f232a;
+    --ui-ink: #e8eaed;
+    --ui-muted: #9aa3af;
+    --ui-line: rgba(232, 234, 237, 0.16);
+    --ui-accent: #E3A83B;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: grid; grid-template-rows: auto 1fr;
+    background: var(--ui-bg); color: var(--ui-ink);
+    font: 14px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  header { border-bottom: 1px solid var(--ui-line); background: var(--ui-raised); }
+  .bar { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; padding: 12px 16px; }
+  .brand { font-weight: 650; letter-spacing: -0.01em; margin-right: 4px; }
+  .brand span { color: var(--ui-muted); font-weight: 400; }
+  fieldset { border: 0; margin: 0; padding: 0; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  legend { float: left; margin-right: 10px; padding: 0; color: var(--ui-muted);
+           font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .opt span {
+    display: inline-block; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--ui-line); color: var(--ui-muted); white-space: nowrap;
+  }
+  .opt input:checked + span { border-color: var(--ui-accent); color: #10120f; background: var(--ui-accent); font-weight: 600; }
+  .opt input:focus-visible + span { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
+  .note { color: var(--ui-muted); font-size: 12px; max-width: 62ch; padding: 0 16px 12px; margin: 0; }
+  .note b { color: var(--ui-ink); font-weight: 600; }
+  .contrast { font-variant-numeric: tabular-nums; }
+  iframe { width: 100%; height: 100%; border: 0; background: #fff; display: block; }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">Theme preview <span>&middot; nothing here ships</span></div>
+
+    <fieldset id="themes"><legend>Look</legend></fieldset>
+    <fieldset id="pages"><legend>Page</legend></fieldset>
+  </div>
+  <p class="note" id="blurb"></p>
+</header>
+<iframe id="stage" title="Site preview"></iframe>
+
+<script>
+// Each theme is a token override file next to this one. The preview injects it
+// into the real page, so what you are looking at is the actual site, not a mock.
+const THEMES = [
+  { id: 'current',   name: 'Current',   file: null,
+    blurb: 'What is live now. Canvas #0E0D0B. The numbers below are measured live, not quoted.' },
+  { id: 'lifted',    name: 'Lifted dark', file: 'lifted.css',
+    blurb: 'Still dark, but the canvas comes up off near-black and the muted ink and rules get stronger. Look at this one first: it tests whether the problem was the darkness or just the contrast.' },
+  { id: 'atrium',    name: 'Atrium',    file: 'atrium.css',
+    blurb: 'Near-white and warm. The brightest option, and the most inviting. Amber stays bright enough to read as amber rather than brown.' },
+  { id: 'daylight',  name: 'Daylight',  file: 'daylight.css',
+    blurb: 'The resume palette promoted to the whole site. Nothing invented: these are the cream tokens already in main.css. The resume itself inverts to dark, so it stays a separate object on the page.' },
+  { id: 'blueprint', name: 'Blueprint', file: 'blueprint.css',
+    blurb: 'Light and cool, blue carrying the structure and amber kept as the single signal. The two colours split the work: blue says this is the system, amber says look here.' }
+];
+
+const PAGES = [
+  { id: 'home',    name: 'Home',          url: '../index.html' },
+  { id: 'poq',     name: 'Price of a Question', url: '../work/price-of-a-question/index.html' },
+  { id: 'rd',      name: 'Research Digest',     url: '../work/research-digest/index.html' },
+  { id: 'arch',    name: 'Architecture',        url: '../writing/finplatform-architecture.html' },
+  { id: 'passage', name: '4B vs 27B',           url: '../writing/passage-measured.html' }
+];
+
+const $ = s => document.querySelector(s);
+const state = { theme: 'current', page: 'home' };
+
+function radios(host, items, group, onPick) {
+  items.forEach((it, i) => {
+    const l = document.createElement('label');
+    l.className = 'opt';
+    l.innerHTML = '<input type="radio" name="' + group + '"' + (i === 0 ? ' checked' : '') +
+                  '><span></span>';
+    l.querySelector('span').textContent = it.name;
+    l.querySelector('input').addEventListener('change', () => onPick(it));
+    host.appendChild(l);
+  });
+}
+
+// Contrast is the whole point of the exercise, so measure it rather than guess.
+function luminance(hex) {
+  const n = hex.replace('#', '');
+  const c = [0, 2, 4].map(i => parseInt(n.slice(i, i + 2), 16) / 255)
+    .map(v => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+function ratio(a, b) {
+  const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
+  return (x + 0.05) / (y + 0.05);
+}
+function readTokens(doc) {
+  const cs = getComputedStyle(doc.documentElement);
+  const pick = k => cs.getPropertyValue(k).trim();
+  return { bg: pick('--bg'), ink: pick('--ink'), muted: pick('--ink-muted'), accent: pick('--accent') };
+}
+
+function applyTheme(doc) {
+  doc.querySelectorAll('link[data-theme-preview]').forEach(l => l.remove());
+  const t = THEMES.find(t => t.id === state.theme);
+  if (t.file) {
+    const link = doc.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = new URL(t.file, location.href).href;
+    link.setAttribute('data-theme-preview', '');
+    doc.head.appendChild(link);
+    // the override must win over main.css, so it goes last and we re-assert it
+    // after the page's own stylesheets have settled
+  }
+  setTimeout(() => report(doc, t), 60);
+}
+
+function report(doc, t) {
+  let line = t.blurb;
+  try {
+    const k = readTokens(doc);
+    if (/^#[0-9a-f]{6}$/i.test(k.bg) && /^#[0-9a-f]{6}$/i.test(k.ink)) {
+      line += ' <b class="contrast">Body text ' + ratio(k.ink, k.bg).toFixed(1) + ':1';
+      if (/^#[0-9a-f]{6}$/i.test(k.muted)) line += ', muted ' + ratio(k.muted, k.bg).toFixed(1) + ':1';
+      if (/^#[0-9a-f]{6}$/i.test(k.accent)) line += ', accent ' + ratio(k.accent, k.bg).toFixed(1) + ':1';
+      line += '.</b> WCAG wants 4.5:1 for body text, 3:1 for large.';
+    }
+  } catch (e) { /* cross-origin, which only happens if this is not served locally */ }
+  $('#blurb').innerHTML = line;
+}
+
+function load() {
+  const p = PAGES.find(p => p.id === state.page);
+  const f = $('#stage');
+  f.addEventListener('load', () => applyTheme(f.contentDocument), { once: true });
+  f.src = p.url;
+}
+
+radios($('#themes'), THEMES, 'theme', t => { state.theme = t.id; load(); });
+radios($('#pages'), PAGES, 'page', p => { state.page = p.id; load(); });
+load();
+</script>
+</body>
+</html>
