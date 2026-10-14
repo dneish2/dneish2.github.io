@@ -9,35 +9,50 @@
 :root {
   color-scheme: dark;
 
-  /* color — warm dark, single amber signal */
-  --bg:        #0E0D0B;
-  /* the canvas colour as raw channels, for scrims and gradients that need an
-     alpha. A theme that changes --bg must change this too, or the sticky header
-     and the video scrim stay the colour of the old canvas. */
-  --bg-rgb:    14, 13, 11;
-  --bg-raised: #171512;
-  --bg-inset:  #0A0908;
-  --ink:       #EDE8DE;
-  --ink-muted: #ACA599;
-  --line:      rgba(237, 232, 222, 0.30);
-  --line-soft: rgba(237, 232, 222, 0.16);
-  --line-strong: rgba(237, 232, 222, 0.40);
-  --accent:    #E3A83B;
-  --accent-hi: #F2C46A;
-  --ok:        #7FB069;
+  /* color — warm dark, single amber signal.
+     The canvas sits off near-black on purpose. At #0E0D0B the body copy was
+     fine and everything structural (rules, muted text, chart strokes) sat too
+     close to the background to read without leaning in. Lifting the canvas and
+     the muted ink costs nothing and buys about a stop of legibility. */
+  --bg:        #1A1815;
+  --bg-raised: #252219;
+  --bg-inset:  #141210;
+  --ink:       #F5F1E8;
+  --ink-muted: #C4BCAD;
+  --line:      rgba(245, 241, 232, 0.34);
+  --line-soft: rgba(245, 241, 232, 0.20);
+  --line-strong: rgba(245, 241, 232, 0.46);
+  --accent:    #F0B850;
+  --accent-hi: #FFD489;
+  --ok:        #8FC178;
+
+  /* The same three colours as raw channels. Inline SVG and any scrim that
+     needs an alpha reads these instead of a literal, so the artwork re-inks
+     itself on whatever surface it is sitting on rather than being drawn once
+     for a dark page. --shadow-rgb is deliberately NOT overridden on a paper
+     surface: a sheet of paper laid on a dark page still casts a dark shadow. */
+  --bg-rgb:     26, 24, 21;
+  --ink-rgb:    245, 241, 232;
+  --accent-rgb: 240, 184, 80;
+  --shadow-rgb: 10, 9, 8;
 
   /* per-project accents (set --proj-accent on each showcase) */
-  --c-finplatform: #E3A83B;
-  --c-passage:     #B86370;
-  --c-prompting:   #8CA37E;
-  --c-realestate:  #7D96B5;
-  --c-research:    #58A6FF;
+  --c-finplatform: #F0B850;
+  --c-passage:     #CE7A86;
+  --c-prompting:   #9DB58E;
+  --c-realestate:  #8FA8C6;
+  --c-research:    #74B6FF;
 
-  /* paper — a light surface reserved for the resume, used sparingly as relief
-     from the all-dark canvas rather than a second theme */
+  /* paper — the light surface. One rule governs it: dark is the machine,
+     paper is the person. Charts, diagrams, routers and ledgers stay on the
+     dark canvas, where light-on-dark strokes read as instruments. Paper shows
+     up where a human does: the origin story, the resume, the beach. It is an
+     object laid on the page, never a second theme and never a mid-section
+     flip, so the two surfaces can sit on one screen without arguing. */
   --cream:        #EFE6D3;
   --cream-raised: #E6DAC0;
   --cream-ink:    #2B2620;
+  --cream-ink-rgb: 43, 38, 32;
   --cream-muted:  #6B6152;
   --cream-accent: #8A5A16;
   --cream-accent-hi: #6E4610;
@@ -302,7 +317,7 @@ img { max-width: 100%; height: auto; display: block; }
   text-decoration: none;
   transition: border-color 0.2s ease, color 0.2s ease;
 }
-.chip-live { color: var(--ok); border-color: rgba(127, 176, 105, 0.4); }
+.chip-live { color: var(--ok); border-color: rgba(143, 193, 120, 0.4); }
 a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: var(--ok); }
 .chip-live::before {
   content: "";
@@ -318,8 +333,8 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   .chip-live::before { animation: chip-live-pulse 2.4s ease-in-out infinite; }
 }
 @keyframes chip-live-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(127, 176, 105, 0.55); }
-  50% { box-shadow: 0 0 0 4px rgba(127, 176, 105, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(143, 193, 120, 0.55); }
+  50% { box-shadow: 0 0 0 4px rgba(143, 193, 120, 0); }
 }
 .chip-soon { border-style: dashed; border-color: var(--line-strong); }
 
@@ -472,8 +487,8 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #58a6ff;
-  box-shadow: 0 0 8px 1px rgba(88, 166, 255, 0.55);
+  background: var(--c-research);
+  box-shadow: 0 0 8px 1px rgba(116, 182, 255, 0.55);
   margin-right: 8px;
   vertical-align: middle;
 }
@@ -579,7 +594,7 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
 .portrait:hover .frame,
 .portrait:focus-within .frame {
   border-top-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(227, 168, 59, 0.25), 0 18px 50px -28px rgba(227, 168, 59, 0.55);
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.25), 0 18px 50px -28px rgba(var(--accent-rgb), 0.55);
 }
 .portrait:hover .frame img,
 .portrait:focus-within .frame img { transform: scale(1.035); filter: saturate(1.06); }
@@ -905,19 +920,53 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   color: var(--ink-muted);
 }
 
-/* resume card — the one place the page turns to paper. A résumé is a printed
-   thing; the cream surface says so before the copy does. */
-.resume-section { padding: var(--s-6) 0; }
-.resume-card {
+/* ---- the paper surface ----------------------------------------------------
+   Everything that turns to paper does it through this one block. It rebinds
+   the same tokens the dark canvas uses, so anything inside — copy, rules,
+   chips, buttons and inline SVG — follows the surface without knowing which
+   surface it is on. --ink-rgb and --accent-rgb are rebound too, which is what
+   lets a line drawing re-ink itself instead of disappearing.
+   --shadow-rgb is left alone on purpose: paper on a dark page casts a dark
+   shadow, and that shadow is what makes it read as a separate sheet. */
+[data-surface="paper"] {
+  color-scheme: light;
   --bg: var(--cream);
   --bg-raised: var(--cream-raised);
+  --bg-inset: var(--cream-raised);
   --ink: var(--cream-ink);
   --ink-muted: var(--cream-muted);
   --accent: var(--cream-accent);
   --accent-hi: var(--cream-accent-hi);
-  --line: rgba(43, 38, 32, 0.22);
-  --line-soft: rgba(43, 38, 32, 0.12);
-  --line-strong: rgba(43, 38, 32, 0.34);
+  --line: rgba(var(--cream-ink-rgb), 0.22);
+  --line-soft: rgba(var(--cream-ink-rgb), 0.12);
+  --line-strong: rgba(var(--cream-ink-rgb), 0.34);
+  --ink-rgb: var(--cream-ink-rgb);
+  --accent-rgb: 138, 90, 22;
+  /* the project signals darken too, or they stop being signals on cream */
+  --c-finplatform: #8A5A16;
+  --c-passage:     #93414F;
+  --c-prompting:   #4F6B42;
+  --c-realestate:  #3F5C7D;
+  --c-research:    #1A5FB4;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* a paper band — full-bleed, so the surface change lands on a section edge
+   rather than inside one. The rules above and below are the fold. */
+.paper-band {
+  padding: var(--s-5) 0;
+  border-top: 1px solid rgba(var(--shadow-rgb), 0.55);
+  border-bottom: 1px solid rgba(var(--shadow-rgb), 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+              inset 0 14px 28px -22px rgba(var(--shadow-rgb), 0.45),
+              inset 0 -14px 28px -22px rgba(var(--shadow-rgb), 0.45);
+}
+
+/* resume card — a résumé is a printed thing, so it is paper, and it is the
+   object the surface rule was first written for. */
+.resume-section { padding: var(--s-6) 0; }
+.resume-card {
   display: flex;
   align-items: center;
   gap: var(--s-4);
@@ -925,12 +974,12 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
   color: var(--ink);
   border-radius: var(--radius);
   padding: var(--s-4);
-  box-shadow: 0 1px 2px rgba(14, 13, 11, 0.06), 0 14px 30px -18px rgba(14, 13, 11, 0.55);
+  box-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.06), 0 14px 30px -18px rgba(var(--shadow-rgb), 0.55);
   transition: box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .resume-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 1px 2px rgba(14, 13, 11, 0.08), 0 20px 36px -16px rgba(14, 13, 11, 0.6);
+  box-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.08), 0 20px 36px -16px rgba(var(--shadow-rgb), 0.6);
 }
 .resume-icon { flex-shrink: 0; line-height: 0; }
 .resume-meta { flex: 1; min-width: 0; }
@@ -1019,8 +1068,8 @@ a.chip-live:hover, a.chip-live:focus-visible { color: var(--ok); border-color: v
 .vg-sun { cursor: pointer; transition: transform 2.8s ease, fill 2.8s ease; }
 .vg-shimmer { opacity: 0.3; transition: stroke 2.8s ease; }
 .beach.sunset .vg-sky { opacity: 0.35; }
-.beach.sunset .vg-sun { transform: translateY(44px); fill: #B86370; animation: none; }
-.beach.sunset .vg-shimmer { stroke: #B86370; }
+.beach.sunset .vg-sun { transform: translateY(44px); fill: var(--c-passage); animation: none; }
+.beach.sunset .vg-shimmer { stroke: var(--c-passage); }
 
 /* hover — the laptop wakes up and a thought appears */
 .vg-bubble {

@@ -10,8 +10,8 @@
   <meta property="og:title" content="David Neish — Decision Systems" />
   <meta property="og:description" content="AI decision systems for finance, language, and research. The work speaks; come play." />
   <meta property="og:url" content="https://dneish2.github.io/" />
-  <meta name="theme-color" content="#0E0D0B" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E0D0B'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23E3A83B' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23E3A83B'/%3E%3C/svg%3E" />
+  <meta name="theme-color" content="#1A1815" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231A1815'/%3E%3Cpath d='M8 23 L16 10 L24 23' stroke='%23F0B850' stroke-width='2' fill='none'/%3E%3Ccircle cx='16' cy='10' r='3' fill='%23F0B850'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="assets/css/main.css" />
   <script>document.documentElement.classList.add('js');</script>
 </head>
@@ -51,7 +51,7 @@
   </section>
 
   <!-- ============================== ORIGIN ============================== -->
-  <section class="origin" id="about">
+  <section class="origin paper-band" id="about" data-surface="paper">
     <div class="container">
       <div class="origin-grid">
         <figure class="portrait" data-reveal>
@@ -187,43 +187,43 @@
           <figure class="diagram-panel" data-reveal>
             <svg viewBox="0 0 360 320" role="img" aria-label="finplatform request routing: a request with a model pick flows through the router to one of four model tiers; credits are metered per model">
               <!-- request -->
-              <rect x="10" y="130" width="92" height="56" rx="4" fill="none" stroke="rgba(237,232,222,0.35)"/>
-              <text x="56" y="152" text-anchor="middle" fill="#EDE8DE" font-family="Consolas,monospace" font-size="12">REQUEST</text>
-              <text x="56" y="170" text-anchor="middle" fill="#ACA599" font-family="Consolas,monospace" font-size="10.5">pick: sonnet</text>
+              <rect x="10" y="130" width="92" height="56" rx="4" fill="none" stroke="rgba(var(--ink-rgb), 0.35)"/>
+              <text x="56" y="152" text-anchor="middle" fill="var(--ink)" font-family="Consolas,monospace" font-size="12">REQUEST</text>
+              <text x="56" y="170" text-anchor="middle" fill="var(--ink-muted)" font-family="Consolas,monospace" font-size="10.5">pick: sonnet</text>
               <!-- router -->
-              <rect x="140" y="130" width="76" height="56" rx="4" fill="none" stroke="#E3A83B"/>
-              <text x="178" y="162" text-anchor="middle" fill="#E3A83B" font-family="Consolas,monospace" font-size="12">ROUTER</text>
+              <rect x="140" y="130" width="76" height="56" rx="4" fill="none" stroke="var(--proj-accent, var(--accent))"/>
+              <text x="178" y="162" text-anchor="middle" fill="var(--proj-accent, var(--accent))" font-family="Consolas,monospace" font-size="12">ROUTER</text>
               <!-- request -> router -->
-              <line x1="102" y1="158" x2="140" y2="158" stroke="#E3A83B" stroke-width="1.5"/>
+              <line x1="102" y1="158" x2="140" y2="158" stroke="var(--proj-accent, var(--accent))" stroke-width="1.5"/>
               <!-- tiers -->
               <g font-family="Consolas,monospace">
-                <rect x="254" y="28" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.34)"/>
-                <text x="302" y="46" text-anchor="middle" fill="#ACA599" font-size="11">T1 LOCAL</text>
-                <text x="302" y="61" text-anchor="middle" fill="#ACA599" font-size="10.5">ollama &middot; 1 cr</text>
+                <rect x="254" y="28" width="96" height="44" rx="4" fill="none" stroke="rgba(var(--ink-rgb), 0.34)"/>
+                <text x="302" y="46" text-anchor="middle" fill="var(--ink-muted)" font-size="11">T1 LOCAL</text>
+                <text x="302" y="61" text-anchor="middle" fill="var(--ink-muted)" font-size="10.5">ollama &middot; 1 cr</text>
 
-                <rect x="254" y="98" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.34)"/>
-                <text x="302" y="116" text-anchor="middle" fill="#ACA599" font-size="11">T2 MID</text>
-                <text x="302" y="131" text-anchor="middle" fill="#ACA599" font-size="10.5">haiku &middot; 2 cr</text>
+                <rect x="254" y="98" width="96" height="44" rx="4" fill="none" stroke="rgba(var(--ink-rgb), 0.34)"/>
+                <text x="302" y="116" text-anchor="middle" fill="var(--ink-muted)" font-size="11">T2 MID</text>
+                <text x="302" y="131" text-anchor="middle" fill="var(--ink-muted)" font-size="10.5">haiku &middot; 2 cr</text>
 
-                <rect x="254" y="168" width="96" height="44" rx="4" fill="none" stroke="#E3A83B"/>
-                <text x="302" y="186" text-anchor="middle" fill="#E3A83B" font-size="11">T3 LARGE</text>
-                <text x="302" y="201" text-anchor="middle" fill="#E3A83B" font-size="10.5">sonnet &middot; 5 cr</text>
+                <rect x="254" y="168" width="96" height="44" rx="4" fill="none" stroke="var(--proj-accent, var(--accent))"/>
+                <text x="302" y="186" text-anchor="middle" fill="var(--proj-accent, var(--accent))" font-size="11">T3 LARGE</text>
+                <text x="302" y="201" text-anchor="middle" fill="var(--proj-accent, var(--accent))" font-size="10.5">sonnet &middot; 5 cr</text>
 
-                <rect x="254" y="238" width="96" height="44" rx="4" fill="none" stroke="rgba(237,232,222,0.34)"/>
-                <text x="302" y="256" text-anchor="middle" fill="#ACA599" font-size="11">T3 DEEP</text>
-                <text x="302" y="271" text-anchor="middle" fill="#ACA599" font-size="10.5">research &middot; 10 cr</text>
+                <rect x="254" y="238" width="96" height="44" rx="4" fill="none" stroke="rgba(var(--ink-rgb), 0.34)"/>
+                <text x="302" y="256" text-anchor="middle" fill="var(--ink-muted)" font-size="11">T3 DEEP</text>
+                <text x="302" y="271" text-anchor="middle" fill="var(--ink-muted)" font-size="10.5">research &middot; 10 cr</text>
               </g>
               <!-- router -> tiers -->
-              <line x1="216" y1="146" x2="254" y2="50"  stroke="rgba(237,232,222,0.30)"/>
-              <line x1="216" y1="152" x2="254" y2="120" stroke="rgba(237,232,222,0.30)"/>
-              <line x1="216" y1="164" x2="254" y2="190" stroke="#E3A83B" stroke-width="1.5"/>
-              <line x1="216" y1="170" x2="254" y2="260" stroke="rgba(237,232,222,0.30)"/>
+              <line x1="216" y1="146" x2="254" y2="50"  stroke="rgba(var(--ink-rgb), 0.30)"/>
+              <line x1="216" y1="152" x2="254" y2="120" stroke="rgba(var(--ink-rgb), 0.30)"/>
+              <line x1="216" y1="164" x2="254" y2="190" stroke="var(--proj-accent, var(--accent))" stroke-width="1.5"/>
+              <line x1="216" y1="170" x2="254" y2="260" stroke="rgba(var(--ink-rgb), 0.30)"/>
               <!-- chosen node -->
-              <circle cx="254" cy="190" r="3" fill="#E3A83B"/>
+              <circle cx="254" cy="190" r="3" fill="var(--proj-accent, var(--accent))"/>
               <!-- traveling request dot (CSS offset-path) -->
-              <circle class="req-dot" cx="0" cy="0" r="3.5" fill="#F2C46A"/>
+              <circle class="req-dot" cx="0" cy="0" r="3.5" fill="var(--accent-hi)"/>
               <!-- footer note -->
-              <text x="180" y="312" text-anchor="middle" fill="#ACA599" font-family="Consolas,monospace" font-size="10.5">credits metered per model &middot; behavior evals on every answer</text>
+              <text x="180" y="312" text-anchor="middle" fill="var(--ink-muted)" font-family="Consolas,monospace" font-size="10.5">credits metered per model &middot; behavior evals on every answer</text>
             </svg>
             <figcaption>The request path. Your model pick is honored end-to-end.</figcaption>
           </figure>
@@ -271,35 +271,35 @@
         <figure class="diagram-panel" data-reveal style="margin-top: var(--s-3)">
           <svg viewBox="0 0 620 132" role="img" aria-label="Passage flow: text, a document, a photo or speech go in, an engine is chosen local first, the text is translated with URLs and figures masked in code, and the result comes back beside its source">
             <g font-family="Consolas,monospace" font-size="10.5">
-              <rect x="6" y="30" width="104" height="72" rx="5" fill="none" stroke="rgba(237,232,222,0.3)"/>
-              <text x="58" y="50" text-anchor="middle" fill="#EDE8DE" font-size="11">IN</text>
-              <text x="58" y="67" text-anchor="middle" fill="#ACA599">text &middot; document</text>
-              <text x="58" y="82" text-anchor="middle" fill="#ACA599">photo &middot; voice</text>
+              <rect x="6" y="30" width="104" height="72" rx="5" fill="none" stroke="rgba(var(--ink-rgb), 0.3)"/>
+              <text x="58" y="50" text-anchor="middle" fill="var(--ink)" font-size="11">IN</text>
+              <text x="58" y="67" text-anchor="middle" fill="var(--ink-muted)">text &middot; document</text>
+              <text x="58" y="82" text-anchor="middle" fill="var(--ink-muted)">photo &middot; voice</text>
 
-              <line x1="110" y1="66" x2="150" y2="66" stroke="#B86370" stroke-width="1.5"/>
-              <path d="M144 62 L150 66 L144 70" fill="none" stroke="#B86370" stroke-width="1.5"/>
+              <line x1="110" y1="66" x2="150" y2="66" stroke="var(--c-passage)" stroke-width="1.5"/>
+              <path d="M144 62 L150 66 L144 70" fill="none" stroke="var(--c-passage)" stroke-width="1.5"/>
 
-              <rect x="150" y="42" width="112" height="48" rx="5" fill="none" stroke="#B86370"/>
-              <text x="206" y="62" text-anchor="middle" fill="#B86370" font-size="11">ENGINE</text>
-              <text x="206" y="78" text-anchor="middle" fill="#ACA599">local first</text>
+              <rect x="150" y="42" width="112" height="48" rx="5" fill="none" stroke="var(--c-passage)"/>
+              <text x="206" y="62" text-anchor="middle" fill="var(--c-passage)" font-size="11">ENGINE</text>
+              <text x="206" y="78" text-anchor="middle" fill="var(--ink-muted)">local first</text>
 
-              <line x1="262" y1="66" x2="302" y2="66" stroke="#B86370" stroke-width="1.5"/>
-              <path d="M296 62 L302 66 L296 70" fill="none" stroke="#B86370" stroke-width="1.5"/>
+              <line x1="262" y1="66" x2="302" y2="66" stroke="var(--c-passage)" stroke-width="1.5"/>
+              <path d="M296 62 L302 66 L296 70" fill="none" stroke="var(--c-passage)" stroke-width="1.5"/>
 
-              <rect x="302" y="42" width="120" height="48" rx="5" fill="none" stroke="rgba(237,232,222,0.3)"/>
-              <text x="362" y="62" text-anchor="middle" fill="#EDE8DE" font-size="11">TRANSLATE</text>
-              <text x="362" y="78" text-anchor="middle" fill="#ACA599">urls and figures masked</text>
+              <rect x="302" y="42" width="120" height="48" rx="5" fill="none" stroke="rgba(var(--ink-rgb), 0.3)"/>
+              <text x="362" y="62" text-anchor="middle" fill="var(--ink)" font-size="11">TRANSLATE</text>
+              <text x="362" y="78" text-anchor="middle" fill="var(--ink-muted)">urls and figures masked</text>
 
-              <line x1="422" y1="66" x2="462" y2="66" stroke="#B86370" stroke-width="1.5"/>
-              <path d="M456 62 L462 66 L456 70" fill="none" stroke="#B86370" stroke-width="1.5"/>
+              <line x1="422" y1="66" x2="462" y2="66" stroke="var(--c-passage)" stroke-width="1.5"/>
+              <path d="M456 62 L462 66 L456 70" fill="none" stroke="var(--c-passage)" stroke-width="1.5"/>
 
-              <rect x="462" y="36" width="152" height="60" rx="5" fill="none" stroke="rgba(237,232,222,0.3)"/>
-              <text x="538" y="55" text-anchor="middle" fill="#EDE8DE" font-size="11">REVIEW</text>
-              <line x1="538" y1="63" x2="538" y2="88" stroke="rgba(237,232,222,0.22)"/>
-              <text x="500" y="79" text-anchor="middle" fill="#ACA599">source</text>
-              <text x="577" y="79" text-anchor="middle" fill="#ACA599">translation</text>
+              <rect x="462" y="36" width="152" height="60" rx="5" fill="none" stroke="rgba(var(--ink-rgb), 0.3)"/>
+              <text x="538" y="55" text-anchor="middle" fill="var(--ink)" font-size="11">REVIEW</text>
+              <line x1="538" y1="63" x2="538" y2="88" stroke="rgba(var(--ink-rgb), 0.22)"/>
+              <text x="500" y="79" text-anchor="middle" fill="var(--ink-muted)">source</text>
+              <text x="577" y="79" text-anchor="middle" fill="var(--ink-muted)">translation</text>
 
-              <text x="310" y="122" text-anchor="middle" fill="#ACA599" font-size="9.5">every result names the engine that served it</text>
+              <text x="310" y="122" text-anchor="middle" fill="var(--ink-muted)" font-size="9.5">every result names the engine that served it</text>
             </g>
           </svg>
         </figure>
@@ -473,16 +473,16 @@
   <!-- ============================== RESUME ============================== -->
   <section class="resume-section" id="resume">
     <div class="container">
-      <div class="resume-card" data-reveal>
+      <div class="resume-card" data-surface="paper" data-reveal>
         <div class="resume-icon" aria-hidden="true">
           <svg viewBox="0 0 64 80" width="64" height="80">
-            <path d="M8 2h34l14 14v62H8z" fill="none" stroke="#8A5A16" stroke-width="2"/>
-            <path d="M42 2v14h14" fill="none" stroke="#8A5A16" stroke-width="2"/>
-            <line x1="16" y1="34" x2="48" y2="34" stroke="rgba(43,38,32,0.4)" stroke-width="2"/>
-            <line x1="16" y1="42" x2="48" y2="42" stroke="rgba(43,38,32,0.4)" stroke-width="2"/>
-            <line x1="16" y1="50" x2="40" y2="50" stroke="rgba(43,38,32,0.4)" stroke-width="2"/>
-            <line x1="16" y1="58" x2="44" y2="58" stroke="rgba(43,38,32,0.25)" stroke-width="2"/>
-            <line x1="16" y1="66" x2="36" y2="66" stroke="rgba(43,38,32,0.25)" stroke-width="2"/>
+            <path d="M8 2h34l14 14v62H8z" fill="none" stroke="var(--accent)" stroke-width="2"/>
+            <path d="M42 2v14h14" fill="none" stroke="var(--accent)" stroke-width="2"/>
+            <line x1="16" y1="34" x2="48" y2="34" stroke="rgba(var(--ink-rgb), 0.4)" stroke-width="2"/>
+            <line x1="16" y1="42" x2="48" y2="42" stroke="rgba(var(--ink-rgb), 0.4)" stroke-width="2"/>
+            <line x1="16" y1="50" x2="40" y2="50" stroke="rgba(var(--ink-rgb), 0.4)" stroke-width="2"/>
+            <line x1="16" y1="58" x2="44" y2="58" stroke="rgba(var(--ink-rgb), 0.25)" stroke-width="2"/>
+            <line x1="16" y1="66" x2="36" y2="66" stroke="rgba(var(--ink-rgb), 0.25)" stroke-width="2"/>
           </svg>
         </div>
         <div class="resume-meta">
@@ -499,46 +499,46 @@
   </section>
 
   <!-- ============================== VIGNETTE ============================== -->
-  <section class="vignette-section">
+  <section class="vignette-section paper-band" data-surface="paper">
     <div class="container">
       <figure class="vignette" data-reveal>
         <svg class="beach" viewBox="0 0 340 150" role="img" aria-label="Line drawing of David reclining on a beach chair with a laptop and a coconut drink, palm tree swaying, sun over the water. Click the sun for sunset.">
           <defs>
             <linearGradient id="vg-sunset-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#B86370" stop-opacity="0.05" />
-              <stop offset="1" stop-color="#E3A83B" stop-opacity="0.5" />
+              <stop offset="0" stop-color="var(--c-passage)" stop-opacity="0.05" />
+              <stop offset="1" stop-color="var(--proj-accent, var(--accent))" stop-opacity="0.5" />
             </linearGradient>
           </defs>
           <!-- sunset sky wash (revealed on sun click) -->
           <rect class="vg-sky" x="0" y="0" width="340" height="91" fill="url(#vg-sunset-grad)" />
           <!-- sun -->
-          <circle class="vg-sun" cx="272" cy="34" r="13" fill="#E3A83B">
+          <circle class="vg-sun" cx="272" cy="34" r="13" fill="var(--proj-accent, var(--accent))">
             <title>Click for sunset</title>
           </circle>
           <!-- horizon -->
-          <line x1="0" y1="92" x2="340" y2="92" stroke="rgba(237,232,222,0.34)" stroke-width="1" />
+          <line x1="0" y1="92" x2="340" y2="92" stroke="rgba(var(--ink-rgb), 0.34)" stroke-width="1" />
           <!-- sun reflection on the water -->
-          <path class="vg-shimmer" d="M262 98 h20 M266 105 h12 M269 111 h7" stroke="#E3A83B" stroke-width="1" stroke-linecap="round" fill="none" />
+          <path class="vg-shimmer" d="M262 98 h20 M266 105 h12 M269 111 h7" stroke="var(--proj-accent, var(--accent))" stroke-width="1" stroke-linecap="round" fill="none" />
           <!-- waves (wavelength 40px; drift loops one wavelength) -->
-          <path class="vg-wave vg-wave-a" d="M-40 102 q 10 -6 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="rgba(237,232,222,0.22)" stroke-width="1" />
-          <path class="vg-wave vg-wave-b" d="M-40 112 q 10 -4 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="rgba(237,232,222,0.12)" stroke-width="1" />
+          <path class="vg-wave vg-wave-a" d="M-40 102 q 10 -6 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="rgba(var(--ink-rgb), 0.30)" stroke-width="1" />
+          <path class="vg-wave vg-wave-b" d="M-40 112 q 10 -4 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="rgba(var(--ink-rgb), 0.20)" stroke-width="1" />
           <!-- sand -->
-          <path d="M0 150 L0 132 Q 170 122 340 132 L340 150 Z" fill="rgba(237,232,222,0.05)" />
+          <path d="M0 150 L0 132 Q 170 122 340 132 L340 150 Z" fill="rgba(var(--ink-rgb), 0.09)" />
           <!-- gulls -->
-          <path class="vg-gulls" d="M96 42 q 4 -4 8 0 q 4 -4 8 0 M126 32 q 3 -3 6 0 q 3 -3 6 0" fill="none" stroke="rgba(237,232,222,0.30)" stroke-width="1" stroke-linecap="round" />
+          <path class="vg-gulls" d="M96 42 q 4 -4 8 0 q 4 -4 8 0 M126 32 q 3 -3 6 0 q 3 -3 6 0" fill="none" stroke="rgba(var(--ink-rgb), 0.30)" stroke-width="1" stroke-linecap="round" />
           <!-- palm -->
-          <g class="vg-palm" fill="none" stroke="rgba(237,232,222,0.55)" stroke-width="1.5" stroke-linecap="round">
+          <g class="vg-palm" fill="none" stroke="rgba(var(--ink-rgb), 0.55)" stroke-width="1.5" stroke-linecap="round">
             <path d="M30 132 C 32 110 36 88 46 70" />
             <path d="M46 70 Q 30 58 14 62" />
             <path d="M46 70 Q 40 52 24 48" />
             <path d="M46 70 Q 56 50 70 46" />
             <path d="M46 70 Q 60 60 76 66" />
             <path d="M46 70 Q 36 74 24 82" />
-            <circle cx="43" cy="73" r="2.5" fill="rgba(237,232,222,0.35)" stroke="none" />
-            <circle cx="50" cy="74" r="2.5" fill="rgba(237,232,222,0.35)" stroke="none" />
+            <circle cx="43" cy="73" r="2.5" fill="rgba(var(--ink-rgb), 0.35)" stroke="none" />
+            <circle cx="50" cy="74" r="2.5" fill="rgba(var(--ink-rgb), 0.35)" stroke="none" />
           </g>
           <!-- chair + figure + laptop -->
-          <g fill="none" stroke="rgba(237,232,222,0.55)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <g fill="none" stroke="rgba(var(--ink-rgb), 0.55)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <!-- lounge chair -->
             <path d="M150 96 L168 114 L206 116" />
             <path d="M172 116 L172 130 M200 117 L200 130 M158 104 L154 130" />
@@ -553,18 +553,18 @@
             <path d="M186 103 L183 92 L177 94" />
           </g>
           <!-- laptop screen glow -->
-          <polygon class="vg-screen" points="183.5,93 186,103 178.5,104.5 177.5,94.5" fill="#E3A83B" />
+          <polygon class="vg-screen" points="183.5,93 186,103 178.5,104.5 177.5,94.5" fill="var(--proj-accent, var(--accent))" />
           <!-- thought bubble (appears on hover) -->
           <g class="vg-bubble">
-            <rect x="152" y="62" width="86" height="17" rx="8.5" fill="#171512" stroke="rgba(237,232,222,0.35)" stroke-width="1" />
-            <path d="M178 79 L174 87 L186 79" fill="#171512" stroke="rgba(237,232,222,0.35)" stroke-width="1" stroke-linejoin="round" />
-            <text x="195" y="73.5" text-anchor="middle" fill="#EDE8DE" font-family="Consolas,monospace" font-size="8">one more deploy.</text>
+            <rect x="152" y="62" width="86" height="17" rx="8.5" fill="var(--bg-raised)" stroke="rgba(var(--ink-rgb), 0.35)" stroke-width="1" />
+            <path d="M178 79 L174 87 L186 79" fill="var(--bg-raised)" stroke="rgba(var(--ink-rgb), 0.35)" stroke-width="1" stroke-linejoin="round" />
+            <text x="195" y="73.5" text-anchor="middle" fill="var(--ink)" font-family="Consolas,monospace" font-size="8">one more deploy.</text>
           </g>
           <!-- side table + coconut -->
-          <g fill="none" stroke="rgba(237,232,222,0.55)" stroke-width="1.5" stroke-linecap="round">
+          <g fill="none" stroke="rgba(var(--ink-rgb), 0.55)" stroke-width="1.5" stroke-linecap="round">
             <path d="M222 130 L222 118 M214 118 L230 118" />
             <circle cx="222" cy="111" r="6" />
-            <path d="M224 106 L230 96" stroke="#E3A83B" />
+            <path d="M224 106 L230 96" stroke="var(--proj-accent, var(--accent))" />
           </g>
         </svg>
         <figcaption>You can catch me on long walks with my wife, or playing with our two cats.</figcaption>

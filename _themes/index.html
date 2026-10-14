@@ -44,7 +44,7 @@
 <body>
 <header>
   <div class="bar">
-    <div class="brand">Theme preview <span>&middot; nothing here ships</span></div>
+    <div class="brand">Theme preview <span>&middot; Lifted has shipped; the rest are experiments</span></div>
 
     <fieldset id="themes"><legend>Look</legend></fieldset>
     <fieldset id="pages"><legend>Page</legend></fieldset>
@@ -57,16 +57,14 @@
 // Each theme is a token override file next to this one. The preview injects it
 // into the real page, so what you are looking at is the actual site, not a mock.
 const THEMES = [
-  { id: 'current',   name: 'Current',   file: null,
-    blurb: 'What is live now. Canvas #0E0D0B. The numbers below are measured live, not quoted.' },
-  { id: 'lifted',    name: 'Lifted dark', file: 'lifted.css',
-    blurb: 'Still dark, but the canvas comes up off near-black and the muted ink and rules get stronger. Look at this one first: it tests whether the problem was the darkness or just the contrast.' },
+  { id: 'current',   name: 'Current (Lifted)', file: null,
+    blurb: 'What is live now. Canvas #1A1815, one canvas for every page, each page carrying its own accent. Paper shows up where a person does. The numbers below are measured live, not quoted.' },
   { id: 'atrium',    name: 'Atrium',    file: 'atrium.css',
-    blurb: 'Near-white and warm. The brightest option, and the most inviting. Amber stays bright enough to read as amber rather than brown.' },
+    blurb: 'Still here to experiment with, not shipped. Near-white and warm, the brightest option. Note that the diagrams and the beach now re-ink themselves, so a light canvas no longer erases them.' },
   { id: 'daylight',  name: 'Daylight',  file: 'daylight.css',
-    blurb: 'The resume palette promoted to the whole site. Nothing invented: these are the cream tokens already in main.css. The resume itself inverts to dark, so it stays a separate object on the page.' },
+    blurb: 'Still here to experiment with, not shipped. The paper palette promoted from an object to the whole canvas. The resume inverts to dark so it stays a separate thing.' },
   { id: 'blueprint', name: 'Blueprint', file: 'blueprint.css',
-    blurb: 'Light and cool, blue carrying the structure and amber kept as the single signal. The two colours split the work: blue says this is the system, amber says look here.' }
+    blurb: 'Still here to experiment with, not shipped. Light and cool. Worth comparing against Research Digest as it ships now, where blue is the accent rather than the canvas.' }
 ];
 
 const PAGES = [
