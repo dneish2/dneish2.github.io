@@ -72,7 +72,7 @@
       </header>
 
       <div class="aside" data-reveal style="--i:1">
-        <b>30-second version.</b> A deep research note costs $0.019 measured: one search, one Sonnet call, twelve seconds. A morning brief costs under a cent. Search is hard capped at $7.92 a month. Every number below shows the file or the arithmetic behind it.
+        A deep research note costs $0.019 measured: one search, one Sonnet call, twelve seconds. A morning brief costs under a cent. Search is hard capped at $7.92 a month. Every number below shows the file or the arithmetic behind it.
       </div>
 
       <div class="req" data-reveal>GET /api/research?t=MU&amp;depth=deep</div>
@@ -108,7 +108,7 @@
         <p class="dek">Desk work splits into tasks, tasks take time, and time on a desk has a rate. Every row here shows its arithmetic.</p>
       </header>
 
-      <p data-reveal>The human column is an estimate, built the same way every time. Take a public base-comp band, load it 1.35x for what a seat costs beyond salary, and divide by a 2,600-hour desk year.</p>
+      <p data-reveal>The human price is an estimate. Take a public salary range, add 35% for what a seat costs beyond pay, and divide by the hours a desk works in a year.</p>
 
       <div class="deriv" data-reveal style="--i:1">
         <div class="row"><span>base comp band, equity research associate</span><span>$130k to $160k</span></div>
@@ -118,11 +118,11 @@
         <div class="row out"><span>fully loaded hourly</span><span>$68 to $83</span></div>
       </div>
 
-      <p data-reveal style="--i:2">Run that for every seat and you get the desk&rsquo;s rate card. The ledger below prices work against five of them; the sixth is the seat that reads what the desk produces rather than producing it. Midpoints throughout, so the table stays readable.</p>
+      <p data-reveal style="--i:2">Do that for each role on a research desk and you get an hourly rate per role. The table below prices each task at the rate of the role that would normally do it, using the middle of each range. The sixth role reads the desk&rsquo;s work instead of producing it, so no task is priced against it.</p>
 
       <div class="seat-rates" id="seatRates" data-reveal style="--i:3"></div>
 
-      <p data-reveal style="--i:4">The machine column is measured. Each row charges fixed credits set by the model that actually ran, so the price tracks real cost, not a flat guess.</p>
+      <p data-reveal style="--i:4">The machine price is measured. Each task costs a fixed number of credits, set by the model that actually ran it.</p>
 
       <div class="tl-scroll" data-reveal style="--i:5">
         <table class="tl">
@@ -142,7 +142,7 @@
       </div>
 
       <div class="aside" data-reveal>
-        <b>Two rows cost nothing, and they are not the boring ones.</b> Classifying whether a name is even publicly traded, and grading how a trade was exited, are both real work done with no model at all. A deterministic action is the only genuinely free thing on this list. Everything else, including the local model, draws a credit, because the local model is not free to the platform either.
+        <b>Two tasks are free.</b> Checking whether a company is publicly traded, and grading how a trade was closed, are real work done by plain code with no model. Everything else costs credits, including the local model, because running it isn&rsquo;t free for the platform either.
       </div>
 
       <figure class="demo-reel" data-reveal style="--proj-accent: var(--c-finplatform)">
